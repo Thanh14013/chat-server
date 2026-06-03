@@ -77,10 +77,10 @@ vcs-securechat/
 ```
 TuiManager class:
   Fields:
-    - chat_win    : WINDOW*   (vùng hiển thị tin nhắn)
-    - input_win   : WINDOW*   (thanh nhập liệu)
-    - sidebar_win : WINDOW*   (danh sách user + rooms)
-    - header_win  : WINDOW*   (status bar)
+    - chat_win    : std::unique_ptr<WINDOW, decltype(&delwin)> (vùng hiển thị tin nhắn, quản lý chuẩn RAII)
+    - input_win   : std::unique_ptr<WINDOW, decltype(&delwin)> (thanh nhập liệu)
+    - sidebar_win : std::unique_ptr<WINDOW, decltype(&delwin)> (danh sách user + rooms)
+    - header_win  : std::unique_ptr<WINDOW, decltype(&delwin)> (status bar)
     - scroll_pos  : int       (vị trí scroll)
     - msg_history : deque<string> (tin nhắn đã hiển thị, max 500)
 
@@ -265,22 +265,26 @@ HistoryEntry struct:
 ChatHistory class:
   Fields:
     - ring_buffer : deque<HistoryEntry>  (max HISTORY_BUFFER_SIZE = 100)
-    - log_file    : ofstream             (logs/chat_history/room_YYYYMMDD.jsonl)
+    (Sử dụng server/utils/Database để lưu trữ lâu dài)
 
   Methods:
-    - append(entry)              : thêm vào ring buffer + flush vào file
-    - getRecent(n=50) → vector   : lấy N tin gần nhất
+    - append(entry)              : thêm vào ring buffer + INSERT vào bảng ChatHistory (SQLite)
+    - getRecent(n=50) → vector   : lấy N tin gần nhất từ ring_buffer hoặc từ SQLite
     - serializeForClient(entries) → Packet : đóng gói lịch sử gửi cho client mới
-    - rotateLog()                : tạo file mới khi sang ngày mới
+    - cleanupOldHistory()        : tự động xoá tin nhắn quá 30 ngày trong db
 
-  File format (JSONL — JSON Lines, mỗi dòng 1 entry):
-    {"ts":1700000001,"sender":"Alice","room":"general","msg":"Hello!","type":"CHAT"}
-    {"ts":1700000002,"sender":"","room":"general","msg":"Bob joined","type":"SYSTEM"}
+  Database Table (ChatHistory trong SQLite):
+    - id (INTEGER PRIMARY KEY AUTOINCREMENT)
+    - timestamp (INTEGER)
+    - sender (TEXT)
+    - room (TEXT)
+    - message (TEXT)
+    - msg_type (TEXT)
 
   Bảo mật:
-    - Log file có permission 600 (chỉ owner đọc được)
-    - Tự xoá log file cũ hơn 30 ngày
-    - Tên file không chứa thông tin nhạy cảm
+    - File db `vcs_chat.db` có permission 600 (chỉ owner đọc được)
+    - Tự động cleanup data cũ để tối ưu query
+    - Tên file/tables không rò rỉ dữ liệu nhạy cảm ra ngoài hệ thống
 ```
 
 ---
@@ -437,22 +441,22 @@ AuditEvent struct:
 
 AuditLogger class (singleton):
   Fields:
-    - log_file    : ofstream  (logs/audit/audit_YYYYMMDD.jsonl)
     - prev_hash   : string    (SHA256 của event cuối, khởi tạo = "GENESIS")
     - buffer      : deque<AuditEvent> (flush 100 events hoặc 5 phút 1 lần)
     - log_mutex   : mutex
+    (Sử dụng server/utils/Database để thao tác trực tiếp với bảng AuditLog)
 
   Methods:
     - log(event)             : thêm vào buffer, tính prev_hash chain
-    - flush()                : ghi buffer xuống file
-    - verifyChain(filepath)  : đọc file, kiểm tra chain toàn vẹn
-    - exportToCSV(filepath)  : xuất audit trail sang CSV cho compliance
+    - flush()                : INSERT buffer vào bảng AuditLog (SQLite)
+    - verifyChain()          : truy vấn bảng AuditLog theo thứ tự, kiểm tra chain toàn vẹn
+    - exportToCSV(filepath)  : xuất audit trail từ database sang CSV cho compliance
 
   Tamper-evident chain:
     event[0].hash = SHA256(event[0].data + "GENESIS")
     event[1].hash = SHA256(event[1].data + event[0].hash)
     event[n].hash = SHA256(event[n].data + event[n-1].hash)
-    → Nếu ai sửa event[k], tất cả hash từ k+1 trở đi sẽ sai
+    → Nếu ai trực tiếp sửa row `k` trong SQLite, tất cả hash từ `k+1` trở đi sẽ sai
     → verifyChain() phát hiện ngay
 
   Events được log:

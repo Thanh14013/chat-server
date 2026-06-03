@@ -8,8 +8,8 @@
 
 - [x] RSA-2048 key pair được sinh trên server lúc khởi động
 - [x] Handshake protocol: client ↔ server trao đổi key trước khi chat
-- [x] AES-256-CBC mã hoá toàn bộ payload sau handshake
-- [x] HMAC-SHA256 kiểm tra tính toàn vẹn từng packet
+- [x] AES-256-GCM mã hoá toàn bộ payload sau handshake (tích hợp AEAD kiểm tra toàn vẹn)
+- [x] HMAC-SHA256 chỉ sử dụng để ký JWT-style Session Token
 - [x] Nonce 16-byte chống replay attack
 - [x] Password được hash bằng PBKDF2 (không lưu plaintext)
 - [x] Session token JWT-style với expiry
@@ -42,15 +42,15 @@ Kết nối mới
      │
      ▼
 [6] CONNECT_REQUEST  ← gửi nickname + PBKDF2(password)
-                         payload được AES-encrypt
-                         + HMAC-SHA256 signature
+                         payload được AES-GCM encrypt
+                         + GCM Auth Tag (thay thế HMAC)
                          + sequence_num = 1
      │
      ▼
 [7] SESSION_TOKEN    ← server trả JWT-style token
      │
      ▼
-[Mọi packet tiếp theo đều: AES-encrypted + HMAC-signed + seq_num tăng dần]
+[Mọi packet tiếp theo đều: AES-GCM encrypted + GCM Auth Tag + seq_num tăng dần]
 ```
 
 ---
@@ -85,7 +85,7 @@ vcs-securechat/
 
 ### `crypto/aes.h / .cpp`
 
-**Mục đích:** Implement AES-256-CBC encryption/decryption wrapper trên OpenSSL
+**Mục đích:** Implement AES-256-GCM encryption/decryption wrapper trên OpenSSL (hỗ trợ AEAD)
 
 **Nội dung quan trọng:**
 ```
@@ -95,19 +95,19 @@ AES256CBC class:
     - iv[16]    : uint8_t (initialization vector — phải random, unique mỗi message)
 
   Methods:
-    - encrypt(plaintext)  → ciphertext : vector<uint8_t>
-    - decrypt(ciphertext) → plaintext  : vector<uint8_t>
+    - encrypt(plaintext, aad)  → {ciphertext, auth_tag_16_bytes}
+    - decrypt(ciphertext, auth_tag, aad) → plaintext
     - generateKey()       → key        : static helper
     - generateIV()        → iv         : static helper (dùng CSPRNG)
 
   Quan trọng:
     - IV KHÔNG được tái sử dụng — sinh mới cho từng message
     - IV được đính kèm ở đầu ciphertext (16 bytes đầu = IV)
-    - Dùng PKCS7 padding
+    - Không cần Padding (GCM là stream cipher)
     - Mỗi AES instance gắn với 1 client session
 ```
 
-**Lý do chọn CBC:** Phổ biến, được kiểm chứng, dễ debug. Nếu muốn nâng cấp sau có thể đổi sang GCM (có AEAD).
+**Lý do chọn GCM:** Tuân thủ chuẩn AEAD, đảm bảo Encrypt-then-MAC (tránh hoàn toàn Padding Oracle Attack có thể gặp nếu tự implement CBC + MAC riêng rẽ).
 
 ---
 
@@ -136,7 +136,7 @@ RSA2048 class:
 
 ### `crypto/hmac.h / .cpp`
 
-**Mục đích:** HMAC-SHA256 để xác minh tính toàn vẹn của packet
+**Mục đích:** HMAC-SHA256 được sử dụng riêng để xác minh tính toàn vẹn của JWT-style Session Token (không dùng cho packet)
 
 **Nội dung quan trọng:**
 ```
@@ -145,11 +145,9 @@ HMACSHA256 class:
     - compute(data, key) → signature : vector<uint8_t> 32 bytes
     - verify(data, key, sig) → bool  : constant-time comparison (tránh timing attack)
 
-  Cách dùng trong packet:
-    - HMAC key = AES session key (dùng chung)
-    - Input  = packet_header_bytes + encrypted_payload
-    - Output = 32-byte signature, appended sau payload
-    - Packet format: [header 15B] [encrypted_payload] [hmac 32B]
+  Cách dùng:
+    - Không còn dùng cho packet (packet đã chuyển sang dùng AEAD của AES-256-GCM).
+    - HMAC chỉ dùng để ký Token JWT bằng server_secret_key.
 
   Lưu ý:
     - PHẢI dùng constant-time comparison — không dùng memcmp() thông thường
@@ -176,7 +174,8 @@ SHA256 class:
   Lưu ý:
     - Không hash password thuần SHA256 — phải PBKDF2 với salt
     - 100.000 iterations là khuyến nghị NIST 2023
-    - Salt phải unique per user, lưu cùng hash trong "database" (file)
+    - Salt phải unique per user, lưu cùng hash trong database
+    - TRỌNG YẾU: Bắt buộc dùng `OPENSSL_cleanse` hoặc `memset_s` để xoá sạch plaintext password khỏi RAM sau khi băm, chống memory dump.
 ```
 
 ---
@@ -210,7 +209,7 @@ CSPRNG class (singleton):
 CryptoEngine class (singleton):
   Fields:
     - rsa_keypair : RSA2048          (sinh một lần lúc start)
-    - session_keys: map<fd, AES256CBC> (mỗi client có key riêng)
+    - session_keys: map<fd, AES256GCM> (mỗi client có key riêng)
 
   Methods:
     - initialize()                   : sinh RSA key pair
@@ -218,10 +217,8 @@ CryptoEngine class (singleton):
     - establishSession(fd, encrypted_key_bytes) → bool
         + decrypt AES session key bằng RSA private key
         + lưu vào session_keys[fd]
-    - encryptPayload(fd, data) → bytes
-    - decryptPayload(fd, data) → bytes
-    - computeHMAC(fd, data) → bytes
-    - verifyHMAC(fd, data, sig) → bool
+    - encryptPayload(fd, plaintext) → {ciphertext, auth_tag}
+    - decryptPayload(fd, ciphertext, auth_tag) → plaintext
     - removeSession(fd)              : gọi khi client disconnect
 
   Thread safety:
@@ -282,30 +279,30 @@ UserRecord struct:
 
 AuthManager class:
   Fields:
-    - users_db : map<nickname, UserRecord>  (load từ users.json lúc start)
     - active_sessions : map<token, fd>
+    (Sử dụng server/utils/Database để thao tác trực tiếp với SQLite, không giữ in-memory db lớn)
 
   Methods:
     - registerUser(nickname, password) → ErrorCode
         + validate nickname (regex: [a-zA-Z0-9_]{3,32})
-        + check duplicate
-        + PBKDF2 hash password với random salt
-        + lưu vào users_db
-    - authenticate(nickname, password_hash) → {token, ErrorCode}
+        + query SQLite kiểm tra duplicate
+        + PBKDF2 hash password với random salt (ngay sau đó xoá plain password bằng `OPENSSL_cleanse`)
+        + INSERT vào bảng Users trong SQLite
+    - authenticate(nickname, password) → {token, ErrorCode}
+        + query SQLite lấy thông tin UserRecord
         + check failed_attempts → ERR_AUTH_TOO_MANY_ATTEMPTS nếu ≥ 5
-        + verify PBKDF2 hash
+        + verify PBKDF2 hash (đồng thời xoá plain password bằng `OPENSSL_cleanse`)
         + sinh session token
-        + update last_login
+        + update last_login trong SQLite
     - validateToken(token) → {fd, valid}
     - revokeToken(token)
     - isNicknameTaken(nickname) → bool
     - getUserRole(nickname) → Role
-    - persistUsers()                         : ghi users.json (encrypt nếu có thể)
 
   Bảo mật:
     - Sau 5 lần fail → lock account 15 phút
     - Password hash không bao giờ log ra
-    - users.json không lưu plaintext password
+    - Database SQLite không lưu plaintext password, chỉ lưu salt + PBKDF2 hash
 ```
 
 ---
@@ -426,13 +423,13 @@ Packet on-wire format:
 │  AES IV cho message này — RANDOM mỗi lần            │
 ├─────────────────────────────────────────────────────┤
 │  ENCRYPTED PAYLOAD (variable)                       │
-│  AES-256-CBC( plaintext_data )                      │
+│  AES-256-GCM( plaintext_data )                      │
 ├─────────────────────────────────────────────────────┤
-│  HMAC SIGNATURE (32 bytes)                          │
-│  HMAC-SHA256( header || iv || encrypted_payload )   │
+│  GCM AUTH TAG (16 bytes)                            │
+│  Tạo bởi AES-GCM (thay thế hoàn toàn HMAC)          │
 └─────────────────────────────────────────────────────┘
 
-Total overhead per packet: 15 + 16 + 32 = 63 bytes
+Total overhead per packet: 15 + 16 + 16 = 47 bytes
 ```
 
 **Lý do IV plaintext:** IV không cần bí mật, chỉ cần unique. Đặt trước ciphertext là convention chuẩn.

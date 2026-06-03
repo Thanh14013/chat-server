@@ -470,8 +470,8 @@ valgrind --leak-check=full ./vcs_server
 # → 0 definitely lost, 0 indirectly lost
 
 # Kiểm tra audit log integrity
-./vcs_server --verify-audit-log logs/audit/audit_$(date +%Y%m%d).jsonl
-# → "Audit chain verified: 1,247 events, all valid"
+./vcs_server --verify-audit-log
+# → "Audit chain verified: 1,247 events from database, all valid"
 
 # Demo Wireshark: không thấy plaintext sau handshake
 tcpdump -i lo -X port 9000 | grep -E "(Alice|Bob|Hello)" 

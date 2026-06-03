@@ -1,6 +1,6 @@
 # Tuần 1 — Core Foundation
 
-> **Mục tiêu tuần 1:** Dựng khung hệ thống hoàn chỉnh. Cuối tuần phải có server nhận nhiều kết nối đồng thời và client gửi/nhận tin nhắn qua terminal.
+> **Mục tiêu tuần 1:** Dựng khung hệ thống hoàn chỉnh. Cuối tuần phải có server nhận nhiều kết nối đồng thời, tích hợp database SQLite và client gửi/nhận tin nhắn qua terminal.
 
 ---
 
@@ -14,6 +14,7 @@
 - [x] Thông báo join/leave toàn phòng
 - [x] Graceful shutdown: server nhận SIGINT, đóng sạch tất cả socket
 - [x] Config file JSON: port, max clients, thread pool size
+- [x] Khởi tạo database SQLite (`vcs_chat.db`) sẵn sàng cho lưu trữ
 
 ---
 
@@ -34,9 +35,14 @@ vcs-securechat/
 │   │   ├── ThreadPool.h / .cpp
 │   │   ├── ClientSession.h / .cpp
 │   │   └── EventLoop.h / .cpp
+│   ├── protocol/
+│   │   ├── Packet.h / .cpp
+│   │   ├── Parser.h / .cpp
+│   │   └── Builder.h / .cpp
 │   └── utils/
 │       ├── Logger.h / .cpp
-│       └── Config.h / .cpp
+│       ├── Config.h / .cpp
+│       └── Database.h / .cpp
 └── client/
     ├── main.cpp
     └── core/
@@ -209,7 +215,7 @@ ERR_INTERNAL              = 0xFF
 - Lưu `std::unordered_map<int, ClientSession*>` — fd → session
 - `shutdown()` method: đóng listening socket, gửi MSG_SYSTEM_NOTIFY "server shutting down" cho tất cả client, join tất cả threads
 - Xử lý SIGINT/SIGTERM: register signal handler gọi `shutdown()`
-- Giới hạn MAX_CLIENTS: nếu vượt → gửi ERR_SERVER_FULL rồi close socket ngay
+- Giới hạn MAX_CLIENTS: Cần kiểm tra số lượng active connections ngay tại hàm `accept()`. Nếu hệ thống đã đạt MAX_CLIENTS, phải ngắt kết nối ngay (trả `ERR_SERVER_FULL` nếu kịp) để tránh cạn kiệt File Descriptor của hệ điều hành trước khi đưa vào Thread Pool.
 
 ---
 
@@ -316,16 +322,28 @@ Methods:
 
 ---
 
-### `server/protocol/Packet.h / .cpp`
+### `server/protocol/Packet.h / .cpp`, `Parser.h / .cpp`, `Builder.h / .cpp`
 
 **Mục đích:** Serialize/deserialize packet theo binary format đã định nghĩa ở `Protocol.h`
 
 **Nội dung quan trọng:**
-- `toBytes()`: chuyển Packet thành `std::vector<uint8_t>` để gửi qua socket
-- `fromBytes()`: parse bytes nhận từ socket thành Packet, validate magic bytes, version
-- `validateChecksum()`: tính CRC32 payload, so sánh với header.checksum
+- `Packet`: Cấu trúc dữ liệu chứa header và payload
+- `Builder::toBytes(Packet)`: chuyển Packet thành `std::vector<uint8_t>` để gửi qua socket
+- `Parser::fromBytes(bytes)`: parse bytes nhận từ socket thành Packet, validate magic bytes, version
 - Xử lý partial read: dùng length-prefix — đọc đủ 15 bytes header trước, rồi đọc đúng `payload_length` bytes
 - `isValid()`: kiểm tra magic bytes + version + checksum
+
+---
+
+### `server/utils/Database.h / .cpp`
+
+**Mục đích:** Quản lý kết nối tới SQLite database dùng chung trong hệ thống
+
+**Nội dung quan trọng:**
+- Wrapper xung quanh `sqlite3*` connection
+- Tự động tạo các bảng nếu chưa có (Users, ChatHistory, AuditLog)
+- Cung cấp thread-safe queries (sử dụng mutex để serialize write hoặc dùng WAL mode)
+- Dùng cho tuần sau khi triển khai Auth và ChatHistory
 
 ---
 
