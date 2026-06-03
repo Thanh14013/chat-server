@@ -89,7 +89,7 @@ vcs-securechat/
 
 **Nội dung quan trọng:**
 ```
-AES256CBC class:
+AES256GCM class:
   Fields:
     - key[32]   : uint8_t (256-bit key)
     - iv[16]    : uint8_t (initialization vector — phải random, unique mỗi message)

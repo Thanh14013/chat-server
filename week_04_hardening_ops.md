@@ -9,7 +9,6 @@
 - [x] Rate limiter với Token Bucket Algorithm
 - [x] Intrusion Detection System (IDS): phát hiện brute force, port scan, flood
 - [x] IP blacklist động: tự ban sau N lần vi phạm
-- [x] Tamper-proof audit log với chain hash (đã viết skeleton tuần 3)
 - [x] Memory safety: valgrind clean, không leak
 - [x] Load test: benchmark với 50-100 concurrent clients
 - [x] Threat Model document
@@ -268,7 +267,7 @@ Cấu trúc theo STRIDE model (Microsoft):
 
 4. Information Disclosure
    Threat: Nghe lén traffic (Wireshark, tcpdump)
-   Mitigation: AES-256-CBC encryption, key exchange qua RSA-2048
+   Mitigation: AES-256-GCM encryption, key exchange qua RSA-2048
 
 5. Denial of Service
    Threat: Flood server với kết nối / tin nhắn
@@ -302,9 +301,8 @@ Residual risks (thành thật với reviewer):
 ```
 Sections:
   1. Cryptographic Primitives
-     - Tại sao AES-256-CBC thay vì AES-128-GCM?
-       → 128-GCM mạnh hơn nhưng phức tạp hơn; 256-CBC đủ cho demo, dễ audit
-       → Future: migrate sang GCM để có AEAD (authenticate-then-encrypt tích hợp)
+     - Tại sao AES-256-GCM thay vì AES-256-CBC?
+       → GCM hỗ trợ AEAD, ngăn chặn Padding Oracle Attack, an toàn hơn nhiều so với tự implement CBC + HMAC.
      - Tại sao RSA-2048 thay vì ECDH/ECDSA?
        → Phổ biến hơn, dễ giải thích hơn trong interview
        → Future: ECDH P-256 cho Perfect Forward Secrecy
@@ -423,7 +421,6 @@ echo "[PASS/FAIL] Audit chain integrity"
 
 ## Future Improvements
   - Perfect Forward Secrecy (ECDH)
-  - AES-GCM thay AES-CBC
   - TLS 1.3 integration
   - Distributed server (multiple nodes)
   - End-to-end encryption (server không giải mã được)

@@ -45,9 +45,13 @@ vcs-securechat/
 │       └── Database.h / .cpp
 └── client/
     ├── main.cpp
-    └── core/
-        ├── TcpClient.h / .cpp
-        └── MessageQueue.h / .cpp
+    ├── core/
+    │   ├── TcpClient.h / .cpp
+    │   ├── MessageQueue.h / .cpp
+    │   └── ConnectionManager.h / .cpp
+    └── commands/
+        ├── CommandParser.h / .cpp
+        └── CommandHandler.h / .cpp
 ```
 
 ---
@@ -64,7 +68,7 @@ vcs-securechat/
 - Khai báo `cmake_minimum_required(VERSION 3.15)`
 - Hai target: `vcs_server` và `vcs_client`
 - Compile flags: `-std=c++17 -Wall -Wextra -O2`
-- Link: `pthread`, `ncurses`, `OpenSSL::SSL`, `OpenSSL::Crypto`
+- Link: `pthread`, `OpenSSL::SSL`, `OpenSSL::Crypto`
 - Include directories: `common/`, `crypto/`
 - Subdirectory: `server/`, `client/`, `tests/`
 
@@ -114,7 +118,7 @@ RATE_LIMIT_MSG_PER_SEC = 10
 MAGIC_BYTE_0          = 0xVC
 MAGIC_BYTE_1          = 0x53
 PROTOCOL_VERSION      = 1
-MAX_FILE_SIZE_MB      = 10
+MAX_FILE_SIZE_MB      = 3             // 3MB cho transfer 1 lần (không chunk)
 HISTORY_BUFFER_SIZE   = 100         // 100 tin nhắn gần nhất
 AUTH_MAX_ATTEMPTS     = 5           // chống brute force — tuần 4
 NONCE_SIZE            = 16          // bytes, cho replay prevention
@@ -163,7 +167,7 @@ Nhóm File (tuần 3):
   MSG_FILE_REQUEST        = 0x50
   MSG_FILE_ACCEPT         = 0x51
   MSG_FILE_REJECT         = 0x52
-  MSG_FILE_CHUNK          = 0x53
+  MSG_FILE_DATA           = 0x53
   MSG_FILE_COMPLETE       = 0x54
 
 Nhóm Admin (tuần 3):
@@ -363,7 +367,7 @@ Methods:
 
 ### `client/core/MessageQueue.h / .cpp`
 
-**Mục đích:** Thread-safe queue trung gian giữa receive thread và UI thread
+**Mục đích:** Thread-safe queue trung gian giữa receive thread và main thread
 
 **Nội dung quan trọng:**
 - `push(Packet)`: thêm packet vào queue (gọi từ receive thread)

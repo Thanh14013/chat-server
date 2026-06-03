@@ -9,7 +9,7 @@ VCS SecureChat
 ├── Transport Layer   — TCP socket, custom binary protocol, TLS-like handshake
 ├── Crypto Layer      — OpenSSL (AES-256-GCM, RSA-2048, HMAC-SHA256)
 ├── Auth Layer        — Session tokens, bcrypt/PBKDF2, privilege separation
-├── Application Layer — Multi-room chat, file transfer, TUI, admin system
+├── Application Layer — Multi-room chat, file transfer, admin system
 └── Audit & Ops Layer — Logging, rate limiting, basic IDS
 
 
@@ -21,7 +21,7 @@ VCS SecureChat
 |------|--------------------------|--------------------------------------------------------|--------------------------------------------|
 | 1    | **Core Foundation**      | Socket server, thread pool, binary protocol, SQLite    | Server + Client chat 1-1 cơ bản            |
 | 2    | **Security Core**        | OpenSSL crypto, RSA handshake, HMAC, Auth + Session    | Mọi kết nối được mã hóa end-to-end         |
-| 3    | **Advanced Features**    | Multi-room, TUI, file transfer, chat history           | UX hoàn chỉnh, lưu trữ bền vững            |
+| 3    | **Advanced Features**    | Multi-room, terminal thuần, file transfer, chat history| Trải nghiệm chat hoàn chỉnh, lưu trữ bền vững |
 | 4    | **Hardening & Polish**   | Rate limit, audit log, admin, benchmark, docs          | Production-ready + tài liệu đầy đủ         |
 
 ---
@@ -46,7 +46,6 @@ vcs-securechat/
 │   ├── main.cpp
 │   ├── core/           (TcpClient, ConnectionManager, MessageQueue)
 │   ├── security/       (ClientCrypto, CertVerifier)
-│   ├── ui/             (TuiManager, ChatWindow, InputHandler, Notifier)
 │   └── commands/       (CommandParser, CommandHandler)
 │
 ├── common/
@@ -83,7 +82,6 @@ vcs-securechat/
 | Thư viện           | Mục đích                              | Bắt buộc |
 |--------------------|---------------------------------------|----------|
 | `OpenSSL`          | AES-GCM, RSA, HMAC, SHA256, random    | ✅        |
-| `ncurses`          | Terminal UI cho client                | ✅        |
 | `pthread`          | Threading                             | ✅        |
 | `SQLite3`          | Chat history & user database          | ✅        |
 | `nlohmann/json`    | Config, audit log                     | ✅        |

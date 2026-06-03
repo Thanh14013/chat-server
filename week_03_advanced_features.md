@@ -1,21 +1,18 @@
 # Tuần 3 — Advanced Features
 
-> **Mục tiêu tuần 3:** Nâng cấp từ "demo chat" lên "production-like system" với multi-room, TUI đẹp, file transfer có bảo mật, admin system, và chat history persistence.
+> **Mục tiêu tuần 3:** Nâng cấp từ "demo chat" lên "production-like system" với multi-room, giao diện dòng lệnh (CLI), file transfer có bảo mật, admin system, và chat history persistence.
 
 ---
 
 ## Checklist cuối tuần 3
 
-- [x] ncurses TUI: chia màn hình chat / input area / sidebar user list
+- [x] Giao diện dòng lệnh (CLI): sử dụng 2 luồng độc lập đọc stdin và in stdout
 - [x] Multi-room: `/join`, `/leave`, `/rooms`, `/create`
 - [x] Chat history: 100 tin nhắn gần nhất lưu xuống file, gửi cho client mới join
 - [x] File transfer: `/send <user> <file>` với AES-encrypt + SHA256 checksum
 - [x] Private message: `/msg <user> <text>`
 - [x] Admin system: `/kick`, `/mute`, `/ban`, `/promote`
 - [x] Message filtering: chặn nội dung độc hại, SQL injection attempt
-- [x] Typing indicator: hiển thị "Alice is typing..."
-- [x] Read receipt: server xác nhận đã nhận message
-- [x] Online presence: trạng thái ONLINE / AWAY / BUSY
 
 ---
 
@@ -33,11 +30,8 @@ vcs-securechat/
 │       ├── AdminCommands.h / .cpp
 │       └── MessageFilter.h / .cpp
 └── client/
-    ├── ui/                          ← MỚI (thay thế simple stdin/stdout)
-    │   ├── TuiManager.h / .cpp
-    │   ├── ChatWindow.h / .cpp
-    │   ├── InputHandler.h / .cpp
-    │   └── Notifier.h / .cpp
+    ├── core/                        ← CẬP NHẬT
+    │   └── ConnectionManager.h / .cpp
     └── commands/                    ← MỚI
         ├── CommandParser.h / .cpp
         └── CommandHandler.h / .cpp
@@ -49,93 +43,27 @@ vcs-securechat/
 
 ---
 
-### `client/ui/TuiManager.h / .cpp`
+### `client/core/ConnectionManager.h / .cpp`
 
-**Mục đích:** Quản lý toàn bộ giao diện ncurses — khởi tạo, vẽ, cleanup
-
-**Layout màn hình:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│  VCS SecureChat v1.0  │ Room: #general │ [🔒 Encrypted]     │  ← HEADER (1 line)
-├──────────────────────────────────────────┬──────────────────┤
-│                                          │  Online (3)      │
-│  [10:32] Alice: Hello everyone!          │  ● Alice         │
-│  [10:33] Bob: Hey Alice!                 │  ● Bob           │
-│  [10:33] *** Charlie joined #general     │  ● Charlie       │  ← CHAT AREA
-│  [10:34] Charlie: Hi all!                │                  │  (LINES-6 rows)
-│  [10:35] Bob is typing...                │  ─────────────   │
-│                                          │  Rooms (2)       │
-│                                          │  # general       │
-│                                          │  # random        │
-├──────────────────────────────────────────┴──────────────────┤
-│  #general > _                                               │  ← INPUT BAR (3 lines)
-│  /help for commands                                         │
-└─────────────────────────────────────────────────────────────┘
-```
+**Mục đích:** Quản lý vòng đời kết nối và điều phối 2 luồng (threads) chính cho CLI client.
 
 **Nội dung quan trọng:**
 ```
-TuiManager class:
+ConnectionManager class:
   Fields:
-    - chat_win    : std::unique_ptr<WINDOW, decltype(&delwin)> (vùng hiển thị tin nhắn, quản lý chuẩn RAII)
-    - input_win   : std::unique_ptr<WINDOW, decltype(&delwin)> (thanh nhập liệu)
-    - sidebar_win : std::unique_ptr<WINDOW, decltype(&delwin)> (danh sách user + rooms)
-    - header_win  : std::unique_ptr<WINDOW, decltype(&delwin)> (status bar)
-    - scroll_pos  : int       (vị trí scroll)
-    - msg_history : deque<string> (tin nhắn đã hiển thị, max 500)
+    - tcp_client : TcpClient
+    - cmd_handler: CommandHandler
+    - running    : bool
 
   Methods:
-    - initialize()           : initscr(), cbreak(), noecho(), keypad()
-    - createWindows()        : tính toán kích thước terminal, tạo 4 windows
-    - refresh()              : vẽ lại tất cả windows
-    - addMessage(msg)        : thêm tin nhắn vào chat_win, auto-scroll
-    - getInput() → string    : đọc input từ user (xử lý backspace, arrow keys)
-    - updateSidebar(users, rooms) : vẽ lại sidebar
-    - updateHeader(room, encrypted) : cập nhật status bar
-    - showNotification(text) : flash notification 2 giây
-    - onResize()             : xử lý SIGWINCH — terminal resize
-    - cleanup()              : endwin()
-
-  Color pairs (ncurses):
-    - PAIR 1: Timestamp (cyan)
-    - PAIR 2: Nickname (green for others, bold white for self)
-    - PAIR 3: System message (yellow)
-    - PAIR 4: Private message (magenta)
-    - PAIR 5: Admin action (red)
-    - PAIR 6: Header bar (blue background)
-    - PAIR 7: Error (red bold)
-    - PAIR 8: Encrypted indicator (green bold)
-```
-
----
-
-### `client/ui/InputHandler.h / .cpp`
-
-**Mục đích:** Xử lý keyboard input với lịch sử lệnh và autocomplete nickname
-
-**Nội dung quan trọng:**
-```
-InputHandler class:
-  Features:
-    - Command history: mũi tên ↑↓ xem lại lệnh đã gõ (max 50)
-    - Tab completion: gõ /k[Tab] → /kick, hoặc gõ Al[Tab] → Alice
-    - Ctrl+C: confirm quit (hỏi "Really quit? [y/n]")
-    - Ctrl+L: clear chat window
-    - PgUp/PgDn: scroll chat history
-    - Ctrl+P/N: điều hướng giữa các rooms
-
-  InputBuffer:
-    - current_input : string
-    - cursor_pos    : int      (cho insert mode)
-    - history       : deque<string>
-    - history_idx   : int
-
-  Methods:
-    - processKey(int ch) → {SUBMIT, CONTINUE, QUIT, SCROLL_UP, SCROLL_DOWN}
-    - getBuffer() → string
-    - clearBuffer()
-    - addToHistory(cmd)
-    - autoComplete()         : hoàn thành lệnh hoặc nickname
+    - start() : Khởi chạy 2 luồng độc lập
+    - inputThread() : Đọc liên tục từ stdin (std::getline).
+        + Nếu là lệnh (bắt đầu bằng '/'), đưa cho CommandHandler xử lý.
+        + Nếu là tin nhắn thường, đóng gói thành Packet và gửi qua tcp_client.
+    - receiveThread() : Nhận Packet từ server.
+        + In ra stdout theo định dạng rõ ràng (ví dụ: `[10:33] [#general] Alice: Hello`).
+        + Hỗ trợ hiển thị riêng biệt tin nhắn hệ thống, tin nhắn admin, private message.
+    - stop() : Dừng các luồng an toàn.
 ```
 
 ---
@@ -156,9 +84,6 @@ Tất cả lệnh được hỗ trợ:
   /create #room_name          → tạo room mới (explicit)
   /msg <nickname> <text>      → tin nhắn riêng
   /send <nickname> <filepath> → gửi file
-  /away [message]             → set trạng thái AWAY
-  /back                       → set trạng thái ONLINE
-  /busy [message]             → set trạng thái BUSY
   /whois <nickname>           → xem info của user
   /help [command]             → hiển thị help
 
@@ -302,8 +227,6 @@ FileTransferSession struct:
   - filename     : string
   - file_size    : uint64_t
   - sha256_hash  : string           (hash trước khi gửi, dùng để verify)
-  - chunks_total : int
-  - chunks_recv  : int
   - temp_path    : string           (server lưu tạm file đang nhận)
   - start_time   : time_t
   - status       : enum {PENDING, ACCEPTED, IN_PROGRESS, COMPLETE, FAILED}
@@ -319,15 +242,14 @@ FileTransfer class:
     Client B → Server: MSG_FILE_ACCEPT / MSG_FILE_REJECT
     Server → Client A: forward accept/reject
     If accepted:
-      Client A → Server: MSG_FILE_CHUNK x N
-        { transfer_id: "...", chunk_num: 0, data: [4096 bytes AES-encrypted] }
+      Client A → Server: MSG_FILE_DATA
+        { transfer_id: "...", data: [Toàn bộ nội dung file đã mã hóa AES] }
       Server relay → Client B
       Client B verify: SHA256(reassembled) == original_hash
       Client B → Server: MSG_FILE_COMPLETE / MSG_ERROR
 
   Giới hạn:
-    - MAX_FILE_SIZE = 10 MB (configurable)
-    - CHUNK_SIZE = 4096 bytes
+    - MAX_FILE_SIZE = 3 MB (gửi 1 lần không cần chunking để tối ưu cho CLI)
     - Transfer timeout = 120 giây
     - Chỉ cho phép extension: .txt .pdf .png .jpg .zip .cpp .h .md (whitelist)
 
@@ -375,7 +297,7 @@ AdminCommands class:
 
   broadcast(admin_fd, message):
     + gửi tới tất cả rooms với tag [SERVER BROADCAST]
-    + highlight màu đặc biệt trên TUI
+    + hiển thị rõ ràng trên terminal (thêm tiền tố [BROADCAST])
 
   Phân quyền:
     GUEST  : chỉ đọc (nếu room cho phép guests)
@@ -473,11 +395,9 @@ AuditLogger class (singleton):
 ## Kết quả kiểm thử cuối tuần 3
 
 ```bash
-# Test TUI: chạy 2 client, kiểm tra:
-# - Sidebar hiển thị đúng user list khi join/leave
-# - Màu sắc phân biệt các loại tin nhắn
-# - Arrow keys cuộn lịch sử chat
-# - Tab completion hoạt động
+# Test CLI: chạy 2 client, kiểm tra:
+# - Input thread gõ lệnh không bị block bởi receive thread.
+# - Luồng tin nhắn mới in ra liên tục không làm gián đoạn lệnh đang gõ.
 
 # Test multi-room:
 # Alice: /create #devteam → "Room #devteam created"
