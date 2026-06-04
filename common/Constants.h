@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace Constants {
+namespace Constants{
     constexpr uint16_t DEFAULT_PORT          = 9000;
     constexpr int      MAX_CLIENTS           = 256;
     constexpr int      THREAD_POOL_SIZE      = 32;
