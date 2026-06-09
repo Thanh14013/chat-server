@@ -1,0 +1,166 @@
+[2026-06-09 01:35:21.189] [INFO ] [139631848138560] Config loaded from: test_config.json
+[2026-06-09 01:35:21.208] [INFO ] [139631848138560] Database opened: vcs_chat.db
+[2026-06-09 01:35:21.233] [INFO ] [139631848138560] Database tables ready.
+[2026-06-09 01:35:21.234] [INFO ] [139631848138560] ThreadPool initialized with 10 workers.
+[2026-06-09 01:35:21.234] [INFO ] [139631848138560] Server starting...
+[2026-06-09 01:35:21.234] [INFO ] [139631848138560] Listening on 0.0.0.0:9500
+[2026-06-09 01:35:21.234] [INFO ] [139631848138560] Max clients: 5
+[2026-06-09 01:35:21.234] [INFO ] [139631848138560] Press Ctrl+C to stop
+[2026-06-09 01:35:22.190] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=8
+[2026-06-09 01:35:22.190] [INFO ] [139631831316032] Client authenticated: Alice from 127.0.0.1
+[2026-06-09 01:35:22.191] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=9
+[2026-06-09 01:35:22.191] [INFO ] [139631822923328] Client authenticated: Bob from 127.0.0.1
+[2026-06-09 01:35:22.192] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=10
+[2026-06-09 01:35:22.194] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=11
+[2026-06-09 01:35:22.697] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=10
+[2026-06-09 01:35:22.698] [INFO ] [139631797745216] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 01:35:22.702] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=11
+[2026-06-09 01:35:22.704] [INFO ] [139631789352512] Client authenticated: Dave from 127.0.0.1
+[2026-06-09 01:35:22.705] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=12
+[2026-06-09 01:35:22.706] [INFO ] [139631780959808] Client authenticated: Eve from 127.0.0.1
+[2026-06-09 01:35:22.708] [WARN ] [139631848138560] Max clients reached. Rejecting: 127.0.0.1
+[2026-06-09 01:35:22.709] [INFO ] [139631797745216] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-09 01:35:22.709] [INFO ] [139631797745216] Client left: Charlie
+[2026-06-09 01:35:22.709] [INFO ] [139631789352512] Client disconnected: 127.0.0.1 nick=Dave
+[2026-06-09 01:35:22.709] [INFO ] [139631789352512] Client left: Dave
+[2026-06-09 01:35:22.710] [INFO ] [139631780959808] Client disconnected: 127.0.0.1 nick=Eve
+[2026-06-09 01:35:22.710] [INFO ] [139631822923328] Client disconnected: 127.0.0.1 nick=Bob
+[2026-06-09 01:35:22.710] [INFO ] [139631822923328] Client left: Bob
+[2026-06-09 01:35:22.710] [INFO ] [139631780959808] Client left: Eve
+[2026-06-09 01:35:23.211] [INFO ] [139631848138560] New connection from: 127.0.0.1 fd=13
+[2026-06-09 01:35:23.211] [INFO ] [139631772567104] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 01:35:23.211] [INFO ] [139631772567104] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-09 01:35:23.212] [INFO ] [139631772567104] Client left: Charlie
+[2026-06-09 01:35:23.212] [INFO ] [139631848138560] Shutdown signal received.
+[2026-06-09 01:35:23.235] [INFO ] [139631848138560] Server stopped.
+[2026-06-09 01:35:23.244] [INFO ] [139631848138560] End.
+[2026-06-09 04:36:17.006] [INFO ] [140209948362560] Config loaded from: test_config.json
+[2026-06-09 04:36:17.020] [INFO ] [140209948362560] Database opened: vcs_chat.db
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] Database tables ready.
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] ThreadPool initialized with 10 workers.
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] Server starting...
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] Listening on 0.0.0.0:9500
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] Max clients: 5
+[2026-06-09 04:36:17.026] [INFO ] [140209948362560] Press Ctrl+C to stop
+[2026-06-09 04:36:18.006] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-09 04:36:18.006] [INFO ] [140209872791104] Client authenticated: Alice from 127.0.0.1
+[2026-06-09 04:36:18.007] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:36:18.007] [INFO ] [140209864398400] Client authenticated: Bob from 127.0.0.1
+[2026-06-09 04:36:18.007] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:36:18.008] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:36:18.511] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:36:18.511] [INFO ] [140209864398400] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:36:18.512] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-09 04:36:18.512] [INFO ] [140209881183808] Client authenticated: Dave from 127.0.0.1
+[2026-06-09 04:36:18.512] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-09 04:36:18.512] [INFO ] [140209889576512] Client authenticated: Eve from 127.0.0.1
+[2026-06-09 04:36:18.513] [INFO ] [140209948362560] Client left: Charlie
+[2026-06-09 04:36:18.513] [INFO ] [140209948362560] Client left: Dave
+[2026-06-09 04:36:18.513] [INFO ] [140209948362560] Client left: Eve
+[2026-06-09 04:36:18.513] [INFO ] [140209948362560] Client left: Bob
+[2026-06-09 04:36:19.014] [INFO ] [140209948362560] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:36:19.014] [INFO ] [140209906361920] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:36:19.015] [INFO ] [140209948362560] Client left: Charlie
+[2026-06-09 04:36:19.015] [INFO ] [140209948362560] Shutdown signal received.
+[2026-06-09 04:36:19.028] [INFO ] [140209948362560] Server stopped.
+[2026-06-09 04:36:19.039] [INFO ] [140209948362560] End.
+[2026-06-09 04:37:21.082] [INFO ] [140123365128000] Config loaded from: test_config.json
+[2026-06-09 04:37:21.099] [INFO ] [140123365128000] Database opened: vcs_chat.db
+[2026-06-09 04:37:21.107] [INFO ] [140123365128000] Database tables ready.
+[2026-06-09 04:37:21.108] [INFO ] [140123365128000] ThreadPool initialized with 10 workers.
+[2026-06-09 04:37:21.108] [INFO ] [140123365128000] Server starting...
+[2026-06-09 04:37:21.108] [INFO ] [140123365128000] Listening on 0.0.0.0:9500
+[2026-06-09 04:37:21.108] [INFO ] [140123365128000] Max clients: 5
+[2026-06-09 04:37:21.108] [INFO ] [140123365128000] Press Ctrl+C to stop
+[2026-06-09 04:37:22.081] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-09 04:37:22.082] [INFO ] [140123356698176] Client authenticated: Alice from 127.0.0.1
+[2026-06-09 04:37:22.083] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:22.084] [INFO ] [140123348305472] Client authenticated: Bob from 127.0.0.1
+[2026-06-09 04:37:22.084] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:22.085] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:22.591] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:22.591] [INFO ] [140123348305472] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:37:22.591] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-09 04:37:22.592] [INFO ] [140123339912768] Client authenticated: Dave from 127.0.0.1
+[2026-06-09 04:37:22.592] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-09 04:37:22.592] [INFO ] [140123331520064] Client authenticated: Eve from 127.0.0.1
+[2026-06-09 04:37:22.593] [INFO ] [140123365128000] Client left: Charlie
+[2026-06-09 04:37:22.593] [INFO ] [140123365128000] Client left: Dave
+[2026-06-09 04:37:22.593] [INFO ] [140123365128000] Client left: Eve
+[2026-06-09 04:37:22.594] [INFO ] [140123365128000] Client left: Bob
+[2026-06-09 04:37:23.095] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:23.095] [INFO ] [140123314734656] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:37:23.095] [INFO ] [140123365128000] Client left: Charlie
+[2026-06-09 04:37:23.606] [INFO ] [140123365128000] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:23.606] [INFO ] [140123281163840] Client authenticated: DaveWrong from 127.0.0.1
+[2026-06-09 04:37:23.607] [ERROR] [140123365128000] Malformed packet header. Closing connection fd=10
+[2026-06-09 04:37:23.607] [ERROR] [140123365128000] CRC32 checksum mismatch. Dropping corrupted packet.
+[2026-06-09 04:37:56.091] [INFO ] [140047882700608] Config loaded from: test_config.json
+[2026-06-09 04:37:56.110] [INFO ] [140047882700608] Database opened: vcs_chat.db
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] Database tables ready.
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] ThreadPool initialized with 10 workers.
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] Server starting...
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] Listening on 0.0.0.0:9500
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] Max clients: 5
+[2026-06-09 04:37:56.122] [INFO ] [140047882700608] Press Ctrl+C to stop
+[2026-06-09 04:37:57.090] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-09 04:37:57.091] [INFO ] [140047865878080] Client authenticated: Alice from 127.0.0.1
+[2026-06-09 04:37:57.091] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:57.091] [INFO ] [140047857485376] Client authenticated: Bob from 127.0.0.1
+[2026-06-09 04:37:57.092] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:57.093] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:57.597] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:37:57.597] [INFO ] [140047857485376] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-09 04:37:57.598] [INFO ] [140047849092672] Client authenticated: Dave from 127.0.0.1
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-09 04:37:57.598] [INFO ] [140047840699968] Client authenticated: Eve from 127.0.0.1
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] Client left: Charlie
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] Client left: Dave
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] Client left: Eve
+[2026-06-09 04:37:57.598] [INFO ] [140047882700608] Client left: Bob
+[2026-06-09 04:37:58.099] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:58.100] [INFO ] [140047823914560] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:37:58.100] [INFO ] [140047882700608] Client left: Charlie
+[2026-06-09 04:37:58.610] [INFO ] [140047882700608] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:37:58.611] [INFO ] [140047874270784] Client authenticated: DaveWrong from 127.0.0.1
+[2026-06-09 04:37:58.611] [ERROR] [140047882700608] Malformed packet header. Closing connection fd=10
+[2026-06-09 04:39:27.043] [INFO ] [139688283985728] Config loaded from: test_config.json
+[2026-06-09 04:39:27.054] [INFO ] [139688283985728] Database opened: vcs_chat.db
+[2026-06-09 04:39:27.058] [INFO ] [139688283985728] Database tables ready.
+[2026-06-09 04:39:27.059] [INFO ] [139688283985728] ThreadPool initialized with 10 workers.
+[2026-06-09 04:39:27.059] [INFO ] [139688283985728] Server starting...
+[2026-06-09 04:39:27.059] [INFO ] [139688283985728] Listening on 0.0.0.0:9500
+[2026-06-09 04:39:27.059] [INFO ] [139688283985728] Max clients: 5
+[2026-06-09 04:39:27.059] [INFO ] [139688283985728] Press Ctrl+C to stop
+[2026-06-09 04:39:28.047] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-09 04:39:28.048] [INFO ] [139688275555904] Client authenticated: Alice from 127.0.0.1
+[2026-06-09 04:39:28.049] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:39:28.049] [INFO ] [139688267163200] Client authenticated: Bob from 127.0.0.1
+[2026-06-09 04:39:28.049] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:39:28.050] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:39:28.553] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-09 04:39:28.553] [INFO ] [139688267163200] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:39:28.554] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-09 04:39:28.554] [INFO ] [139688258770496] Client authenticated: Dave from 127.0.0.1
+[2026-06-09 04:39:28.554] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-09 04:39:28.554] [INFO ] [139688250377792] Client authenticated: Eve from 127.0.0.1
+[2026-06-09 04:39:28.554] [INFO ] [139688283985728] Client left: Charlie
+[2026-06-09 04:39:28.554] [INFO ] [139688283985728] Client left: Dave
+[2026-06-09 04:39:28.554] [INFO ] [139688283985728] Client left: Eve
+[2026-06-09 04:39:28.555] [INFO ] [139688283985728] Client left: Bob
+[2026-06-09 04:39:29.056] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:39:29.056] [INFO ] [139688233592384] Client authenticated: Charlie from 127.0.0.1
+[2026-06-09 04:39:29.057] [INFO ] [139688283985728] Client left: Charlie
+[2026-06-09 04:39:29.570] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:39:29.570] [INFO ] [139688200021568] Client authenticated: DaveWrong from 127.0.0.1
+[2026-06-09 04:39:29.570] [ERROR] [139688283985728] Malformed packet header. Closing connection fd=10
+[2026-06-09 04:39:29.570] [INFO ] [139688283985728] Client left: DaveWrong
+[2026-06-09 04:39:29.571] [ERROR] [139688283985728] CRC32 checksum mismatch. Dropping corrupted packet.
+[2026-06-09 04:39:30.072] [INFO ] [139688283985728] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-09 04:39:30.073] [INFO ] [139688267163200] Client authenticated: DaveLarge from 127.0.0.1
+[2026-06-09 04:39:30.114] [ERROR] [139688283985728] Payload too large: 50000. Closing connection fd=10
+[2026-06-09 04:39:30.114] [INFO ] [139688283985728] Client left: DaveLarge
+[2026-06-09 04:39:30.114] [INFO ] [139688283985728] Shutdown signal received.
+[2026-06-09 04:39:31.060] [INFO ] [139688283985728] Server stopped.
+[2026-06-09 04:39:31.070] [INFO ] [139688283985728] End.

@@ -1,0 +1,134 @@
+[2026-06-08 08:27:19.198] [INFO ] [139819788175168] Config loaded from: test_config.json
+[2026-06-08 08:27:19.214] [INFO ] [139819788175168] Database opened: vcs_chat.db
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] Database tables ready.
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] ThreadPool initialized with 4 workers.
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] Server starting...
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] Listening on 0.0.0.0:9500
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] Max clients: 5
+[2026-06-08 08:27:19.231] [INFO ] [139819788175168] Press Ctrl+C to stop
+[2026-06-08 08:27:20.195] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=8
+[2026-06-08 08:27:20.197] [INFO ] [139819762959936] Client authenticated: Alice from 127.0.0.1
+[2026-06-08 08:27:20.197] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=9
+[2026-06-08 08:27:20.197] [INFO ] [139819771352640] Client authenticated: Bob from 127.0.0.1
+[2026-06-08 08:27:20.198] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:27:20.198] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:27:20.700] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:27:20.701] [INFO ] [139819762959936] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:27:20.701] [INFO ] [139819788175168] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:28:28.219] [INFO ] [139744365860672] Config loaded from: test_config.json
+[2026-06-08 08:28:28.239] [INFO ] [139744365860672] Database opened: vcs_chat.db
+[2026-06-08 08:28:28.250] [INFO ] [139744365860672] Database tables ready.
+[2026-06-08 08:28:28.250] [INFO ] [139744365860672] ThreadPool initialized with 4 workers.
+[2026-06-08 08:28:28.251] [INFO ] [139744365860672] Server starting...
+[2026-06-08 08:28:28.251] [INFO ] [139744365860672] Listening on 0.0.0.0:9500
+[2026-06-08 08:28:28.251] [INFO ] [139744365860672] Max clients: 5
+[2026-06-08 08:28:28.251] [INFO ] [139744365860672] Press Ctrl+C to stop
+[2026-06-08 08:28:29.217] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=8
+[2026-06-08 08:28:29.217] [INFO ] [139744357430848] Client authenticated: Alice from 127.0.0.1
+[2026-06-08 08:28:29.218] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=9
+[2026-06-08 08:28:29.218] [INFO ] [139744349038144] Client authenticated: Bob from 127.0.0.1
+[2026-06-08 08:28:29.219] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:28:29.219] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:28:29.722] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:28:29.722] [INFO ] [139744340645440] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:28:29.723] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:28:29.723] [INFO ] [139744332252736] Client authenticated: Dave from 127.0.0.1
+[2026-06-08 08:28:29.723] [INFO ] [139744365860672] New connection from: 127.0.0.1 fd=12
+[2026-06-08 08:28:43.023] [INFO ] [140054038705984] Config loaded from: test_config.json
+[2026-06-08 08:28:43.046] [INFO ] [140054038705984] Database opened: vcs_chat.db
+[2026-06-08 08:28:43.055] [INFO ] [140054038705984] Database tables ready.
+[2026-06-08 08:28:43.056] [INFO ] [140054038705984] ThreadPool initialized with 10 workers.
+[2026-06-08 08:28:43.056] [INFO ] [140054038705984] Server starting...
+[2026-06-08 08:28:43.056] [INFO ] [140054038705984] Listening on 0.0.0.0:9500
+[2026-06-08 08:28:43.056] [INFO ] [140054038705984] Max clients: 5
+[2026-06-08 08:28:43.056] [INFO ] [140054038705984] Press Ctrl+C to stop
+[2026-06-08 08:28:44.022] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=8
+[2026-06-08 08:28:44.023] [INFO ] [140054030276160] Client authenticated: Alice from 127.0.0.1
+[2026-06-08 08:28:44.024] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=9
+[2026-06-08 08:28:44.025] [INFO ] [140054021883456] Client authenticated: Bob from 127.0.0.1
+[2026-06-08 08:28:44.025] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:28:44.027] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:28:44.532] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:28:44.533] [INFO ] [140054013490752] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:28:44.533] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:28:44.534] [INFO ] [140053988312640] Client authenticated: Dave from 127.0.0.1
+[2026-06-08 08:28:44.534] [INFO ] [140054038705984] New connection from: 127.0.0.1 fd=12
+[2026-06-08 08:28:44.534] [INFO ] [140053979919936] Client authenticated: Eve from 127.0.0.1
+[2026-06-08 08:28:44.534] [WARN ] [140054038705984] Max clients reached. Rejecting: 127.0.0.1
+[2026-06-08 08:28:44.535] [INFO ] [140054013490752] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-08 08:28:44.535] [INFO ] [140054013490752] Client left: Charlie
+[2026-06-08 08:28:44.535] [INFO ] [140053979919936] Client disconnected: 127.0.0.1 nick=Eve
+[2026-06-08 08:28:44.535] [INFO ] [140053979919936] Client left: Eve
+[2026-06-08 08:28:44.535] [INFO ] [140053988312640] Client disconnected: 127.0.0.1 nick=Dave
+[2026-06-08 08:28:44.535] [INFO ] [140053988312640] Client left: Dave
+[2026-06-08 08:28:44.536] [INFO ] [140054021883456] Client disconnected: 127.0.0.1 nick=Bob
+[2026-06-08 08:28:44.536] [INFO ] [140054021883456] Client left: Bob
+[2026-06-08 08:29:56.479] [INFO ] [139990478415680] Config loaded from: test_config.json
+[2026-06-08 08:29:56.491] [INFO ] [139990478415680] Database opened: vcs_chat.db
+[2026-06-08 08:29:56.500] [INFO ] [139990478415680] Database tables ready.
+[2026-06-08 08:29:56.500] [INFO ] [139990478415680] ThreadPool initialized with 10 workers.
+[2026-06-08 08:29:56.500] [INFO ] [139990478415680] Server starting...
+[2026-06-08 08:29:56.501] [INFO ] [139990478415680] Listening on 0.0.0.0:9500
+[2026-06-08 08:29:56.501] [INFO ] [139990478415680] Max clients: 5
+[2026-06-08 08:29:56.501] [INFO ] [139990478415680] Press Ctrl+C to stop
+[2026-06-08 08:29:57.479] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=8
+[2026-06-08 08:29:57.479] [INFO ] [139990469985856] Client authenticated: Alice from 127.0.0.1
+[2026-06-08 08:29:57.480] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=9
+[2026-06-08 08:29:57.480] [INFO ] [139990461593152] Client authenticated: Bob from 127.0.0.1
+[2026-06-08 08:29:57.480] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:29:57.481] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:29:57.983] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:29:57.984] [INFO ] [139990436415040] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:29:57.984] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:29:57.984] [INFO ] [139990428022336] Client authenticated: Dave from 127.0.0.1
+[2026-06-08 08:29:57.985] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=12
+[2026-06-08 08:29:57.987] [INFO ] [139990419629632] Client authenticated: Eve from 127.0.0.1
+[2026-06-08 08:29:57.987] [WARN ] [139990478415680] Max clients reached. Rejecting: 127.0.0.1
+[2026-06-08 08:29:57.987] [INFO ] [139990428022336] Client disconnected: 127.0.0.1 nick=Dave
+[2026-06-08 08:29:57.987] [INFO ] [139990436415040] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-08 08:29:57.987] [INFO ] [139990428022336] Client left: Dave
+[2026-06-08 08:29:57.987] [INFO ] [139990419629632] Client disconnected: 127.0.0.1 nick=Eve
+[2026-06-08 08:29:57.987] [INFO ] [139990461593152] Client disconnected: 127.0.0.1 nick=Bob
+[2026-06-08 08:29:57.988] [INFO ] [139990436415040] Client left: Charlie
+[2026-06-08 08:29:57.988] [INFO ] [139990461593152] Client left: Bob
+[2026-06-08 08:29:57.989] [INFO ] [139990478415680] New connection from: 127.0.0.1 fd=13
+[2026-06-08 08:29:57.989] [INFO ] [139990411236928] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:29:57.990] [INFO ] [139990419629632] Client left: Eve
+[2026-06-08 08:29:58.030] [INFO ] [139990411236928] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-08 08:29:58.030] [INFO ] [139990411236928] Client left: Charlie
+[2026-06-08 08:30:09.089] [INFO ] [140644159711040] Config loaded from: test_config.json
+[2026-06-08 08:30:09.131] [INFO ] [140644159711040] Database opened: vcs_chat.db
+[2026-06-08 08:30:09.161] [INFO ] [140644159711040] Database tables ready.
+[2026-06-08 08:30:09.163] [INFO ] [140644159711040] ThreadPool initialized with 10 workers.
+[2026-06-08 08:30:09.164] [INFO ] [140644159711040] Server starting...
+[2026-06-08 08:30:09.164] [INFO ] [140644159711040] Listening on 0.0.0.0:9500
+[2026-06-08 08:30:09.166] [INFO ] [140644159711040] Max clients: 5
+[2026-06-08 08:30:09.166] [INFO ] [140644159711040] Press Ctrl+C to stop
+[2026-06-08 08:30:10.095] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=8
+[2026-06-08 08:30:10.095] [INFO ] [140644151281216] Client authenticated: Alice from 127.0.0.1
+[2026-06-08 08:30:10.096] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=9
+[2026-06-08 08:30:10.096] [INFO ] [140644142888512] Client authenticated: Bob from 127.0.0.1
+[2026-06-08 08:30:10.097] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:30:10.098] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:30:10.622] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=10
+[2026-06-08 08:30:10.622] [INFO ] [140644126103104] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:30:10.623] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=11
+[2026-06-08 08:30:10.623] [INFO ] [140644092532288] Client authenticated: Dave from 127.0.0.1
+[2026-06-08 08:30:10.623] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=12
+[2026-06-08 08:30:10.624] [INFO ] [140644100924992] Client authenticated: Eve from 127.0.0.1
+[2026-06-08 08:30:10.624] [WARN ] [140644159711040] Max clients reached. Rejecting: 127.0.0.1
+[2026-06-08 08:30:10.624] [INFO ] [140644126103104] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-08 08:30:10.624] [INFO ] [140644126103104] Client left: Charlie
+[2026-06-08 08:30:10.624] [INFO ] [140644142888512] Client disconnected: 127.0.0.1 nick=Bob
+[2026-06-08 08:30:10.624] [INFO ] [140644142888512] Client left: Bob
+[2026-06-08 08:30:10.624] [INFO ] [140644100924992] Client disconnected: 127.0.0.1 nick=Eve
+[2026-06-08 08:30:10.624] [INFO ] [140644100924992] Client left: Eve
+[2026-06-08 08:30:10.624] [INFO ] [140644092532288] Client disconnected: 127.0.0.1 nick=Dave
+[2026-06-08 08:30:10.624] [INFO ] [140644092532288] Client left: Dave
+[2026-06-08 08:30:10.625] [INFO ] [140644159711040] New connection from: 127.0.0.1 fd=13
+[2026-06-08 08:30:10.626] [INFO ] [140644117710400] Client authenticated: Charlie from 127.0.0.1
+[2026-06-08 08:30:10.666] [INFO ] [140644117710400] Client disconnected: 127.0.0.1 nick=Charlie
+[2026-06-08 08:30:10.666] [INFO ] [140644117710400] Client left: Charlie
+[2026-06-08 08:30:10.667] [INFO ] [140644159711040] Shutdown signal received.
+[2026-06-08 08:30:11.163] [INFO ] [140644159711040] Server stopped.
+[2026-06-08 08:30:11.198] [INFO ] [140644159711040] End.

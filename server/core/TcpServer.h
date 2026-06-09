@@ -10,6 +10,7 @@
 #include "ThreadPool.h"
 #include "ClientSession.h"
 #include "../../common/Protocol.h"
+#include <sys/epoll.h>
 
 class TcpServer {
     public:
@@ -26,14 +27,15 @@ class TcpServer {
         void broadcastToAll(const Packet& pkt, int excludeFd = -1);
 
         ClientSession* getSession(int fd);
-        std::vector<ClientSession*> getSessionInRoom(const std::string& room);
+        std::vector<ClientSession*> getSessionsInRoom(const std::string& room);
         std::vector<std::string> getUsersInRoom(const std::string& room);
         std::vector<std::string> getRoomList();
 
         static TcpServer* s_instance;
 
     private:
-        void acceptLoop();
+        void epollLoop();
+        bool setNonBlocking(int fd);
         void handlePacket(int fd, const Packet& pkt);
 
         void handleConnectRequest(int fd, const Packet& pkt);
@@ -43,7 +45,7 @@ class TcpServer {
         void handlePing(int fd);
         void handlePong(int fd);
         void handleUserListRequest(int fd);
-        void handleUserRoomRequest(int fd);
+        void handleRoomListRequest(int fd);
         void handleRoomJoin(int fd, const Packet& pkt);
         void handleRoomCreate(int fd, const Packet& pkt);
         void handleRoomLeave(int fd);
@@ -53,6 +55,7 @@ class TcpServer {
         void removeSession(int fd);
 
         int m_listenFd;
+        int m_epollFd;
         int m_maxClients;
         std::atomic<bool> m_running;
 

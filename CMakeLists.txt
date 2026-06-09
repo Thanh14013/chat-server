@@ -17,15 +17,11 @@ include_directories(
     ${SQLITE3_INCLUDE_DIRS}
 )
 
-file(GLOB_RECURSE SERVER_SOURCES
-    "server/*.cpp"
-)
+file(GLOB_RECURSE SERVER_SOURCES "server/*.cpp")
+file(GLOB_RECURSE CLIENT_SOURCES "client/*.cpp")
+file(GLOB_RECURSE PROTOCOL_SOURCES "server/protocol/*.cpp")
 
-file(GLOB_RECURSE CLIENT_SOURCES
-    "client/*.cpp"
-)
-
-add_executable(vcs_server ${SERVER_SOURCES})
+add_executable(vcs_server ${SERVER_SOURCES} ${PROTOCOL_SOURCES})
 target_include_directories(vcs_server PRIVATE
     ${CMAKE_SOURCE_DIR}/common
     ${CMAKE_SOURCE_DIR}/server
@@ -38,7 +34,7 @@ target_link_libraries(vcs_server
     ${SQLITE3_LIBRARIES}
 )
 
-add_executable(vcs_client ${CLIENT_SOURCES})
+add_executable(vcs_client ${CLIENT_SOURCES} ${PROTOCOL_SOURCES})
 target_include_directories(vcs_client PRIVATE
     ${CMAKE_SOURCE_DIR}/common
     ${CMAKE_SOURCE_DIR}/client

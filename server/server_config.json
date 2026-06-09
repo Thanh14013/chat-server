@@ -1,0 +1,23 @@
+{
+  "server": {
+    "port": 9000,
+    "max_clients": 128,
+    "thread_pool_size": 32,
+    "session_timeout_seconds": 3600
+  },
+  "security": {
+    "require_auth": false,
+    "max_auth_attempts": 5,
+    "rate_limit_msg_per_sec": 10,
+    "enable_encryption": false,
+    "enable_audit_log": true
+  },
+  "rooms": {
+    "default_room": "general",
+    "max_rooms": 32,
+    "history_size": 100
+  },
+  "admin": {
+    "admin_password_hash": ""
+  }
+}
