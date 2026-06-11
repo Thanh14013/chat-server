@@ -178,6 +178,8 @@ def run_tests():
         
         resp = alice.recv_packet()
         assert resp is not None, "Alice connect accept timeout"
+        if resp['type'] == MessageType.MSG_CONNECT_REJECT:
+            print(f"DEBUG: Alice rejected with payload: {resp['payload']}")
         assert resp['type'] == MessageType.MSG_CONNECT_ACCEPT, f"Expected MSG_CONNECT_ACCEPT, got type {resp['type']}"
         assert resp['payload']['room'] == 'general', f"Expected room 'general', got {resp['payload'].get('room')}"
         print("[+] Test 1 Passed: Alice connected successfully!")
@@ -518,6 +520,10 @@ def run_tests():
         import traceback
         traceback.print_exc()
         print("\n[!] TESTS FAILED!")
+        if 'server_process' in locals() and server_process.poll() is not None:
+            stdout, stderr = server_process.communicate()
+            print("SERVER STDOUT:", stdout.decode())
+            print("SERVER STDERR:", stderr.decode())
         return False
     finally:
         # Clean up

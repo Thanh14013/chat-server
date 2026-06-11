@@ -78,9 +78,13 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
                     return;
                 }
             } else {
-                LOG_ERROR("Unencrypted packet received before handshake for fd=" + std::to_string(m_fd));
-                disconnect();
-                return;
+                if (Config::instance().get().enable_encryption) {
+                    LOG_ERROR("Unencrypted packet received before handshake for fd=" + std::to_string(m_fd));
+                    disconnect();
+                    return;
+                } else {
+                    pkt.payload = std::move(payload);
+                }
             }
         } else {
             pkt.payload = std::move(payload);
