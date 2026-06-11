@@ -28,6 +28,7 @@ namespace vcs::security
         ErrorCode registerUser(const std::string& nickname, std::string password);
 
         ErrorCode authenticate(const std::string& nickname, std::string password, int fd, std::string& token_out);
+        ErrorCode reconnectWithToken(const std::string& token, int new_fd, std::string& nickname_out);
 
         struct ValidationResult{int fd; bool valid;};
         ValidationResult validateToken(const std::string& token) const;

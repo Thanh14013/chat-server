@@ -34,6 +34,13 @@ namespace Builder
         return makePacket(MessageType::MSG_CONNECT_REJECT, j.dump());
     }
 
+    Packet makeReconnectRequest(const std::string &token)
+    {
+        json j;
+        j["token"] = token;
+        return makePacket(MessageType::MSG_RECONNECT_REQUEST, j.dump());
+    }
+
     Packet makeChatBroadcast(const std::string &sender, const std::string &room, const std::string &message)
     {
         json j;

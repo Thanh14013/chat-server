@@ -8,6 +8,7 @@ enum class MessageType : uint8_t {
     MSG_DISCONNECT           = 0x04,
     MSG_PING                 = 0x05,
     MSG_PONG                 = 0x06,
+    MSG_RECONNECT_REQUEST    = 0x07,
 
     MSG_CHAT_SEND            = 0x10,
     MSG_CHAT_BROADCAST       = 0x11,

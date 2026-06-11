@@ -23,6 +23,7 @@ struct ParsedRoomOp {
 
 namespace Parser {
     ParsedConnect  parseConnectRequest(const Packet& pkt);
+    std::string    parseReconnectRequest(const Packet& pkt);
     ParsedChat     parseChatSend(const Packet& pkt);
     ParsedPrivate  parseChatPrivate(const Packet& pkt);
     ParsedRoomOp   parseRoomJoin(const Packet& pkt);

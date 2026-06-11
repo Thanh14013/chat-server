@@ -155,6 +155,24 @@ namespace vcs::security
         return ErrorCode::ERR_OK;
     }
 
+    ErrorCode AuthManager::reconnectWithToken(const std::string &token, int new_fd, std::string &nickname_out)
+    {
+        auto claims = token_manager_->validate(token);
+        if (!claims.valid) {
+            return ErrorCode::ERR_AUTH_FAILED;
+        }
+
+        if (isAccountLocked(claims.sub)) {
+            return ErrorCode::ERR_AUTH_TOO_MANY_ATTEMPTS;
+        }
+
+        nickname_out = claims.sub;
+
+        std::unique_lock<std::shared_mutex> lock(sessions_mutex_);
+        active_sessions_[token] = new_fd;
+        return ErrorCode::ERR_OK;
+    }
+
     AuthManager::ValidationResult AuthManager::validateToken(const std::string &token) const
     {
         auto claims = token_manager_->validate(token);

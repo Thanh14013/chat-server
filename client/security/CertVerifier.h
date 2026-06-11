@@ -19,6 +19,9 @@ namespace vcs::client{
 
             void clearKnownServers();
 
+            std::string getFingerprint(const std::string& host, int port);
+            static std::string fingerprintOf(const std::string& pubkey_pem);
+
             static bool promptUserOnChange(const std::string& host, int port, const std::string& old_fp, const std::string& new_fp);
         
         private:
@@ -28,7 +31,6 @@ namespace vcs::client{
             void saveToDisk() const;
             std::string knownServersPath() const;
 
-            static std::string fingerprintOf(const std::string& pybkey_pem);
             static std::string makeKey(const std::string& host, int port);
 
             mutable std::mutex mutex_;

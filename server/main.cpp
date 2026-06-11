@@ -3,6 +3,7 @@
 #include "utils/Logger.h"
 #include "utils/Config.h"
 #include "utils/Database.h"
+#include "security/CryptoEngine.h"
 #include <csignal>
 #include <cstdlib>
 #include <string>
@@ -51,6 +52,9 @@ int main(int argc, char* argv[]){
 
     g_server = &server;
     g_eventLoop = &eventLoop;
+
+    LOG_INFO("Initializing Crypto Engine...");
+    vcs::security::CryptoEngine::getInstance().initialize();
 
     eventLoop.start();
     server.start(port, maxCli, poolSize);

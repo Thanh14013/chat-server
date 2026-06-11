@@ -6,6 +6,8 @@
 #include "../../common/Constants.h"
 #include "../../common/MessageTypes.h"
 #include "../../common/ErrorCodes.h"
+#include "../security/CryptoEngine.h"
+#include "../utils/Database.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -40,6 +42,13 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
 {
     m_maxClients = maxClients;
     m_threadPool = std::make_unique<ThreadPool>(threadPoolSize);
+    m_sessionToken = std::make_shared<vcs::security::SessionToken>(vcs::security::CryptoEngine::getInstance().getJWTSecret());
+    m_authManager = std::make_unique<vcs::security::AuthManager>(Database::instance().handle(), m_sessionToken);
+    m_keyExchange = std::make_unique<vcs::security::KeyExchange>(vcs::security::CryptoEngine::getInstance().getRSA(),
+        [](int fd, const std::vector<uint8_t>& key){
+            vcs::security::CryptoEngine::getInstance().establishSession(fd, key);
+        }
+    );
 
     m_listenFd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (m_listenFd < 0)
@@ -160,6 +169,7 @@ void TcpServer::epollLoop() {
             epoll_ctl(m_epollFd, EPOLL_CTL_ADD, clientFd, &evClient);
 
             auto session = std::make_shared<ClientSession>(clientFd, ip, this);
+            m_keyExchange->addClient(clientFd, ip);
             {
                 std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
                 m_sessions[clientFd] = session;
@@ -169,8 +179,8 @@ void TcpServer::epollLoop() {
         }
         else{
             if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)){
-                onClientDisconnected(fd);
                 epoll_ctl(m_epollFd, EPOLL_CTL_DEL, fd, nullptr);
+                onClientDisconnected(fd);
                 continue;
             }
 
@@ -179,8 +189,8 @@ void TcpServer::epollLoop() {
                 ssize_t n = ::recv(fd, buffer, sizeof(buffer), 0);
 
                 if (n <= 0){
-                    onClientDisconnected(fd);
                     epoll_ctl(m_epollFd, EPOLL_CTL_DEL, fd, nullptr);
+                    onClientDisconnected(fd);
                 }else{
                     std::shared_ptr<ClientSession> sess;
                     {
@@ -209,7 +219,24 @@ void TcpServer::onPacketReceived(int fd, const Packet& pkt){
 void TcpServer::handlePacket(int fd, const Packet& pkt){
     auto type = static_cast<MessageType>(pkt.header.msg_type);
     switch (type) {
+        case MessageType::MSG_CRYPTO_HELLO: {
+            Packet resp = m_keyExchange->handleHello(fd, pkt);
+            if (ClientSession* sess = getSession(fd)) {
+                sess->sendPacket(resp);
+                if (resp.header.msg_type == static_cast<uint8_t>(MessageType::MSG_ERROR)) onClientDisconnected(fd);
+            }
+            break;
+        }
+        case MessageType::MSG_CRYPTO_KEY_ACCEPT: {
+            Packet resp = m_keyExchange->handleKeyAccept(fd, pkt);
+            if (ClientSession* sess = getSession(fd)) {
+                sess->sendPacket(resp);
+                if (resp.header.msg_type == static_cast<uint8_t>(MessageType::MSG_ERROR)) onClientDisconnected(fd);
+            }
+            break;
+        }
         case MessageType::MSG_CONNECT_REQUEST:   handleConnectRequest(fd, pkt); break;
+        case MessageType::MSG_RECONNECT_REQUEST: handleReconnectRequest(fd, pkt); break;
         case MessageType::MSG_CHAT_SEND:         handleChatSend(fd, pkt);       break;
         case MessageType::MSG_CHAT_PRIVATE:      handleChatPrivate(fd, pkt);    break;
         case MessageType::MSG_DISCONNECT:        handleDisconnect(fd, pkt);     break;
@@ -238,7 +265,24 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     }
 
     if (isNicknameTaken(parsed.nickname)) {
-        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_NICKNAME_TAKEN, "Nickname already in use"));
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_NICKNAME_TAKEN, "User already online"));
+        onClientDisconnected(fd);
+        return;
+    }
+
+    if (!m_authManager->isNicknameTaken(parsed.nickname)) {
+        ErrorCode err = m_authManager->registerUser(parsed.nickname, parsed.password);
+        if (err != ErrorCode::ERR_OK) {
+            sess->sendPacket(Builder::makeConnectReject(err, "Registration failed"));
+            onClientDisconnected(fd);
+            return;
+        }
+    }
+
+    std::string token;
+    ErrorCode err = m_authManager->authenticate(parsed.nickname, parsed.password, fd, token);
+    if (err != ErrorCode::ERR_OK) {
+        sess->sendPacket(Builder::makeConnectReject(err, "Authentication failed"));
         onClientDisconnected(fd);
         return;
     }
@@ -253,12 +297,49 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         m_rooms[cfg.default_room].insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept("token_placeholder", cfg.default_room));
+    sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
 
     std::string notify = parsed.nickname + " joined #" + cfg.default_room;
     broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(notify), fd);
 
     LOG_INFO("Client authenticated: " + parsed.nickname + " from " + sess->ip());
+}
+
+void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
+    std::string token = Parser::parseReconnectRequest(pkt);
+    ClientSession* sess = getSession(fd);
+    if (!sess) return;
+
+    if (token.empty()) {
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_AUTH_FAILED, "Missing token"));
+        onClientDisconnected(fd);
+        return;
+    }
+
+    std::string nickname;
+    ErrorCode err = m_authManager->reconnectWithToken(token, fd, nickname);
+    if (err != ErrorCode::ERR_OK) {
+        sess->sendPacket(Builder::makeConnectReject(err, "Invalid or expired token"));
+        onClientDisconnected(fd);
+        return;
+    }
+
+    const auto& cfg = Config::instance().get();
+    sess->setNickname(nickname);
+    sess->setRoom(cfg.default_room);
+    sess->setAuthenticated(true);
+
+    {
+        std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
+        m_rooms[cfg.default_room].insert(fd);
+    }
+
+    sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
+
+    std::string notify = nickname + " reconnected to #" + cfg.default_room;
+    broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(notify), fd);
+
+    LOG_INFO("Client reconnected: " + nickname + " from " + sess->ip());
 }
 
 void TcpServer::handleChatSend(int fd, const Packet& pkt){
@@ -430,6 +511,10 @@ void TcpServer::onClientDisconnected(int fd) {
 }
 
 void TcpServer::removeSession(int fd) {
+    if (m_keyExchange) m_keyExchange->removeClient(fd);
+    if (m_authManager) m_authManager->removeSessionByFd(fd);
+    vcs::security::CryptoEngine::getInstance().removeSession(fd);
+
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
         for (auto& [rname, members] : m_rooms) {

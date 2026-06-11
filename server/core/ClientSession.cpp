@@ -7,6 +7,7 @@
 #include "../protocol/Parser.h"
 #include "../../common/Constants.h"
 #include "../../common/MessageTypes.h"
+#include "../security/CryptoEngine.h"
 #include <unistd.h>
 #include <nlohmann/json.hpp>
 #include <sys/socket.h>
@@ -66,7 +67,24 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
 
         Packet pkt;
         pkt.header = hdr;
-        pkt.payload = std::move(payload);
+        if (hdr.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_HELLO) &&
+            hdr.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_KEY_ACCEPT)) {
+            if (vcs::security::CryptoEngine::getInstance().hasSession(m_fd)) {
+                try {
+                    pkt.payload = vcs::security::CryptoEngine::getInstance().decryptPayload(m_fd, payload);
+                } catch (const std::exception& e) {
+                    LOG_ERROR("Decryption failed for fd=" + std::to_string(m_fd) + ": " + e.what());
+                    disconnect();
+                    return;
+                }
+            } else {
+                LOG_ERROR("Unencrypted packet received before handshake for fd=" + std::to_string(m_fd));
+                disconnect();
+                return;
+            }
+        } else {
+            pkt.payload = std::move(payload);
+        }
         m_server->onPacketReceived(m_fd, pkt);
 
         offset += totalPacketSize;
@@ -87,7 +105,26 @@ void ClientSession::stop(){
 bool ClientSession::sendPacket(const Packet& pkt){
     std::lock_guard<std::mutex> lock(m_sendMutex);
     if (m_fd < 0) return false;
-    auto bytes = packetToBytes(pkt);
+
+    Packet to_send = pkt;
+    if (to_send.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_HELLO) &&
+        to_send.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_KEY_OFFER) &&
+        to_send.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_KEY_ACCEPT) &&
+        to_send.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_HANDSHAKE_OK)) {
+        
+        if (vcs::security::CryptoEngine::getInstance().hasSession(m_fd)) {
+            try {
+                to_send.payload = vcs::security::CryptoEngine::getInstance().encryptPayload(m_fd, to_send.payload);
+                to_send.header.payload_length = static_cast<uint32_t>(to_send.payload.size());
+                to_send.header.checksum = computeCRC32(to_send.payload);
+            } catch (const std::exception& e) {
+                LOG_ERROR("Encryption failed for fd=" + std::to_string(m_fd));
+                return false;
+            }
+        }
+    }
+
+    auto bytes = packetToBytes(to_send);
     ssize_t total=0;
     ssize_t len = static_cast<ssize_t>(bytes.size());
     while (total < len){

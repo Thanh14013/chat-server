@@ -59,6 +59,11 @@ bool Database::execute(const std::string &sql)
     return true;
 }
 
+sqlite3 *Database::handle()
+{
+    return m_db;
+}
+
 bool Database::createTables()
 {
     const std::string sql = R"(

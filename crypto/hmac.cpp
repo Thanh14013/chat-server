@@ -17,13 +17,25 @@ namespace vcs::crypto
         if (!ctx)
             throw std::runtime_error("HMACSHA256::compute: HMAC_CTX_new failed");
 
-        if (HMAC_Init_ex(ctx, key.data(), static_cast<int>(key.size()),
-                         EVP_sha256(), nullptr) != 1 ||
-            HMAC_Update(ctx, data.data(), data.size()) != 1 ||
-            HMAC_Final(ctx, digest, &digest_len) != 1)
+        if (HMAC_Init_ex(ctx, key.data(), static_cast<int>(key.size()), EVP_sha256(), nullptr) != 1)
         {
             HMAC_CTX_free(ctx);
-            throw std::runtime_error("HMACSHA256::compute: HMAC operation failed");
+            throw std::runtime_error("HMACSHA256::compute: HMAC_Init_ex failed");
+        }
+
+        if (!data.empty())
+        {
+            if (HMAC_Update(ctx, data.data(), data.size()) != 1)
+            {
+                HMAC_CTX_free(ctx);
+                throw std::runtime_error("HMACSHA256::compute: HMAC_Update failed");
+            }
+        }
+
+        if (HMAC_Final(ctx, digest, &digest_len) != 1)
+        {
+            HMAC_CTX_free(ctx);
+            throw std::runtime_error("HMACSHA256::compute: HMAC_Final failed");
         }
 
         HMAC_CTX_free(ctx);

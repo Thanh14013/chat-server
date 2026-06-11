@@ -26,6 +26,19 @@ namespace Parser
         return result;
     }
 
+    std::string parseReconnectRequest(const Packet &pkt)
+    {
+        try
+        {
+            auto j = json::parse(payloadToString(pkt));
+            return j.value("token", "");
+        }
+        catch (...)
+        {
+        }
+        return "";
+    }
+
     ParsedChat parseChatSend(const Packet &pkt)
     {
         ParsedChat result;

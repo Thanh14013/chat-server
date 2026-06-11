@@ -22,7 +22,7 @@ namespace vcs::crypto {
             ~AES256GCM();
 
             AES256GCM(const AES256GCM&) = delete;
-            AES256GCM& operator=(AES256GCM&&) = delete;
+            AES256GCM& operator=(const AES256GCM&) = delete;
 
             AES256GCM(AES256GCM&&) noexcept;
             AES256GCM& operator=(AES256GCM&&) noexcept;

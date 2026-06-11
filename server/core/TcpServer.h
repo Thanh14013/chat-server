@@ -10,6 +10,9 @@
 #include "ThreadPool.h"
 #include "ClientSession.h"
 #include "../../common/Protocol.h"
+#include "../security/KeyExchange.h"
+#include "../security/AuthManager.h"
+#include "../security/SessionToken.h"
 #include <sys/epoll.h>
 
 class TcpServer {
@@ -39,6 +42,7 @@ class TcpServer {
         void handlePacket(int fd, const Packet& pkt);
 
         void handleConnectRequest(int fd, const Packet& pkt);
+        void handleReconnectRequest(int fd, const Packet& pkt);
         void handleChatSend(int fd, const Packet& pkt);
         void handleChatPrivate(int fd, const Packet& pkt);
         void handleDisconnect(int fd, const Packet& pkt);
@@ -65,5 +69,8 @@ class TcpServer {
         mutable std::shared_mutex m_roomsMutex;
 
         std::unique_ptr<ThreadPool> m_threadPool;
+        std::unique_ptr<vcs::security::KeyExchange> m_keyExchange;
+        std::shared_ptr<vcs::security::SessionToken> m_sessionToken;
+        std::unique_ptr<vcs::security::AuthManager> m_authManager;
         
 };

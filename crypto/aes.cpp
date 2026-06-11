@@ -170,7 +170,6 @@ namespace vcs::crypto
             int final_len = 0;
             if (EVP_DecryptFinal_ex(ctx, plaintext.data() + out_len, &final_len) != 1)
             {
-                EVP_CIPHER_CTX_free(ctx);
                 throw std::runtime_error("AES256GCM::decrypt: authentication tag mismatch — packet tampered");
             }
 

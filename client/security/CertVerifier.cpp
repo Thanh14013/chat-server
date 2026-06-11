@@ -35,6 +35,11 @@ namespace vcs::client
         return "sha256" + hex;
     }
 
+    std::string CertVerifier::makeKey(const std::string &host, int port)
+    {
+        return host + ":" + std::to_string(port);
+    }
+
     void CertVerifier::loadFromDisk()
     {
         if (loaded_)
@@ -111,6 +116,16 @@ namespace vcs::client
         std::lock_guard<std::mutex> lock(mutex_);
         known_servers_.clear();
         saveToDisk();
+    }
+
+    std::string CertVerifier::getFingerprint(const std::string &host, int port)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        loadFromDisk();
+        std::string key = makeKey(host, port);
+        auto it = known_servers_.find(key);
+        if (it != known_servers_.end()) return it->second;
+        return "";
     }
 
     bool CertVerifier::promptUserOnChange(const std::string &host, int port, const std::string &old_fp, const std::string &new_fp)

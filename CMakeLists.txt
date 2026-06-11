@@ -12,6 +12,7 @@ pkg_check_modules(SQLITE3 REQUIRED sqlite3)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/common
+    ${CMAKE_SOURCE_DIR}/crypto
     ${CMAKE_SOURCE_DIR}/server
     ${CMAKE_SOURCE_DIR}/client
     ${SQLITE3_INCLUDE_DIRS}
@@ -20,10 +21,21 @@ include_directories(
 file(GLOB_RECURSE SERVER_SOURCES "server/*.cpp")
 file(GLOB_RECURSE CLIENT_SOURCES "client/*.cpp")
 file(GLOB_RECURSE PROTOCOL_SOURCES "server/protocol/*.cpp")
+file(GLOB_RECURSE CRYPTO_SOURCES "crypto/*.cpp")
 
-add_executable(vcs_server ${SERVER_SOURCES} ${PROTOCOL_SOURCES})
+if(SERVER_SOURCES AND PROTOCOL_SOURCES)
+    list(REMOVE_ITEM SERVER_SOURCES ${PROTOCOL_SOURCES})
+endif()
+
+list(REMOVE_DUPLICATES SERVER_SOURCES)
+list(REMOVE_DUPLICATES CLIENT_SOURCES)
+list(REMOVE_DUPLICATES PROTOCOL_SOURCES)
+list(REMOVE_DUPLICATES CRYPTO_SOURCES)
+
+add_executable(vcs_server ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
 target_include_directories(vcs_server PRIVATE
     ${CMAKE_SOURCE_DIR}/common
+    ${CMAKE_SOURCE_DIR}/crypto
     ${CMAKE_SOURCE_DIR}/server
     ${SQLITE3_INCLUDE_DIRS}
 )
@@ -34,9 +46,10 @@ target_link_libraries(vcs_server
     ${SQLITE3_LIBRARIES}
 )
 
-add_executable(vcs_client ${CLIENT_SOURCES} ${PROTOCOL_SOURCES})
+add_executable(vcs_client ${CLIENT_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
 target_include_directories(vcs_client PRIVATE
     ${CMAKE_SOURCE_DIR}/common
+    ${CMAKE_SOURCE_DIR}/crypto
     ${CMAKE_SOURCE_DIR}/client
     ${SQLITE3_INCLUDE_DIRS}
 )
@@ -46,3 +59,20 @@ target_link_libraries(vcs_client
     Threads::Threads
     ${SQLITE3_LIBRARIES}
 )
+
+enable_testing()
+
+add_executable(test_crypto tests/test_crypto.cpp ${CRYPTO_SOURCES})
+target_link_libraries(test_crypto OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
+add_test(NAME test_crypto COMMAND test_crypto)
+
+list(FILTER SERVER_SOURCES EXCLUDE REGEX "main\\.cpp$")
+
+add_executable(test_auth tests/test_auth.cpp ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
+target_include_directories(test_auth PRIVATE ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
+target_link_libraries(test_auth OpenSSL::SSL OpenSSL::Crypto Threads::Threads ${SQLITE3_LIBRARIES})
+add_test(NAME test_auth COMMAND test_auth)
+
+add_executable(test_protocol tests/test_protocol.cpp ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
+target_link_libraries(test_protocol OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
+add_test(NAME test_protocol COMMAND test_protocol)
