@@ -415,7 +415,7 @@ CertVerifier class:
 ```
 Packet on-wire format:
 ┌─────────────────────────────────────────────────────┐
-│  HEADER (15 bytes, PLAINTEXT)                       │
+│  HEADER (17 bytes, PLAINTEXT)                       │
 │  magic[2] | version[1] | msg_type[1] | flags[1]    │
 │  seq_num[4] | payload_length[4] | checksum_crc32[4] │
 ├─────────────────────────────────────────────────────┤
@@ -429,7 +429,7 @@ Packet on-wire format:
 │  Tạo bởi AES-GCM (thay thế hoàn toàn HMAC)          │
 └─────────────────────────────────────────────────────┘
 
-Total overhead per packet: 15 + 16 + 16 = 47 bytes
+Total overhead per packet: 17 + 16 + 16 = 49 bytes
 ```
 
 **Lý do IV plaintext:** IV không cần bí mật, chỉ cần unique. Đặt trước ciphertext là convention chuẩn.
