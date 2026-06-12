@@ -8,46 +8,54 @@
 
 using json = nlohmann::json;
 
-RoomManager& RoomManager::instance() {
+RoomManager &RoomManager::instance()
+{
     static RoomManager inst;
     return inst;
 }
 
-void RoomManager::initialize(TcpServer* server, const std::string& defaultRoom) {
-    m_server      = server;
+void RoomManager::initialize(TcpServer *server, const std::string &defaultRoom)
+{
+    m_server = server;
     m_defaultRoom = defaultRoom;
 
     std::unique_lock<std::shared_mutex> lk(m_mutex);
-    m_rooms[defaultRoom]    = std::make_unique<Room>(defaultRoom, "system");
-    m_histories[defaultRoom]= std::make_unique<ChatHistory>(defaultRoom);
+    m_rooms[defaultRoom] = std::make_unique<Room>(defaultRoom, "system");
+    m_histories[defaultRoom] = std::make_unique<ChatHistory>(defaultRoom);
     LOG_INFO("RoomManager initialized. Default room: #" + defaultRoom);
 }
 
-std::string RoomManager::nickFromFd(int fd) {
-    if (!m_server) return "";
-    ClientSession* s = m_server->getSession(fd);
+std::string RoomManager::nickFromFd(int fd)
+{
+    if (!m_server)
+        return "";
+    ClientSession *s = m_server->getSession(fd);
     return s ? s->nickname() : "";
 }
 
-ErrorCode RoomManager::createRoom(const std::string& name, const std::string& creator) {
+ErrorCode RoomManager::createRoom(const std::string &name, const std::string &creator)
+{
     std::unique_lock<std::shared_mutex> lk(m_mutex);
     if (m_rooms.count(name))
         return ErrorCode::ERR_INTERNAL;
     if ((int)m_rooms.size() >= Constants::MAX_ROOMS)
         return ErrorCode::ERR_INTERNAL;
 
-    m_rooms[name]    = std::make_unique<Room>(name, creator);
-    m_histories[name]= std::make_unique<ChatHistory>(name);
+    m_rooms[name] = std::make_unique<Room>(name, creator);
+    m_histories[name] = std::make_unique<ChatHistory>(name);
     LOG_INFO("Room created: #" + name + " by " + creator);
     return ErrorCode::ERR_OK;
 }
 
-ErrorCode RoomManager::deleteRoom(const std::string& name,
-                                   const std::string& requester, bool isOwner) {
+ErrorCode RoomManager::deleteRoom(const std::string &name,
+                                  const std::string &requester, bool isOwner)
+{
     std::unique_lock<std::shared_mutex> lk(m_mutex);
     auto it = m_rooms.find(name);
-    if (it == m_rooms.end())           return ErrorCode::ERR_ROOM_NOT_FOUND;
-    if (name == m_defaultRoom)         return ErrorCode::ERR_PERMISSION_DENIED;
+    if (it == m_rooms.end())
+        return ErrorCode::ERR_ROOM_NOT_FOUND;
+    if (name == m_defaultRoom)
+        return ErrorCode::ERR_PERMISSION_DENIED;
     if (!isOwner && it->second->creator() != requester)
         return ErrorCode::ERR_PERMISSION_DENIED;
 
@@ -57,28 +65,32 @@ ErrorCode RoomManager::deleteRoom(const std::string& name,
     return ErrorCode::ERR_OK;
 }
 
-ErrorCode RoomManager::joinRoom(int fd, const std::string& nickname,
-                                 const std::string& roomName) {
+ErrorCode RoomManager::joinRoom(int fd, const std::string &nickname, const std::string &roomName)
+{
     std::string oldRoom;
     {
         std::shared_lock<std::shared_mutex> lk(m_mutex);
         auto it = m_fdToRoom.find(fd);
-        if (it != m_fdToRoom.end()) oldRoom = it->second;
+        if (it != m_fdToRoom.end())
+            oldRoom = it->second;
     }
 
     {
         std::unique_lock<std::shared_mutex> lk(m_mutex);
         auto it = m_rooms.find(roomName);
-        if (it == m_rooms.end()) {
-            m_rooms[roomName]    = std::make_unique<Room>(roomName, nickname);
-            m_histories[roomName]= std::make_unique<ChatHistory>(roomName);
+        if (it == m_rooms.end())
+        {
+            m_rooms[roomName] = std::make_unique<Room>(roomName, nickname);
+            m_histories[roomName] = std::make_unique<ChatHistory>(roomName);
             LOG_INFO("Auto-created room #" + roomName + " by " + nickname);
         }
 
-        Room* room = m_rooms[roomName].get();
-        if (room->isFull()) return ErrorCode::ERR_ROOM_FULL;
+        Room *room = m_rooms[roomName].get();
+        if (room->isFull())
+            return ErrorCode::ERR_ROOM_FULL;
 
-        if (!oldRoom.empty() && m_rooms.count(oldRoom)) {
+        if (!oldRoom.empty() && m_rooms.count(oldRoom))
+        {
             m_rooms[oldRoom]->removeMember(fd);
         }
 
@@ -86,26 +98,28 @@ ErrorCode RoomManager::joinRoom(int fd, const std::string& nickname,
         m_fdToRoom[fd] = roomName;
     }
 
-    if (!oldRoom.empty() && oldRoom != roomName) {
+    if (!oldRoom.empty() && oldRoom != roomName)
+    {
         broadcastToRoom(oldRoom,
-            Builder::makeSystemNotify(nickname + " left #" + oldRoom), fd);
+                        Builder::makeSystemNotify(nickname + " left #" + oldRoom), fd);
     }
 
     broadcastToRoom(roomName,
-        Builder::makeSystemNotify(nickname + " joined #" + roomName), fd);
+                    Builder::makeSystemNotify(nickname + " joined #" + roomName), fd);
 
     sendHistoryToClient(fd, roomName, 50);
 
-    if (m_server) {
-        ClientSession* sess = m_server->getSession(fd);
-        if (sess) sess->setRoom(roomName);
+    if (m_server)
+    {
+        ClientSession *sess = m_server->getSession(fd);
+        if (sess)
+            sess->setRoom(roomName);
     }
 
     return ErrorCode::ERR_OK;
 }
 
-void RoomManager::leaveRoom(int fd, const std::string& nickname,
-                             const std::string& roomName) {
+void RoomManager::leaveRoom(int fd, const std::string& nickname, const std::string& roomName) {
     bool roomEmpty = false;
 
     {
@@ -201,6 +215,7 @@ std::vector<std::string> RoomManager::getUsersInRoom(const std::string& room) {
         return nickFromFd(fd);
     });
 }
+
 
 Room* RoomManager::getRoom(const std::string& name) {
     std::shared_lock<std::shared_mutex> lk(m_mutex);

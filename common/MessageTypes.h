@@ -23,6 +23,10 @@ enum class MessageType : uint8_t {
 
     MSG_USER_LIST_REQUEST    = 0x30,
     MSG_USER_LIST_RESPONSE   = 0x31,
+    MSG_USER_LISTALL_REQUEST = 0x32,
+    MSG_USER_LISTALL_RESPONSE= 0x33,
+    MSG_WHOIS_REQUEST        = 0x34,
+    MSG_WHOIS_RESPONSE       = 0x35,
 
     MSG_CRYPTO_HELLO         = 0x40,
     MSG_CRYPTO_KEY_OFFER     = 0x41,
@@ -39,6 +43,7 @@ enum class MessageType : uint8_t {
     MSG_ADMIN_MUTE           = 0x61,
     MSG_ADMIN_BAN            = 0x62,
     MSG_ADMIN_PROMOTE        = 0x63,
+    MSG_ADMIN_BROADCAST      = 0x64,
 
     MSG_ERROR                = 0xFF
 };

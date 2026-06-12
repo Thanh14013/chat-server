@@ -18,7 +18,7 @@ namespace Constants{
     constexpr int      HISTORY_BUFFER_SIZE   = 100;
     constexpr int      AUTH_MAX_ATTEMPTS     = 5;
     constexpr int      NONCE_SIZE            = 16;
-    constexpr int      HEADER_SIZE           = 15;
+    constexpr int      HEADER_SIZE           = 17;
     constexpr int      PING_INTERVAL_SEC     = 30;
     constexpr int      PONG_TIMEOUT_SEC      = 60;
 }

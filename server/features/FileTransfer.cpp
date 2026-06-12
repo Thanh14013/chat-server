@@ -58,7 +58,7 @@ bool FileTransfer::isAllowedExtension(const std::string& filename) {
     return false;
 }
 
-void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson) {
+void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
     if (!m_server) return;
     ClientSession* sender = m_server->getSession(senderFd);
     if (!sender) return;
@@ -88,17 +88,10 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson) {
         return;
     }
 
-    ClientSession* receiver = nullptr;
-    for (auto& room : m_server->getRoomList()) {
-        for (auto* s : m_server->getSessionsInRoom(room)) {
-            if (s->nickname() == toNick) { receiver = s; break; }
-        }
-        if (receiver) break;
-    }
-
+    int receiverFd = m_server->getFdByNickname(toNick);
+    ClientSession* receiver = m_server->getSession(receiverFd);
     if (!receiver) {
-        sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND,
-            "User not found: " + toNick));
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found: " + toNick));
         return;
     }
 
@@ -129,14 +122,11 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson) {
     std::vector<uint8_t> payload(rs.begin(), rs.end());
     receiver->sendPacket(Packet(MessageType::MSG_FILE_REQUEST, payload));
 
-    AUDIT_D(AuditEventType::FILE, sender->nickname(), toNick, "FILE_REQUEST",
-            AuditResult::SUCCESS, sender->ip(),
-            "file=" + filename + " size=" + std::to_string(fileSize));
-    LOG_INFO("FileTransfer request: " + sender->nickname() + " -> " + toNick
-             + " file=" + filename + " tid=" + tid);
+    AUDIT_D(AuditEventType::FILE, sender->nickname(), toNick, "FILE_REQUEST",AuditResult::SUCCESS, sender->ip(),"file=" + filename + " size=" + std::to_string(fileSize));
+    LOG_INFO("FileTransfer request: " + sender->nickname() + " -> " + toNick + " file=" + filename + " tid=" + tid);
 }
 
-void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson) {
+void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
     if (!m_server) return;
 
     json j;
@@ -208,7 +198,7 @@ void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
     LOG_INFO("FileTransfer data relayed: tid=" + tid);
 }
 
-void FileTransfer::handleComplete(int receiverFd, const std::string& payloadJson) {
+void FileTransfer::handleComplete(int senderFd, const std::string& payloadJson) {
     if (!m_server) return;
 
     json j;
@@ -219,12 +209,13 @@ void FileTransfer::handleComplete(int receiverFd, const std::string& payloadJson
     std::lock_guard<std::mutex> lk(m_mutex);
     auto it = m_transfers.find(tid);
     if (it == m_transfers.end()) return;
+    if (it->second.sender_fd != senderFd) return; // SECURITY CHECK
 
-    ClientSession* sender = m_server->getSession(it->second.sender_fd);
-    if (sender) {
+    ClientSession* receiver = m_server->getSession(it->second.receiver_fd);
+    if (receiver) {
         std::string rs = j.dump();
         std::vector<uint8_t> payload(rs.begin(), rs.end());
-        sender->sendPacket(Packet(MessageType::MSG_FILE_COMPLETE, payload));
+        receiver->sendPacket(Packet(MessageType::MSG_FILE_COMPLETE, payload));
     }
 
     AUDIT_D(AuditEventType::FILE, "", "", "FILE_TRANSFER_" + std::string(ok ? "OK" : "FAIL"),

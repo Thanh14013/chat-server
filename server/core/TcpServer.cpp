@@ -8,6 +8,8 @@
 #include "../../common/ErrorCodes.h"
 #include "../security/CryptoEngine.h"
 #include "../utils/Database.h"
+#include "../features/AdminCommands.h"
+#include "../features/FileTransfer.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -95,6 +97,9 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
     m_running = true;
     const auto &cfg = Config::instance().get();
     m_rooms[cfg.default_room] = {};
+
+    AdminCommands::instance().initialize(this);
+    FileTransfer::instance().initialize(this);
 
     LOG_INFO("Server starting...");
     LOG_INFO("Listening on 0.0.0.0:" + std::to_string(port));
@@ -218,6 +223,7 @@ void TcpServer::onPacketReceived(int fd, const Packet& pkt){
 
 void TcpServer::handlePacket(int fd, const Packet& pkt){
     auto type = static_cast<MessageType>(pkt.header.msg_type);
+    std::string payload(pkt.payload.begin(), pkt.payload.end());
     switch (type) {
         case MessageType::MSG_CRYPTO_HELLO: {
             Packet resp = m_keyExchange->handleHello(fd, pkt);
@@ -247,6 +253,75 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
         case MessageType::MSG_ROOM_JOIN:         handleRoomJoin(fd, pkt);       break;
         case MessageType::MSG_ROOM_CREATE:       handleRoomCreate(fd, pkt);     break;
         case MessageType::MSG_ROOM_LEAVE:        handleRoomLeave(fd);           break;
+        case MessageType::MSG_WHOIS_REQUEST: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            std::string target = j.value("target", "");
+            json resp;
+            int tFd = getFdByNickname(target);
+            if (tFd == -1) {
+                resp["error"] = "User not found";
+            } else {
+                ClientSession* tSess = getSession(tFd);
+                if (tSess && tSess->isAuthenticated()) {
+                    resp["nickname"] = tSess->nickname();
+                    resp["ip"]       = tSess->ip();
+                    resp["room"]     = tSess->currentRoom();
+                    resp["is_muted"] = tSess->isMuted();
+                } else {
+                    resp["error"] = "User not found";
+                }
+            }
+            std::string str = resp.dump();
+            if (ClientSession* sess = getSession(fd)) {
+                sess->sendPacket(Packet(MessageType::MSG_WHOIS_RESPONSE, std::vector<uint8_t>(str.begin(), str.end())));
+            }
+            break;
+        }
+        
+        // Admin Commands
+        case MessageType::MSG_ADMIN_KICK: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) AdminCommands::instance().kick(fd, j.value("target",""), j.value("reason",""));
+            break;
+        }
+        case MessageType::MSG_ADMIN_MUTE: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) {
+                int dur = j.value("duration", 300);
+                if (dur == 0) AdminCommands::instance().unmute(fd, j.value("target",""));
+                else          AdminCommands::instance().mute(fd, j.value("target",""), dur);
+            }
+            break;
+        }
+        case MessageType::MSG_ADMIN_BAN: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) {
+                if (j.value("unban", false)) AdminCommands::instance().unban(fd, j.value("target",""));
+                else AdminCommands::instance().ban(fd, j.value("target",""), j.value("reason",""));
+            }
+            break;
+        }
+        case MessageType::MSG_ADMIN_PROMOTE: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) {
+                if (j.value("demote", false)) AdminCommands::instance().demote(fd, j.value("target",""));
+                else AdminCommands::instance().promote(fd, j.value("target",""));
+            }
+            break;
+        }
+        case MessageType::MSG_ADMIN_BROADCAST: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) AdminCommands::instance().broadcast(fd, j.value("message",""));
+            break;
+        }
+
+        // File Transfer
+        case MessageType::MSG_FILE_REQUEST:  FileTransfer::instance().handleRequest (fd, payload); break;
+        case MessageType::MSG_FILE_ACCEPT:   FileTransfer::instance().handleAccept  (fd, payload); break;
+        case MessageType::MSG_FILE_REJECT:   FileTransfer::instance().handleReject  (fd, payload); break;
+        case MessageType::MSG_FILE_DATA:     FileTransfer::instance().handleData    (fd, payload); break;
+        case MessageType::MSG_FILE_COMPLETE: FileTransfer::instance().handleComplete(fd, payload); break;
+
         default:
             LOG_WARN("Unknown packet type: " + std::to_string(pkt.header.msg_type));
             break;
@@ -293,6 +368,11 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     sess->setAuthenticated(true);
 
     {
+        std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
+        m_nicknames[parsed.nickname] = fd;
+    }
+
+    {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
         m_rooms[cfg.default_room].insert(fd);
     }
@@ -328,6 +408,11 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     sess->setNickname(nickname);
     sess->setRoom(cfg.default_room);
     sess->setAuthenticated(true);
+
+    {
+        std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
+        m_nicknames[nickname] = fd;
+    }
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
@@ -371,9 +456,11 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
     auto parsed = Parser::parseChatPrivate(pkt);
     if (parsed.to.empty() || parsed.message.empty()) return;
 
-    std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
-    for (auto& [ofd, sess] : m_sessions){
-        if (sess->nickname() == parsed.to && sess->isAuthenticated()) {
+    int targetFd = getFdByNickname(parsed.to);
+    if (targetFd != -1) {
+        std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
+        auto it = m_sessions.find(targetFd);
+        if (it != m_sessions.end() && it->second->isAuthenticated()) {
             json j;
             j["from"]    = sender->nickname();
             j["to"]      = parsed.to;
@@ -381,7 +468,7 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
             std::string s = j.dump();
             std::vector<uint8_t> payload(s.begin(), s.end());
             Packet p(MessageType::MSG_CHAT_PRIVATE, payload);
-            sess->sendPacket(p);
+            it->second->sendPacket(p);
             sender->sendPacket(p);
             return;
         }
@@ -524,6 +611,9 @@ void TcpServer::removeSession(int fd) {
     std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
     auto it = m_sessions.find(fd);
     if (it != m_sessions.end()) {
+        if (it->second->isAuthenticated()) {
+            m_nicknames.erase(it->second->nickname());
+        }
         it->second->stop();
         m_sessions.erase(it);
     }
@@ -562,6 +652,13 @@ ClientSession* TcpServer::getSession(int fd) {
     return it->second.get();
 }
 
+int TcpServer::getFdByNickname(const std::string& nick) {
+    std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
+    auto it = m_nicknames.find(nick);
+    if (it != m_nicknames.end()) return it->second;
+    return -1;
+}
+
 std::vector<ClientSession*> TcpServer::getSessionsInRoom(const std::string& room) {
     std::set<int> members;
     {
@@ -596,10 +693,7 @@ std::vector<std::string> TcpServer::getRoomList() {
 
 bool TcpServer::isNicknameTaken(const std::string& nick) {
     std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
-    for (auto& [fd, sess] : m_sessions) {
-        if (sess->nickname() == nick && sess->isAuthenticated()) return true;
-    }
-    return false;
+    return m_nicknames.find(nick) != m_nicknames.end();
 }
 
 bool TcpServer::isNicknameValid(const std::string& nick) {

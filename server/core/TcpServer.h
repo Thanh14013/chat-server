@@ -30,6 +30,7 @@ class TcpServer {
         void broadcastToAll(const Packet& pkt, int excludeFd = -1);
 
         ClientSession* getSession(int fd);
+        int getFdByNickname(const std::string& nick);
         std::vector<ClientSession*> getSessionsInRoom(const std::string& room);
         std::vector<std::string> getUsersInRoom(const std::string& room);
         std::vector<std::string> getRoomList();
@@ -64,6 +65,7 @@ class TcpServer {
         std::atomic<bool> m_running;
 
         std::unordered_map<int, std::shared_ptr<ClientSession>> m_sessions;
+        std::unordered_map<std::string, int> m_nicknames; // nickname -> fd
         std::map<std::string, std::set<int>> m_rooms;
         mutable std::shared_mutex m_sessionsMutex;
         mutable std::shared_mutex m_roomsMutex;
