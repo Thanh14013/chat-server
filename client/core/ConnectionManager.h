@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "../commands/CommandHandler.h"
 #include "../commands/CommandParser.h"
 #include "../../common/Protocol.h"

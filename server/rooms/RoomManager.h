@@ -27,8 +27,6 @@ public:
 
     void initialize(TcpServer *server, const std::string &defaultRoom);
 
-    void initialize(TcpServer *server, const std::string &defaultRoom);
-
     ErrorCode createRoom(const std::string &name, const std::string &creator);
     ErrorCode deleteRoom(const std::string &name, const std::string &requester, bool isOwner);
 

@@ -492,7 +492,15 @@ def run_tests():
 
         print("[+] Test 15 Passed: Oversized payload length protection verified!")
 
-        print("[*] Test 16: Graceful Shutdown...")
+        print("[*] Test 16: Message Too Long Edge Case...")
+        long_message = "A" * 4200
+        alice.send_packet(MessageType.MSG_CHAT_SEND, {"message": long_message, "room": "general"})
+        resp = alice.recv_packet(1.0)
+        assert resp is not None and resp['type'] == MessageType.MSG_ERROR, f"Expected MSG_ERROR for long message, got {resp}"
+        assert resp['payload']['code'] == ErrorCode.ERR_MESSAGE_TOO_LONG, "Expected ERR_MESSAGE_TOO_LONG"
+        print("[+] Test 16 Passed: Message too long rejected!")
+
+        print("[*] Test 17: Graceful Shutdown...")
         # Send SIGINT to server process group
         os.killpg(os.getpgid(server_process.pid), signal.SIGINT)
         

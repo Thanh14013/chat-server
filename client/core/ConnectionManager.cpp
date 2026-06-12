@@ -1,4 +1,4 @@
-\#include "ConnectionManager.h"
+#include "ConnectionManager.h"
 #include "../core/TcpClient.h"
 #include "../../common/MessageTypes.h"
 #include <iostream>

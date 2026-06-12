@@ -367,6 +367,11 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     sess->setRoom(cfg.default_room);
     sess->setAuthenticated(true);
 
+    auto role = m_authManager->getUserRole(parsed.nickname);
+    if (role == vcs::security::SessionToken::Role::OWNER) sess->setRole(UserRole::OWNER);
+    else if (role == vcs::security::SessionToken::Role::ADMIN) sess->setRole(UserRole::ADMIN);
+    else sess->setRole(UserRole::USER);
+
     {
         std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
         m_nicknames[parsed.nickname] = fd;
@@ -408,6 +413,11 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     sess->setNickname(nickname);
     sess->setRoom(cfg.default_room);
     sess->setAuthenticated(true);
+
+    auto role = m_authManager->getUserRole(nickname);
+    if (role == vcs::security::SessionToken::Role::OWNER) sess->setRole(UserRole::OWNER);
+    else if (role == vcs::security::SessionToken::Role::ADMIN) sess->setRole(UserRole::ADMIN);
+    else sess->setRole(UserRole::USER);
 
     {
         std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);

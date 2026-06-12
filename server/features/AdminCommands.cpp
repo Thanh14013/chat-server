@@ -77,8 +77,10 @@ void AdminCommands::kick(int adminFd, const std::string &targetNick, const std::
 
 void AdminCommands::mute(int adminFd, const std::string &targetNick, int durationSec)
 {
+    LOG_INFO("AdminCommands::mute called for target=" + targetNick + " by fd=" + std::to_string(adminFd));
     if (!hasAdminRight(adminFd))
     {
+        LOG_INFO("Mute failed: fd=" + std::to_string(adminFd) + " has no admin rights");
         ClientSession *admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(
@@ -87,9 +89,12 @@ void AdminCommands::mute(int adminFd, const std::string &targetNick, int duratio
     }
     std::string anik = adminNick(adminFd);
     int targetFd = m_server->getFdByNickname(targetNick);
+    LOG_INFO("Mute: targetFd=" + std::to_string(targetFd) + " for " + targetNick);
     ClientSession *target = m_server->getSession(targetFd);
-    if (!target)
+    if (!target) {
+        LOG_INFO("Mute failed: target session is null");
         return;
+    }
 
     time_t until = (durationSec > 0) ? std::time(nullptr) + durationSec : 0;
     target->setMuted(true, until);

@@ -28,6 +28,8 @@ namespace vcs::security
     {
         switch (r)
         {
+        case Role::OWNER:
+            return "OWNER";
         case Role::ADMIN:
             return "ADMIN";
         case Role::USER:
@@ -39,6 +41,8 @@ namespace vcs::security
 
     SessionToken::Role SessionToken::stringToRole(const std::string &s)
     {
+        if (s == "OWNER")
+            return Role::OWNER;
         if (s == "ADMIN")
             return Role::ADMIN;
         if (s == "USER")

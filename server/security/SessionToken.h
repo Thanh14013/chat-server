@@ -10,7 +10,7 @@ namespace vcs::security{
     class SessionToken{
         public:
             static constexpr int SESSION_LIFETIME_SEC = 3600;
-            enum class Role { GUEST, USER, ADMIN};
+            enum class Role { GUEST, USER, ADMIN, OWNER };
 
             struct Claims{
                 std::string sub;
