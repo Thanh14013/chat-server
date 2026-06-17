@@ -37,6 +37,9 @@ bool Config::load(const std::string& path){
             m_cfg.require_auth           = s.value("require_auth", m_cfg.require_auth);
             m_cfg.max_auth_attempts      = s.value("max_auth_attempts", m_cfg.max_auth_attempts);
             m_cfg.rate_limit_msg_per_sec = s.value("rate_limit_msg_per_sec", m_cfg.rate_limit_msg_per_sec);
+            m_cfg.connect_rate_per_min   = s.value("connect_rate_per_min", m_cfg.connect_rate_per_min);
+            m_cfg.auth_rate_per_min      = s.value("auth_rate_per_min", m_cfg.auth_rate_per_min);
+            m_cfg.file_transfer_per_hour = s.value("file_transfer_per_hour", m_cfg.file_transfer_per_hour);
             m_cfg.enable_encryption      = s.value("enable_encryption", m_cfg.enable_encryption);
             m_cfg.enable_audit_log       = s.value("enable_audit_log", m_cfg.enable_audit_log);
         }

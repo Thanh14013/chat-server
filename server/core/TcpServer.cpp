@@ -10,6 +10,8 @@
 #include "../utils/Database.h"
 #include "../features/AdminCommands.h"
 #include "../features/FileTransfer.h"
+#include "../security/RateLimiter.h"
+#include "../security/IntrusionDetector.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -100,6 +102,8 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
 
     AdminCommands::instance().initialize(this);
     FileTransfer::instance().initialize(this);
+    IntrusionDetector::instance().loadBanList();
+    IntrusionDetector::instance().addWhitelist("127.0.0.1");
 
     LOG_INFO("Server starting...");
     LOG_INFO("Listening on 0.0.0.0:" + std::to_string(port));
@@ -155,6 +159,19 @@ void TcpServer::epollLoop() {
             int clientFd = ::accept(m_listenFd, (sockaddr*)&clientAddr, &addrLen);
             if (clientFd < 0) continue;
             std::string ip = inet_ntoa(clientAddr.sin_addr);
+
+            IPStatus ipStatus = IntrusionDetector::instance().checkIP(ip);
+            if (ipStatus == IPStatus::BLOCKED) {
+                ::close(clientFd);
+                continue;
+            }
+
+            if (RateLimiter::instance().checkLimit("ip_" + ip, RateLimitType::CONNECT) == RateCheckResult::RATE_LIMITED) {
+                ::close(clientFd);
+                continue;
+            }
+
+            LOG_INFO("New connection accepted: fd=" + std::to_string(clientFd) + " IP=" + ip);
 
             {
                 std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
@@ -354,9 +371,18 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         }
     }
 
+    if (RateLimiter::instance().checkLimit("ip_" + sess->ip() + "_auth", RateLimitType::AUTH) == RateCheckResult::RATE_LIMITED) {
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_RATE_LIMITED, "Too many auth attempts"));
+        onClientDisconnected(fd);
+        return;
+    }
+
     std::string token;
     ErrorCode err = m_authManager->authenticate(parsed.nickname, parsed.password, fd, token);
     if (err != ErrorCode::ERR_OK) {
+        if (err == ErrorCode::ERR_AUTH_FAILED || err == ErrorCode::ERR_AUTH_TOO_MANY_ATTEMPTS) {
+            IntrusionDetector::instance().reportViolation(sess->ip(), ViolationType::FAILED_AUTH);
+        }
         sess->sendPacket(Builder::makeConnectReject(err, "Authentication failed"));
         onClientDisconnected(fd);
         return;
@@ -443,6 +469,12 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 
     if (sess->isMuted()){
         sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You are muted"));
+        return;
+    }
+
+    std::string fd_key = "fd_" + std::to_string(fd);
+    if (RateLimiter::instance().checkLimit(fd_key, RateLimitType::MSG_CHAT) == RateCheckResult::RATE_LIMITED) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_RATE_LIMITED, "Slow down"));
         return;
     }
 
@@ -592,6 +624,8 @@ void TcpServer::handleRoomLeave(int fd){
 }
 
 void TcpServer::onClientDisconnected(int fd) {
+    std::string fd_key = "fd_" + std::to_string(fd);
+    RateLimiter::instance().removeKey(fd_key);
     auto sess = getSession(fd);
     std::string nick, room;
     if (sess) {

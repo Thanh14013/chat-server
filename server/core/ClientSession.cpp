@@ -8,6 +8,7 @@
 #include "../../common/Constants.h"
 #include "../../common/MessageTypes.h"
 #include "../security/CryptoEngine.h"
+#include "../security/IntrusionDetector.h"
 #include <unistd.h>
 #include <nlohmann/json.hpp>
 #include <sys/socket.h>
@@ -43,12 +44,14 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
             hdr.magic[1] != Constants::MAGIC_BYTE_1 || 
             hdr.version != Constants::PROTOCOL_VERSION) {
             LOG_ERROR("Malformed packet header. Closing connection fd=" + std::to_string(m_fd));
+            IntrusionDetector::instance().reportViolation(m_ip, ViolationType::INVALID_PACKET);
             disconnect();
             return;
         }
 
         if (hdr.payload_length > static_cast<uint32_t>(Constants::MAX_MESSAGE_LEN + 256)) {
             LOG_ERROR("Payload too large: " + std::to_string(hdr.payload_length) + ". Closing connection fd=" + std::to_string(m_fd));
+            IntrusionDetector::instance().reportViolation(m_ip, ViolationType::INVALID_PACKET);
             disconnect();
             return;
         }
@@ -74,6 +77,7 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
                     pkt.payload = vcs::security::CryptoEngine::getInstance().decryptPayload(m_fd, payload);
                 } catch (const std::exception& e) {
                     LOG_ERROR("Decryption failed for fd=" + std::to_string(m_fd) + ": " + e.what());
+                    IntrusionDetector::instance().reportViolation(m_ip, ViolationType::HMAC_FAILURE);
                     disconnect();
                     return;
                 }

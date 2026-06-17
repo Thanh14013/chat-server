@@ -62,11 +62,12 @@ target_link_libraries(vcs_client
 
 enable_testing()
 
+list(FILTER CLIENT_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+list(FILTER SERVER_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 add_executable(test_crypto tests/test_crypto.cpp ${CRYPTO_SOURCES})
 target_link_libraries(test_crypto OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
 add_test(NAME test_crypto COMMAND test_crypto)
 
-list(FILTER SERVER_SOURCES EXCLUDE REGEX "main\\.cpp$")
 
 add_executable(test_auth tests/test_auth.cpp ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
 target_include_directories(test_auth PRIVATE ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
@@ -76,3 +77,12 @@ add_test(NAME test_auth COMMAND test_auth)
 add_executable(test_protocol tests/test_protocol.cpp ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
 target_link_libraries(test_protocol OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
 add_test(NAME test_protocol COMMAND test_protocol)
+
+add_executable(test_ratelimit tests/test_ratelimit.cpp ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
+target_include_directories(test_ratelimit PRIVATE ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
+target_link_libraries(test_ratelimit OpenSSL::SSL OpenSSL::Crypto Threads::Threads ${SQLITE3_LIBRARIES})
+add_test(NAME test_ratelimit COMMAND test_ratelimit)
+
+add_executable(benchmark_load tests/benchmark_load.cpp ${CLIENT_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
+target_include_directories(benchmark_load PRIVATE ${CMAKE_SOURCE_DIR}/client ${CMAKE_SOURCE_DIR}/common ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
+target_link_libraries(benchmark_load OpenSSL::SSL OpenSSL::Crypto Threads::Threads ${SQLITE3_LIBRARIES})

@@ -8,6 +8,7 @@
 #include <ctime>
 #include <mutex>
 #include <openssl/crypto.h>
+#include "IntrusionDetector.h"
 
 namespace vcs::security
 {
@@ -182,6 +183,7 @@ namespace vcs::security
                     (now - cs.handshake_time) > HANDSHAKE_TIMEOUT_SEC)
                 {
                     to_disconnect.push_back(fd);
+                    IntrusionDetector::instance().reportViolation(cs.peer_ip, ViolationType::PORT_SCAN);
                 }
             }
         }
@@ -199,6 +201,7 @@ namespace vcs::security
         {
             blocked_until = std::time(nullptr) + IP_BLOCK_SECONDS;
         }
+        IntrusionDetector::instance().reportViolation(ip, ViolationType::HANDSHAKE_FAIL);
     }
     Packet KeyExchange::buildErrorPacket(ErrorCode code) const
     {

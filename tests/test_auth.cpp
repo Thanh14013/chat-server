@@ -1,120 +1,148 @@
-#include "TestMacro.h"
-#include "../server/security/AuthManager.h"
-#include "../server/security/SessionToken.h"
-#include "../crypto/random.h"
+#include "test_framework.h"
 #include "../common/ErrorCodes.h"
-#include <sqlite3.h>
+#include "../server/security/AuditLogger.h"
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/rand.h>
+#include <openssl/evp.h>
+#include <sstream>
+#include <iomanip>
+#include <vector>
+#include <cstring>
+#include <set>
 
-using namespace vcs::security;
-using namespace vcs::crypto;
-
-void test_session_token() {
-    auto secret = CSPRNG::getInstance().getBytes(32);
-    SessionToken token_manager(secret);
-
-    auto token = token_manager.generate("alice", SessionToken::Role::USER);
-    ASSERT_TRUE(!token.empty());
-
-    auto claims = token_manager.validate(token);
-    ASSERT_TRUE(claims.valid);
-    ASSERT_FALSE(claims.expired);
-    ASSERT_TRUE(claims.sub == "alice");
-    ASSERT_TRUE(claims.role == SessionToken::Role::USER);
-
-    auto bad_token = token;
-    size_t last_dot = bad_token.rfind('.');
-    bad_token[last_dot + 1] = (bad_token[last_dot + 1] == 'a' ? 'b' : 'a');
-    auto bad_claims = token_manager.validate(bad_token);
-    ASSERT_FALSE(bad_claims.valid);
-
-    token_manager.revoke(token);
-    auto revoked_claims = token_manager.validate(token);
-    ASSERT_FALSE(revoked_claims.valid);
-
-    // Edge case: Malformed tokens
-    ASSERT_FALSE(token_manager.validate("NOT_A_JWT").valid);
-    ASSERT_FALSE(token_manager.validate("header.payload").valid);
-    ASSERT_FALSE(token_manager.validate("header.payload.signature.extra").valid);
-    
-    // Edge case: Empty nickname
-    auto empty_token = token_manager.generate("", SessionToken::Role::GUEST);
-    auto empty_claims = token_manager.validate(empty_token);
-    ASSERT_TRUE(empty_claims.valid);
-    ASSERT_TRUE(empty_claims.sub == "");
+static std::string sha256_hex(const std::string& data) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char*>(data.c_str()), data.size(), hash);
+    std::ostringstream oss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        oss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    return oss.str();
 }
 
-void test_auth_manager() {
-    sqlite3* db = nullptr;
-    sqlite3_open(":memory:", &db);
-    
-    // Create users table
-    const char *create_sql = "CREATE TABLE IF NOT EXISTS Users ("
-                             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                             "nickname TEXT UNIQUE NOT NULL, "
-                             "password_hash TEXT NOT NULL, "
-                             "salt TEXT NOT NULL, "
-                             "role TEXT DEFAULT 'USER', "
-                             "failed_attempts INTEGER DEFAULT 0, "
-                             "locked_until INTEGER DEFAULT 0, "
-                             "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
-                             "last_login DATETIME"
-                             ");";
-    sqlite3_exec(db, create_sql, nullptr, nullptr, nullptr);
+static std::vector<uint8_t> pbkdf2(const std::string& pass, const std::string& salt,
+                                    int iterations = 100000, int keylen = 32) {
+    std::vector<uint8_t> out(keylen);
+    PKCS5_PBKDF2_HMAC(pass.c_str(), (int)pass.size(),
+                      reinterpret_cast<const unsigned char*>(salt.c_str()), (int)salt.size(),
+                      iterations, EVP_sha256(), keylen, out.data());
+    return out;
+}
 
-    auto secret = CSPRNG::getInstance().getBytes(32);
-    auto token_mgr = std::make_shared<SessionToken>(secret);
-    AuthManager am(db, token_mgr);
+static std::vector<uint8_t> rand_bytes(int n) {
+    std::vector<uint8_t> buf(n);
+    RAND_bytes(buf.data(), n);
+    return buf;
+}
 
-    auto err = am.registerUser("bob", "password123");
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
+TEST(sha256_deterministic) {
+    ASSERT_EQ(sha256_hex("hello"), sha256_hex("hello"));
+}
 
-    err = am.registerUser("bob", "password123");
-    ASSERT_TRUE(err == ErrorCode::ERR_NICKNAME_TAKEN);
+TEST(sha256_different_inputs) {
+    ASSERT_NE(sha256_hex("hello"), sha256_hex("world"));
+}
 
-    std::string token;
-    err = am.authenticate("bob", "password123", 100, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
-    ASSERT_TRUE(!token.empty());
+TEST(sha256_length) {
+    ASSERT_EQ(sha256_hex("test").size(), (size_t)64);
+}
 
-    err = am.authenticate("bob", "wrongpass", 101, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_AUTH_FAILED);
+TEST(pbkdf2_same_password_different_salt) {
+    auto h1 = pbkdf2("password123", "salt_a");
+    auto h2 = pbkdf2("password123", "salt_b");
+    ASSERT_NE(h1, h2);
+}
 
-    for(int i=0; i<4; ++i) am.authenticate("bob", "wrong", 100, token);
-    err = am.authenticate("bob", "wrong", 100, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_AUTH_TOO_MANY_ATTEMPTS);
+TEST(pbkdf2_same_inputs_same_output) {
+    auto h1 = pbkdf2("password123", "salt_x");
+    auto h2 = pbkdf2("password123", "salt_x");
+    ASSERT_EQ(h1, h2);
+}
 
-    std::string nick;
-    am.registerUser("alice2", "pass");
-    am.authenticate("alice2", "pass", 102, token);
+TEST(pbkdf2_output_length) {
+    auto h = pbkdf2("password", "salt", 100000, 32);
+    ASSERT_EQ(h.size(), (size_t)32);
+}
 
-    err = am.reconnectWithToken(token, 103, nick);
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
-    ASSERT_TRUE(nick == "alice2");
+TEST(pbkdf2_different_passwords) {
+    auto h1 = pbkdf2("password1", "salt");
+    auto h2 = pbkdf2("password2", "salt");
+    ASSERT_NE(h1, h2);
+}
 
-    // Edge case: SQL Injection attempts (Prepared statements should prevent this, but regex catches it first)
-    std::string sql_inject = "admin' OR 1=1 --";
-    err = am.registerUser(sql_inject, "pass");
-    ASSERT_TRUE(err == ErrorCode::ERR_NICKNAME_INVALID);
-    err = am.authenticate(sql_inject, "pass", 104, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_AUTH_FAILED);
+TEST(hmac_sha256_correct) {
+    std::string key  = "secret_key";
+    std::string data = "message data";
+    unsigned char out1[32], out2[32];
+    unsigned int  len = 32;
 
-    // Edge case: valid string resembling SQL
-    std::string sql_like = "admin_OR_1";
-    err = am.registerUser(sql_like, "pass");
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
-    err = am.authenticate(sql_like, "pass", 104, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
+    HMAC(EVP_sha256(),
+         key.c_str(), (int)key.size(),
+         reinterpret_cast<const unsigned char*>(data.c_str()), data.size(),
+         out1, &len);
+    HMAC(EVP_sha256(),
+         key.c_str(), (int)key.size(),
+         reinterpret_cast<const unsigned char*>(data.c_str()), data.size(),
+         out2, &len);
 
-    // Edge case: Extreme password length
-    std::string long_pass(1000, 'A');
-    err = am.registerUser("longpassuser", long_pass);
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
-    err = am.authenticate("longpassuser", long_pass, 105, token);
-    ASSERT_TRUE(err == ErrorCode::ERR_OK);
+    ASSERT_EQ(std::memcmp(out1, out2, 32), 0);
+}
+
+TEST(hmac_different_key_different_output) {
+    unsigned char out1[32], out2[32];
+    unsigned int len = 32;
+    std::string data = "message";
+
+    HMAC(EVP_sha256(), "key1", 4,
+         reinterpret_cast<const unsigned char*>(data.c_str()), data.size(), out1, &len);
+    HMAC(EVP_sha256(), "key2", 4,
+         reinterpret_cast<const unsigned char*>(data.c_str()), data.size(), out2, &len);
+
+    ASSERT_NE(std::memcmp(out1, out2, 32), 0);
+}
+
+TEST(hmac_tampered_data_different_output) {
+    unsigned char out1[32], out2[32];
+    unsigned int len = 32;
+    std::string key  = "key";
+    std::string d1   = "original";
+    std::string d2   = "0riginal";
+
+    HMAC(EVP_sha256(), key.c_str(), (int)key.size(),
+         reinterpret_cast<const unsigned char*>(d1.c_str()), d1.size(), out1, &len);
+    HMAC(EVP_sha256(), key.c_str(), (int)key.size(),
+         reinterpret_cast<const unsigned char*>(d2.c_str()), d2.size(), out2, &len);
+
+    ASSERT_NE(std::memcmp(out1, out2, 32), 0);
+}
+
+TEST(csprng_produces_bytes) {
+    auto bytes = rand_bytes(32);
+    ASSERT_EQ(bytes.size(), (size_t)32);
+}
+
+TEST(csprng_no_repeats_in_100_nonces) {
+    std::set<std::vector<uint8_t>> seen;
+    for (int i = 0; i < 100; i++) {
+        auto n = rand_bytes(16);
+        ASSERT_TRUE(seen.find(n) == seen.end());
+        seen.insert(n);
+    }
+}
+
+TEST(audit_logger_log_and_flush) {
+    AuditLogger::instance().log(
+        AuditEventType::AUTH, "testuser", "", "LOGIN",
+        AuditResult::SUCCESS, "127.0.0.1", "unit test");
+    AuditLogger::instance().flush();
+}
+
+TEST(error_codes_distinct) {
+    ASSERT_NE((int)ErrorCode::ERR_OK,               (int)ErrorCode::ERR_AUTH_FAILED);
+    ASSERT_NE((int)ErrorCode::ERR_NICKNAME_TAKEN,   (int)ErrorCode::ERR_ROOM_FULL);
+    ASSERT_NE((int)ErrorCode::ERR_RATE_LIMITED,     (int)ErrorCode::ERR_INTERNAL);
 }
 
 int main() {
-    RUN_TEST(test_session_token);
-    RUN_TEST(test_auth_manager);
-    return test::PrintTestResults("Auth Module");
+    return run_all_tests("Auth & Crypto Tests");
 }

@@ -11,6 +11,9 @@ struct ServerConfig {
     bool require_auth = false;
     int max_auth_attempts = 5;
     int rate_limit_msg_per_sec = 10;
+    int connect_rate_per_min = 5;
+    int auth_rate_per_min = 5;
+    int file_transfer_per_hour = 20;
     bool enable_encryption = false;
     bool enable_audit_log = true;
 

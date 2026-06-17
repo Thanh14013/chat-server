@@ -3,6 +3,9 @@
 #include "ClientSession.h"
 #include "../protocol/Builder.h"
 #include "../utils/Logger.h"
+#include "../security/IntrusionDetector.h"
+#include "../security/AuditLogger.h"
+#include "../features/FileTransfer.h"
 #include "../../common/Constants.h"
 #include <chrono>
 #include <vector>
@@ -52,7 +55,7 @@ void EventLoop::loop(){
             }
         }
 
-        if (ticker % 60 ==0){
+        if (ticker % 60 == 0){
             std::vector<int> timedOut;
             for (auto& room : m_server->getRoomList()){
                 for (auto s : m_server->getSessionsInRoom(room)){
@@ -63,6 +66,13 @@ void EventLoop::loop(){
                 LOG_INFO("Session timed out, disconnecting fd=" + std::to_string(fd));
                 m_server->onClientDisconnected(fd);
             }
+            FileTransfer::instance().cleanupExpired();
+        }
+
+        if (ticker % 600 == 0) {
+            IntrusionDetector::instance().decayScores();
+            AuditLogger::instance().flush();
+            LOG_INFO("IDS decay + audit flush done.");
         }
         
         if (ticker >= 3600) ticker = 0;
