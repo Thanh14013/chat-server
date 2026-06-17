@@ -29,9 +29,9 @@ class TcpServer {
         void broadcastToRoom(const std::string& room, const Packet& pkt, int excludeFd = -1);
         void broadcastToAll(const Packet& pkt, int excludeFd = -1);
 
-        ClientSession* getSession(int fd);
+        std::shared_ptr<ClientSession> getSession(int fd);
         int getFdByNickname(const std::string& nick);
-        std::vector<ClientSession*> getSessionsInRoom(const std::string& room);
+        std::vector<std::shared_ptr<ClientSession>> getSessionsInRoom(const std::string& room);
         std::vector<std::string> getUsersInRoom(const std::string& room);
         std::vector<std::string> getRoomList();
 

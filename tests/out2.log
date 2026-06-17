@@ -1,0 +1,19 @@
+[*] Starting Server...
+[*] Registering Alice, Bob, Charlie...
+[*] Making Alice OWNER via DB...
+[+] Users connected.
+[*] Test MUTE...
+Alice received: {'type': 19, 'payload': {'message': 'Charlie joined #general'}}
+Alice received: {'type': 255, 'payload': {'code': 10, 'detail': 'No admin rights'}}
+[-] TEST FAILED: Bob should be muted, got {'type': 17, 'payload': {'message': 'Hello', 'room': 'general', 'sender': 'Bob'}}
+SERVER STDOUT:
+ [2026-06-17 02:08:39.745] [INFO ] [140300225460032] Config loaded from: test_config.json
+[2026-06-17 02:08:39.757] [INFO ] [140300225460032] Database opened: vcs_chat.db
+[2026-06-17 02:08:39.765] [INFO ] [140300225460032] Database tables ready.
+[2026-06-17 02:08:39.765] [INFO ] [140300225460032] Initializing Crypto Engine...
+[2026-06-17 02:08:40.256] [INFO ] [140300225460032] ThreadPool initialized with 4 workers.
+[2026-06-17 02:08:40.256] [CRIT ] [140300225460032] Bind failed on port 9500
+[2026-06-17 02:08:41.265] [INFO ] [140300225460032] End.
+
+SERVER STDERR:
+ 

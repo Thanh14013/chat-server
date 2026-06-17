@@ -1,0 +1,69 @@
+[*] Starting Server...
+[*] Registering Alice, Bob, Charlie...
+[*] Making Alice OWNER via DB...
+[+] Users connected.
+[*] Test MUTE...
+Alice received: {'type': 19, 'payload': {'message': 'Charlie joined #general'}}
+Alice received: {'type': 19, 'payload': {'message': 'Bob has been muted for 300 seconds by Alice'}}
+[+] MUTE passed.
+[*] Test UNMUTE...
+[+] UNMUTE passed.
+[*] Test KICK...
+[+] KICK passed.
+[*] Test ADMIN Edge Cases (Unauthorized)...
+[+] ADMIN Edge Cases passed.
+[*] Test PROMOTE & WHOIS...
+[*] Test WHOIS Edge Case (User not found)...
+[+] PROMOTE & WHOIS passed.
+[*] Test FILE TRANSFER Edge Cases...
+[*] Test FILE TRANSFER...
+[+] FILE TRANSFER passed.
+[*] Test ROOMS Edge Cases...
+[*] Test ROOMS...
+[+] ROOMS passed.
+[*] Test BAN...
+[+] BAN passed.
+[*] ALL TESTS PASSED SUCCESSFULLY!
+SERVER STDOUT:
+ [2026-06-17 02:09:28.345] [INFO ] [139859219597120] Config loaded from: test_config.json
+[2026-06-17 02:09:28.365] [INFO ] [139859219597120] Database opened: vcs_chat.db
+[2026-06-17 02:09:28.372] [INFO ] [139859219597120] Database tables ready.
+[2026-06-17 02:09:28.372] [INFO ] [139859219597120] Initializing Crypto Engine...
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] ThreadPool initialized with 4 workers.
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Server starting...
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Listening on 0.0.0.0:9500
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Max clients: 100
+[2026-06-17 02:09:28.589] [INFO ] [139859219597120] Press Ctrl+C to stop
+[2026-06-17 02:09:29.344] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:09:29.504] [INFO ] [139859211167296] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:09:29.504] [INFO ] [139859219597120] Client left: Alice
+[2026-06-17 02:09:30.011] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:09:30.132] [INFO ] [139859202774592] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:09:30.132] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:09:30.379] [INFO ] [139859194381888] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:09:30.380] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:09:30.690] [INFO ] [139859185989184] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:09:30.790] [INFO ] [139859211167296] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:09:30.791] [INFO ] [139859211167296] Mute: targetFd=10 for Bob
+[2026-06-17 02:09:30.791] [INFO ] [139859211167296] MUTE: admin=Alice target=Bob
+[2026-06-17 02:09:32.094] [INFO ] [139859211167296] Client left: Bob
+[2026-06-17 02:09:32.094] [INFO ] [139859211167296] KICK: admin=Alice target=Bob reason=Test kick
+[2026-06-17 02:09:32.695] [INFO ] [139859202774592] AdminCommands::mute called for target=Alice by fd=11
+[2026-06-17 02:09:32.695] [INFO ] [139859202774592] Mute failed: fd=11 has no admin rights
+[2026-06-17 02:09:32.695] [INFO ] [139859194381888] PROMOTE: Charlie -> ADMIN
+[2026-06-17 02:09:33.298] [INFO ] [139859211167296] FileTransfer request: Charlie -> Alice file=test.txt tid=3fbd601f9169db93
+[2026-06-17 02:09:33.298] [INFO ] [139859202774592] FileTransfer rejected: tid=3fbd601f9169db93
+[2026-06-17 02:09:33.299] [INFO ] [139859194381888] FileTransfer request: Charlie -> Alice file=test2.txt tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.299] [INFO ] [139859185989184] FileTransfer accepted: tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.299] [INFO ] [139859211167296] FileTransfer data relayed: tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.342] [INFO ] [139859202774592] FileTransfer complete: tid=e241848ccf6a44f4 ok=yes
+[2026-06-17 02:09:33.342] [INFO ] [139859185989184] Room created: #secret by Charlie
+[2026-06-17 02:09:33.944] [INFO ] [139859202774592] Client left: Charlie
+[2026-06-17 02:09:33.944] [INFO ] [139859202774592] BAN: admin=Alice target=Charlie ip=127.0.0.1
+[2026-06-17 02:09:34.445] [INFO ] [139859219597120] Shutdown signal received.
+[2026-06-17 02:09:34.589] [INFO ] [139859219597120] Server stopped.
+[2026-06-17 02:09:34.737] [INFO ] [139859219597120] End.
+
+SERVER STDERR:
+ 
+RC=0

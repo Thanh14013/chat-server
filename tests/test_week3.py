@@ -167,6 +167,7 @@ def run_tests():
         resp = alice.recv_packet()
         assert resp['type'] == MessageType.MSG_CONNECT_ACCEPT
         alice.close()
+        time.sleep(0.5)
         
         print("[*] Making Alice OWNER via DB...")
         set_user_admin('Alice')

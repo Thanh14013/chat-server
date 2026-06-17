@@ -35,7 +35,7 @@ void EventLoop::loop(){
             std::vector<int> deadFds;
 
             for (auto& room : m_server->getRoomList()){
-                for (auto* sess : m_server->getSessionsInRoom(room)){
+                for (auto sess : m_server->getSessionsInRoom(room)){
                     if (!sess->isAuthenticated()) continue;
                     if (!sess->m_pongReceived) {
                         LOG_WARN("Client timeout (no pong): " + sess->nickname());
@@ -55,7 +55,7 @@ void EventLoop::loop(){
         if (ticker % 60 ==0){
             std::vector<int> timedOut;
             for (auto& room : m_server->getRoomList()){
-                for (auto* s : m_server->getSessionsInRoom(room)){
+                for (auto s : m_server->getSessionsInRoom(room)){
                     if (s->isTimedOut()) timedOut.push_back(s->fd());
                 }
             }

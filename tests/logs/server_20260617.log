@@ -1,0 +1,264 @@
+[2026-06-17 00:58:58.822] [INFO ] [140347555620672] New non-blocking connection: 64.62.156.38 fd=12
+[2026-06-17 00:58:58.822] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=12
+[2026-06-17 01:17:09.840] [INFO ] [140347555620672] New non-blocking connection: 87.251.64.141 fd=12
+[2026-06-17 01:58:07.036] [INFO ] [140347555620672] New non-blocking connection: 20.98.137.225 fd=12
+[2026-06-17 01:58:07.036] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=12
+[2026-06-17 01:58:07.426] [INFO ] [140347555620672] New non-blocking connection: 20.98.137.225 fd=12
+[2026-06-17 01:58:07.426] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=12
+[2026-06-17 02:03:26.027] [INFO ] [139882390271808] Config loaded from: test_config.json
+[2026-06-17 02:03:26.054] [INFO ] [139882390271808] Database opened: vcs_chat.db
+[2026-06-17 02:03:26.062] [INFO ] [139882390271808] Database tables ready.
+[2026-06-17 02:03:26.062] [INFO ] [139882390271808] Initializing Crypto Engine...
+[2026-06-17 02:03:26.682] [INFO ] [139882390271808] ThreadPool initialized with 10 workers.
+[2026-06-17 02:03:26.682] [INFO ] [139882390271808] Server starting...
+[2026-06-17 02:03:26.682] [INFO ] [139882390271808] Listening on 0.0.0.0:9500
+[2026-06-17 02:03:26.682] [INFO ] [139882390271808] Max clients: 5
+[2026-06-17 02:03:26.682] [INFO ] [139882390271808] Press Ctrl+C to stop
+[2026-06-17 02:03:27.024] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:27.253] [INFO ] [139882339878464] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:27.253] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:27.540] [INFO ] [139882331485760] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:03:27.540] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:27.540] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:28.045] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:28.297] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-17 02:03:28.297] [INFO ] [139882331485760] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:28.494] [INFO ] [139882323093056] Client authenticated: Dave from 127.0.0.1
+[2026-06-17 02:03:28.494] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-17 02:03:28.717] [INFO ] [139882390271808] Client left: Charlie
+[2026-06-17 02:03:28.717] [INFO ] [139882390271808] Client left: Dave
+[2026-06-17 02:03:28.717] [INFO ] [139882390271808] Client left: Bob
+[2026-06-17 02:03:28.717] [INFO ] [139882390271808] Client left: Eve
+[2026-06-17 02:03:28.717] [INFO ] [139882314700352] Client authenticated: Eve from 127.0.0.1
+[2026-06-17 02:03:29.218] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:29.332] [INFO ] [139882390271808] Client left: Charlie
+[2026-06-17 02:03:29.332] [INFO ] [139882348271168] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:29.842] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:30.075] [ERROR] [139882390271808] Malformed packet header. Closing connection fd=10
+[2026-06-17 02:03:30.075] [INFO ] [139882390271808] Client left: DaveWrong
+[2026-06-17 02:03:30.075] [ERROR] [139882390271808] CRC32 checksum mismatch. Dropping corrupted packet.
+[2026-06-17 02:03:30.075] [INFO ] [139882381841984] Client authenticated: DaveWrong from 127.0.0.1
+[2026-06-17 02:03:30.576] [INFO ] [139882390271808] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:30.828] [ERROR] [139882390271808] Payload too large: 50000. Closing connection fd=10
+[2026-06-17 02:03:30.828] [INFO ] [139882390271808] Client left: DaveLarge
+[2026-06-17 02:03:30.829] [INFO ] [139882390271808] Shutdown signal received.
+[2026-06-17 02:03:30.829] [INFO ] [139882331485760] Client authenticated: DaveLarge from 127.0.0.1
+[2026-06-17 02:03:31.684] [INFO ] [139882390271808] Server stopped.
+[2026-06-17 02:03:31.695] [INFO ] [139882390271808] End.
+[2026-06-17 02:03:31.769] [INFO ] [140552797222720] Config loaded from: test_config.json
+[2026-06-17 02:03:31.779] [INFO ] [140552797222720] Database opened: vcs_chat.db
+[2026-06-17 02:03:31.790] [INFO ] [140552797222720] Database tables ready.
+[2026-06-17 02:03:31.791] [INFO ] [140552797222720] Initializing Crypto Engine...
+[2026-06-17 02:03:32.197] [INFO ] [140552797222720] ThreadPool initialized with 4 workers.
+[2026-06-17 02:03:32.198] [INFO ] [140552797222720] Server starting...
+[2026-06-17 02:03:32.198] [INFO ] [140552797222720] Listening on 0.0.0.0:9500
+[2026-06-17 02:03:32.198] [INFO ] [140552797222720] Max clients: 100
+[2026-06-17 02:03:32.198] [INFO ] [140552797222720] Press Ctrl+C to stop
+[2026-06-17 02:03:32.768] [INFO ] [140552797222720] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:32.956] [INFO ] [140552788792896] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:32.958] [INFO ] [140552797222720] Client left: Alice
+[2026-06-17 02:03:32.963] [INFO ] [140552797222720] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:33.066] [INFO ] [140552780400192] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:33.066] [INFO ] [140552797222720] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:33.328] [INFO ] [140552772007488] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:03:33.329] [INFO ] [140552797222720] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:33.516] [INFO ] [140552763614784] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:33.617] [INFO ] [140552788792896] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:03:33.617] [INFO ] [140552788792896] Mute: targetFd=10 for Bob
+[2026-06-17 02:03:33.617] [INFO ] [140552788792896] MUTE: admin=Alice target=Bob
+[2026-06-17 02:03:34.920] [INFO ] [140552788792896] Client left: Bob
+[2026-06-17 02:03:34.920] [INFO ] [140552788792896] KICK: admin=Alice target=Bob reason=Test kick
+[2026-06-17 02:03:35.521] [INFO ] [140552780400192] AdminCommands::mute called for target=Alice by fd=11
+[2026-06-17 02:03:35.521] [INFO ] [140552780400192] Mute failed: fd=11 has no admin rights
+[2026-06-17 02:03:35.522] [INFO ] [140552772007488] PROMOTE: Charlie -> ADMIN
+[2026-06-17 02:03:36.124] [INFO ] [140552788792896] FileTransfer request: Charlie -> Alice file=test.txt tid=adc7b3a9cd4f1ae0
+[2026-06-17 02:03:36.124] [INFO ] [140552780400192] FileTransfer rejected: tid=adc7b3a9cd4f1ae0
+[2026-06-17 02:03:36.124] [INFO ] [140552772007488] FileTransfer request: Charlie -> Alice file=test2.txt tid=eb116a3e57a7fbbd
+[2026-06-17 02:03:36.124] [INFO ] [140552763614784] FileTransfer accepted: tid=eb116a3e57a7fbbd
+[2026-06-17 02:03:36.124] [INFO ] [140552788792896] FileTransfer data relayed: tid=eb116a3e57a7fbbd
+[2026-06-17 02:03:36.166] [INFO ] [140552780400192] FileTransfer complete: tid=eb116a3e57a7fbbd ok=yes
+[2026-06-17 02:03:36.166] [INFO ] [140552763614784] Room created: #secret by Charlie
+[2026-06-17 02:03:36.768] [INFO ] [140552780400192] Client left: Charlie
+[2026-06-17 02:03:36.768] [INFO ] [140552780400192] BAN: admin=Alice target=Charlie ip=127.0.0.1
+[2026-06-17 02:03:37.268] [INFO ] [140552797222720] Shutdown signal received.
+[2026-06-17 02:03:38.198] [INFO ] [140552797222720] Server stopped.
+[2026-06-17 02:03:38.208] [INFO ] [140552797222720] End.
+[2026-06-17 02:03:41.439] [INFO ] [140015410411328] Config loaded from: test_config.json
+[2026-06-17 02:03:41.462] [INFO ] [140015410411328] Database opened: vcs_chat.db
+[2026-06-17 02:03:41.465] [INFO ] [140015410411328] Database tables ready.
+[2026-06-17 02:03:41.465] [INFO ] [140015410411328] Initializing Crypto Engine...
+[2026-06-17 02:03:42.124] [INFO ] [140015410411328] ThreadPool initialized with 10 workers.
+[2026-06-17 02:03:42.124] [INFO ] [140015410411328] Server starting...
+[2026-06-17 02:03:42.124] [INFO ] [140015410411328] Listening on 0.0.0.0:9500
+[2026-06-17 02:03:42.124] [INFO ] [140015410411328] Max clients: 5
+[2026-06-17 02:03:42.124] [INFO ] [140015410411328] Press Ctrl+C to stop
+[2026-06-17 02:03:42.438] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:42.634] [INFO ] [140015401981504] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:42.635] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:42.797] [INFO ] [140015393588800] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:03:42.797] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:42.798] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:43.300] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:43.582] [INFO ] [140015393588800] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:43.582] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=12
+[2026-06-17 02:03:43.815] [INFO ] [140015385196096] Client authenticated: Dave from 127.0.0.1
+[2026-06-17 02:03:43.815] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=13
+[2026-06-17 02:03:44.022] [INFO ] [140015376803392] Client authenticated: Eve from 127.0.0.1
+[2026-06-17 02:03:44.023] [INFO ] [140015410411328] Client left: Charlie
+[2026-06-17 02:03:44.023] [INFO ] [140015410411328] Client left: Dave
+[2026-06-17 02:03:44.023] [INFO ] [140015410411328] Client left: Eve
+[2026-06-17 02:03:44.023] [INFO ] [140015410411328] Client left: Bob
+[2026-06-17 02:03:44.524] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:44.657] [INFO ] [140015360017984] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:44.657] [INFO ] [140015410411328] Client left: Charlie
+[2026-06-17 02:03:45.166] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:45.381] [INFO ] [140015326447168] Client authenticated: DaveWrong from 127.0.0.1
+[2026-06-17 02:03:45.381] [ERROR] [140015410411328] Malformed packet header. Closing connection fd=10
+[2026-06-17 02:03:45.381] [INFO ] [140015410411328] Client left: DaveWrong
+[2026-06-17 02:03:45.382] [ERROR] [140015410411328] CRC32 checksum mismatch. Dropping corrupted packet.
+[2026-06-17 02:03:45.883] [INFO ] [140015410411328] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:46.094] [ERROR] [140015410411328] Payload too large: 50000. Closing connection fd=10
+[2026-06-17 02:03:46.094] [INFO ] [140015410411328] Client left: DaveLarge
+[2026-06-17 02:03:46.095] [INFO ] [140015410411328] Shutdown signal received.
+[2026-06-17 02:03:46.095] [INFO ] [140015393588800] Client authenticated: DaveLarge from 127.0.0.1
+[2026-06-17 02:03:46.125] [INFO ] [140015410411328] Server stopped.
+[2026-06-17 02:03:46.132] [INFO ] [140015410411328] End.
+[2026-06-17 02:03:46.203] [INFO ] [140559648786240] Config loaded from: test_config.json
+[2026-06-17 02:03:46.213] [INFO ] [140559648786240] Database opened: vcs_chat.db
+[2026-06-17 02:03:46.221] [INFO ] [140559648786240] Database tables ready.
+[2026-06-17 02:03:46.221] [INFO ] [140559648786240] Initializing Crypto Engine...
+[2026-06-17 02:03:46.641] [INFO ] [140559648786240] ThreadPool initialized with 4 workers.
+[2026-06-17 02:03:46.641] [INFO ] [140559648786240] Server starting...
+[2026-06-17 02:03:46.642] [INFO ] [140559648786240] Listening on 0.0.0.0:9500
+[2026-06-17 02:03:46.642] [INFO ] [140559648786240] Max clients: 100
+[2026-06-17 02:03:46.642] [INFO ] [140559648786240] Press Ctrl+C to stop
+[2026-06-17 02:03:47.202] [INFO ] [140559648786240] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:47.449] [INFO ] [140559615178304] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:47.451] [INFO ] [140559648786240] Client left: Alice
+[2026-06-17 02:03:47.455] [INFO ] [140559648786240] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:03:47.551] [INFO ] [140559648786240] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:03:47.552] [INFO ] [140559623571008] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:03:47.754] [INFO ] [140559648786240] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:03:47.754] [INFO ] [140559631963712] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:03:47.961] [INFO ] [140559640356416] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:03:48.061] [INFO ] [140559615178304] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:03:48.061] [INFO ] [140559615178304] Mute: targetFd=10 for Bob
+[2026-06-17 02:03:48.062] [INFO ] [140559615178304] MUTE: admin=Alice target=Bob
+[2026-06-17 02:03:49.364] [INFO ] [140559615178304] Client left: Bob
+[2026-06-17 02:03:49.364] [INFO ] [140559615178304] KICK: admin=Alice target=Bob reason=Test kick
+[2026-06-17 02:03:49.966] [INFO ] [140559623571008] AdminCommands::mute called for target=Alice by fd=11
+[2026-06-17 02:03:49.966] [INFO ] [140559623571008] Mute failed: fd=11 has no admin rights
+[2026-06-17 02:03:49.966] [INFO ] [140559631963712] PROMOTE: Charlie -> ADMIN
+[2026-06-17 02:03:50.568] [INFO ] [140559615178304] FileTransfer request: Charlie -> Alice file=test.txt tid=22d35eb233c82d8f
+[2026-06-17 02:03:50.569] [INFO ] [140559623571008] FileTransfer rejected: tid=22d35eb233c82d8f
+[2026-06-17 02:03:50.569] [INFO ] [140559631963712] FileTransfer request: Charlie -> Alice file=test2.txt tid=0b66279fe5391ee3
+[2026-06-17 02:03:50.569] [INFO ] [140559640356416] FileTransfer accepted: tid=0b66279fe5391ee3
+[2026-06-17 02:03:50.569] [INFO ] [140559615178304] FileTransfer data relayed: tid=0b66279fe5391ee3
+[2026-06-17 02:03:50.610] [INFO ] [140559623571008] FileTransfer complete: tid=0b66279fe5391ee3 ok=yes
+[2026-06-17 02:03:50.610] [INFO ] [140559640356416] Room created: #secret by Charlie
+[2026-06-17 02:03:51.212] [INFO ] [140559623571008] Client left: Charlie
+[2026-06-17 02:03:51.212] [INFO ] [140559623571008] BAN: admin=Alice target=Charlie ip=127.0.0.1
+[2026-06-17 02:03:51.712] [INFO ] [140559648786240] Shutdown signal received.
+[2026-06-17 02:03:52.651] [INFO ] [140559648786240] Server stopped.
+[2026-06-17 02:03:52.665] [INFO ] [140559648786240] End.
+[2026-06-17 02:04:50.037] [INFO ] [140219397470016] Config loaded from: test_config.json
+[2026-06-17 02:04:50.052] [INFO ] [140219397470016] Database opened: vcs_chat.db
+[2026-06-17 02:04:50.056] [INFO ] [140219397470016] Database tables ready.
+[2026-06-17 02:04:50.056] [INFO ] [140219397470016] Initializing Crypto Engine...
+[2026-06-17 02:04:51.032] [INFO ] [140219397470016] Shutdown signal received.
+[2026-06-17 02:04:51.246] [INFO ] [140219397470016] ThreadPool initialized with 4 workers.
+[2026-06-17 02:04:51.246] [INFO ] [140219397470016] Server starting...
+[2026-06-17 02:04:51.246] [INFO ] [140219397470016] Listening on 0.0.0.0:9500
+[2026-06-17 02:04:51.246] [INFO ] [140219397470016] Max clients: 100
+[2026-06-17 02:04:51.246] [INFO ] [140219397470016] Press Ctrl+C to stop
+[2026-06-17 02:06:55.740] [INFO ] [139838328923968] Config loaded from: test_config.json
+[2026-06-17 02:06:55.749] [INFO ] [139838328923968] Database opened: vcs_chat.db
+[2026-06-17 02:06:55.755] [INFO ] [139838328923968] Database tables ready.
+[2026-06-17 02:06:55.755] [INFO ] [139838328923968] Initializing Crypto Engine...
+[2026-06-17 02:06:56.112] [INFO ] [139838328923968] ThreadPool initialized with 4 workers.
+[2026-06-17 02:06:56.112] [CRIT ] [139838328923968] Bind failed on port 9500
+[2026-06-17 02:06:56.738] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:06:57.004] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:06:57.004] [INFO ] [140219389040192] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:06:57.004] [INFO ] [139838328923968] Shutdown signal received.
+[2026-06-17 02:06:57.005] [INFO ] [140219397470016] Client left: Alice
+[2026-06-17 02:08:21.685] [INFO ] [140217896601408] Config loaded from: test_config.json
+[2026-06-17 02:08:21.693] [INFO ] [140217896601408] Database opened: vcs_chat.db
+[2026-06-17 02:08:21.697] [INFO ] [140217896601408] Database tables ready.
+[2026-06-17 02:08:21.697] [INFO ] [140217896601408] Initializing Crypto Engine...
+[2026-06-17 02:08:21.776] [INFO ] [140217896601408] ThreadPool initialized with 4 workers.
+[2026-06-17 02:08:21.776] [CRIT ] [140217896601408] Bind failed on port 9500
+[2026-06-17 02:08:22.684] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:08:22.782] [INFO ] [140219363862080] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:08:22.782] [INFO ] [140219397470016] Client left: Alice
+[2026-06-17 02:08:22.783] [INFO ] [140217896601408] End.
+[2026-06-17 02:08:23.284] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:08:23.486] [INFO ] [140219372254784] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:08:23.487] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:08:23.837] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:08:23.846] [INFO ] [140219380647488] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:08:24.101] [INFO ] [140219389040192] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:08:24.201] [INFO ] [140219363862080] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:08:24.201] [INFO ] [140219363862080] Mute failed: fd=9 has no admin rights
+[2026-06-17 02:08:24.906] [INFO ] [140219397470016] Client left: Alice
+[2026-06-17 02:08:24.906] [INFO ] [140219397470016] Client left: Bob
+[2026-06-17 02:08:24.906] [INFO ] [140219397470016] Client left: Charlie
+[2026-06-17 02:08:39.745] [INFO ] [140300225460032] Config loaded from: test_config.json
+[2026-06-17 02:08:39.757] [INFO ] [140300225460032] Database opened: vcs_chat.db
+[2026-06-17 02:08:39.765] [INFO ] [140300225460032] Database tables ready.
+[2026-06-17 02:08:39.765] [INFO ] [140300225460032] Initializing Crypto Engine...
+[2026-06-17 02:08:40.256] [INFO ] [140300225460032] ThreadPool initialized with 4 workers.
+[2026-06-17 02:08:40.256] [CRIT ] [140300225460032] Bind failed on port 9500
+[2026-06-17 02:08:40.743] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:08:40.850] [INFO ] [140219380647488] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:08:40.851] [INFO ] [140219397470016] Client left: Alice
+[2026-06-17 02:08:41.265] [INFO ] [140300225460032] End.
+[2026-06-17 02:08:41.352] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:08:41.450] [INFO ] [140219389040192] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:08:41.450] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:08:41.549] [INFO ] [140219363862080] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:08:41.549] [INFO ] [140219397470016] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:08:41.678] [INFO ] [140219372254784] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:08:41.782] [INFO ] [140219380647488] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:08:41.782] [INFO ] [140219380647488] Mute failed: fd=9 has no admin rights
+[2026-06-17 02:08:42.481] [INFO ] [140219397470016] Client left: Alice
+[2026-06-17 02:08:42.481] [INFO ] [140219397470016] Client left: Bob
+[2026-06-17 02:08:42.481] [INFO ] [140219397470016] Client left: Charlie
+[2026-06-17 02:09:28.345] [INFO ] [139859219597120] Config loaded from: test_config.json
+[2026-06-17 02:09:28.365] [INFO ] [139859219597120] Database opened: vcs_chat.db
+[2026-06-17 02:09:28.372] [INFO ] [139859219597120] Database tables ready.
+[2026-06-17 02:09:28.372] [INFO ] [139859219597120] Initializing Crypto Engine...
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] ThreadPool initialized with 4 workers.
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Server starting...
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Listening on 0.0.0.0:9500
+[2026-06-17 02:09:28.588] [INFO ] [139859219597120] Max clients: 100
+[2026-06-17 02:09:28.589] [INFO ] [139859219597120] Press Ctrl+C to stop
+[2026-06-17 02:09:29.344] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:09:29.504] [INFO ] [139859211167296] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:09:29.504] [INFO ] [139859219597120] Client left: Alice
+[2026-06-17 02:09:30.011] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=9
+[2026-06-17 02:09:30.132] [INFO ] [139859202774592] Client authenticated: Alice from 127.0.0.1
+[2026-06-17 02:09:30.132] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=10
+[2026-06-17 02:09:30.379] [INFO ] [139859194381888] Client authenticated: Bob from 127.0.0.1
+[2026-06-17 02:09:30.380] [INFO ] [139859219597120] New non-blocking connection: 127.0.0.1 fd=11
+[2026-06-17 02:09:30.690] [INFO ] [139859185989184] Client authenticated: Charlie from 127.0.0.1
+[2026-06-17 02:09:30.790] [INFO ] [139859211167296] AdminCommands::mute called for target=Bob by fd=9
+[2026-06-17 02:09:30.791] [INFO ] [139859211167296] Mute: targetFd=10 for Bob
+[2026-06-17 02:09:30.791] [INFO ] [139859211167296] MUTE: admin=Alice target=Bob
+[2026-06-17 02:09:32.094] [INFO ] [139859211167296] Client left: Bob
+[2026-06-17 02:09:32.094] [INFO ] [139859211167296] KICK: admin=Alice target=Bob reason=Test kick
+[2026-06-17 02:09:32.695] [INFO ] [139859202774592] AdminCommands::mute called for target=Alice by fd=11
+[2026-06-17 02:09:32.695] [INFO ] [139859202774592] Mute failed: fd=11 has no admin rights
+[2026-06-17 02:09:32.695] [INFO ] [139859194381888] PROMOTE: Charlie -> ADMIN
+[2026-06-17 02:09:33.298] [INFO ] [139859211167296] FileTransfer request: Charlie -> Alice file=test.txt tid=3fbd601f9169db93
+[2026-06-17 02:09:33.298] [INFO ] [139859202774592] FileTransfer rejected: tid=3fbd601f9169db93
+[2026-06-17 02:09:33.299] [INFO ] [139859194381888] FileTransfer request: Charlie -> Alice file=test2.txt tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.299] [INFO ] [139859185989184] FileTransfer accepted: tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.299] [INFO ] [139859211167296] FileTransfer data relayed: tid=e241848ccf6a44f4
+[2026-06-17 02:09:33.342] [INFO ] [139859202774592] FileTransfer complete: tid=e241848ccf6a44f4 ok=yes
+[2026-06-17 02:09:33.342] [INFO ] [139859185989184] Room created: #secret by Charlie
+[2026-06-17 02:09:33.944] [INFO ] [139859202774592] Client left: Charlie
+[2026-06-17 02:09:33.944] [INFO ] [139859202774592] BAN: admin=Alice target=Charlie ip=127.0.0.1
+[2026-06-17 02:09:34.445] [INFO ] [139859219597120] Shutdown signal received.
+[2026-06-17 02:09:34.589] [INFO ] [139859219597120] Server stopped.
+[2026-06-17 02:09:34.737] [INFO ] [139859219597120] End.

@@ -227,7 +227,7 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
     switch (type) {
         case MessageType::MSG_CRYPTO_HELLO: {
             Packet resp = m_keyExchange->handleHello(fd, pkt);
-            if (ClientSession* sess = getSession(fd)) {
+            if (auto sess = getSession(fd)) {
                 sess->sendPacket(resp);
                 if (resp.header.msg_type == static_cast<uint8_t>(MessageType::MSG_ERROR)) onClientDisconnected(fd);
             }
@@ -235,7 +235,7 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
         }
         case MessageType::MSG_CRYPTO_KEY_ACCEPT: {
             Packet resp = m_keyExchange->handleKeyAccept(fd, pkt);
-            if (ClientSession* sess = getSession(fd)) {
+            if (auto sess = getSession(fd)) {
                 sess->sendPacket(resp);
                 if (resp.header.msg_type == static_cast<uint8_t>(MessageType::MSG_ERROR)) onClientDisconnected(fd);
             }
@@ -261,7 +261,7 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
             if (tFd == -1) {
                 resp["error"] = "User not found";
             } else {
-                ClientSession* tSess = getSession(tFd);
+                auto tSess = getSession(tFd);
                 if (tSess && tSess->isAuthenticated()) {
                     resp["nickname"] = tSess->nickname();
                     resp["ip"]       = tSess->ip();
@@ -272,7 +272,7 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
                 }
             }
             std::string str = resp.dump();
-            if (ClientSession* sess = getSession(fd)) {
+            if (auto sess = getSession(fd)) {
                 sess->sendPacket(Packet(MessageType::MSG_WHOIS_RESPONSE, std::vector<uint8_t>(str.begin(), str.end())));
             }
             break;
@@ -330,7 +330,7 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
 
 void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     auto parsed = Parser::parseConnectRequest(pkt);
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess) return;
 
     if (!isNicknameValid(parsed.nickname)) {
@@ -392,7 +392,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
 
 void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     std::string token = Parser::parseReconnectRequest(pkt);
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess) return;
 
     if (token.empty()) {
@@ -438,7 +438,7 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
 }
 
 void TcpServer::handleChatSend(int fd, const Packet& pkt){
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     if (sess->isMuted()){
@@ -460,7 +460,7 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 }
 
 void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
-    ClientSession* sender = getSession(fd);
+    auto sender = getSession(fd);
     if (!sender || !sender->isAuthenticated()) return;
 
     auto parsed = Parser::parseChatPrivate(pkt);
@@ -491,17 +491,17 @@ void TcpServer::handleDisconnect(int fd, const Packet&) {
 }
 
 void TcpServer::handlePing(int fd) {
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (sess) sess->sendPacket(Builder::makePong());
 }
 
 void TcpServer::handlePong(int fd) {
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (sess) sess->m_pongReceived = true;
 }
 
 void TcpServer::handleUserListRequest(int fd) {
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     auto users = getUsersInRoom(sess->currentRoom());
@@ -510,7 +510,7 @@ void TcpServer::handleUserListRequest(int fd) {
 }
 
 void TcpServer::handleRoomListRequest(int fd) {
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     auto rooms = getRoomList();
@@ -519,7 +519,7 @@ void TcpServer::handleRoomListRequest(int fd) {
 }
 
 void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     auto parsed = Parser::parseRoomJoin(pkt);
@@ -542,7 +542,7 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
 }
 
 void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     auto parsed = Parser::parseRoomCreate(pkt);
@@ -567,7 +567,7 @@ void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
 }
 
 void TcpServer::handleRoomLeave(int fd){
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
     const auto& cfg    = Config::instance().get();
@@ -592,7 +592,7 @@ void TcpServer::handleRoomLeave(int fd){
 }
 
 void TcpServer::onClientDisconnected(int fd) {
-    ClientSession* sess = getSession(fd);
+    auto sess = getSession(fd);
     std::string nick, room;
     if (sess) {
         nick = sess->nickname();
@@ -655,11 +655,11 @@ void TcpServer::broadcastToAll(const Packet& pkt, int excludeFd) {
     }
 }
 
-ClientSession* TcpServer::getSession(int fd) {
+std::shared_ptr<ClientSession> TcpServer::getSession(int fd) {
     std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
     auto it = m_sessions.find(fd);
     if (it == m_sessions.end()) return nullptr;
-    return it->second.get();
+    return it->second;
 }
 
 int TcpServer::getFdByNickname(const std::string& nick) {
@@ -669,18 +669,18 @@ int TcpServer::getFdByNickname(const std::string& nick) {
     return -1;
 }
 
-std::vector<ClientSession*> TcpServer::getSessionsInRoom(const std::string& room) {
+std::vector<std::shared_ptr<ClientSession>> TcpServer::getSessionsInRoom(const std::string& room) {
     std::set<int> members;
     {
         std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
         auto it = m_rooms.find(room);
         if (it != m_rooms.end()) members = it->second;
     }
-    std::vector<ClientSession*> result;
+    std::vector<std::shared_ptr<ClientSession>> result;
     std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
     for (int fd : members) {
         auto it = m_sessions.find(fd);
-        if (it != m_sessions.end()) result.push_back(it->second.get());
+        if (it != m_sessions.end()) result.push_back(it->second);
     }
     return result;
 }
@@ -688,7 +688,7 @@ std::vector<ClientSession*> TcpServer::getSessionsInRoom(const std::string& room
 std::vector<std::string> TcpServer::getUsersInRoom(const std::string& room) {
     auto sessions = getSessionsInRoom(room);
     std::vector<std::string> names;
-    for (auto* s : sessions) {
+    for (auto s : sessions) {
         if (s->isAuthenticated()) names.push_back(s->nickname());
     }
     return names;

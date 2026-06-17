@@ -60,7 +60,7 @@ bool FileTransfer::isAllowedExtension(const std::string& filename) {
 
 void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
     if (!m_server) return;
-    ClientSession* sender = m_server->getSession(senderFd);
+    auto sender = m_server->getSession(senderFd);
     if (!sender) return;
 
     json j;
@@ -89,7 +89,7 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
     }
 
     int receiverFd = m_server->getFdByNickname(toNick);
-    ClientSession* receiver = m_server->getSession(receiverFd);
+    auto receiver = m_server->getSession(receiverFd);
     if (!receiver) {
         sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found: " + toNick));
         return;
@@ -139,7 +139,7 @@ void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
 
     it->second.status = TransferStatus::ACCEPTED;
 
-    ClientSession* sender = m_server->getSession(it->second.sender_fd);
+    auto sender = m_server->getSession(it->second.sender_fd);
     if (!sender) return;
 
     std::string rs = j.dump();
@@ -159,7 +159,7 @@ void FileTransfer::handleReject(int receiverFd, const std::string& payloadJson) 
     auto it = m_transfers.find(tid);
     if (it == m_transfers.end()) return;
 
-    ClientSession* sender = m_server->getSession(it->second.sender_fd);
+    auto sender = m_server->getSession(it->second.sender_fd);
     if (sender) {
         std::string rs = j.dump();
         std::vector<uint8_t> payload(rs.begin(), rs.end());
@@ -186,7 +186,7 @@ void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
 
     it->second.status = TransferStatus::IN_PROGRESS;
 
-    ClientSession* receiver = m_server->getSession(it->second.receiver_fd);
+    auto receiver = m_server->getSession(it->second.receiver_fd);
     if (!receiver) {
         m_transfers.erase(it);
         return;
@@ -211,7 +211,7 @@ void FileTransfer::handleComplete(int senderFd, const std::string& payloadJson) 
     if (it == m_transfers.end()) return;
     if (it->second.sender_fd != senderFd) return; // SECURITY CHECK
 
-    ClientSession* receiver = m_server->getSession(it->second.receiver_fd);
+    auto receiver = m_server->getSession(it->second.receiver_fd);
     if (receiver) {
         std::string rs = j.dump();
         std::vector<uint8_t> payload(rs.begin(), rs.end());

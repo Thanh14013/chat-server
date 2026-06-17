@@ -606,3 +606,43 @@
 [2026-06-12 10:22:45.013] [INFO ] [140510367344448] Shutdown signal received.
 [2026-06-12 10:22:45.864] [INFO ] [140510367344448] Server stopped.
 [2026-06-12 10:22:45.874] [INFO ] [140510367344448] End.
+[2026-06-12 12:19:32.686] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:32.868] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 12:19:36.922] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:40.222] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:40.987] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 12:19:42.511] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:49.225] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:50.301] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 12:19:53.049] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:19:53.664] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 12:20:00.030] [INFO ] [140347555620672] New non-blocking connection: 66.132.224.89 fd=9
+[2026-06-12 12:20:01.154] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 13:16:42.330] [INFO ] [140347555620672] New non-blocking connection: 135.237.126.9 fd=9
+[2026-06-12 13:16:42.337] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 13:16:42.784] [INFO ] [140347555620672] New non-blocking connection: 135.237.126.9 fd=9
+[2026-06-12 13:16:42.785] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:00:00.872] [INFO ] [140347555620672] New non-blocking connection: 20.65.195.59 fd=9
+[2026-06-12 19:00:09.337] [INFO ] [140347555620672] New non-blocking connection: 185.93.89.79 fd=10
+[2026-06-12 19:00:09.337] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=10
+[2026-06-12 19:00:11.074] [INFO ] [140347555620672] New non-blocking connection: 20.65.195.59 fd=9
+[2026-06-12 19:00:11.074] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:36.928] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:37.109] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:37.109] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:37.475] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:37.475] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:37.840] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:37.840] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:38.207] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:38.207] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:38.573] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:38.573] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:38.937] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:38.937] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:39.301] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:39.301] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:39.666] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:39.666] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9
+[2026-06-12 19:41:40.031] [INFO ] [140347555620672] New non-blocking connection: 79.124.40.174 fd=9
+[2026-06-12 19:41:40.031] [ERROR] [140347555620672] Malformed packet header. Closing connection fd=9

@@ -24,7 +24,7 @@ std::string AdminCommands::adminNick(int adminFd)
 {
     if (!m_server)
         return "unknown";
-    ClientSession *s = m_server->getSession(adminFd);
+    auto s = m_server->getSession(adminFd);
     return s ? s->nickname() : "unknown";
 }
 
@@ -32,7 +32,7 @@ bool AdminCommands::hasAdminRight(int adminFd, bool ownerOnly)
 {
     if (!m_server)
         return false;
-    ClientSession *s = m_server->getSession(adminFd);
+    auto s = m_server->getSession(adminFd);
     if (!s)
         return false;
     if (ownerOnly)
@@ -44,7 +44,7 @@ void AdminCommands::kick(int adminFd, const std::string &targetNick, const std::
 {
     if (!hasAdminRight(adminFd))
     {
-        ClientSession *admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "No admin rights"));
         return;
@@ -53,11 +53,11 @@ void AdminCommands::kick(int adminFd, const std::string &targetNick, const std::
     std::string anik = adminNick(adminFd);
 
     int targetFd = m_server->getFdByNickname(targetNick);
-    ClientSession *target = m_server->getSession(targetFd);
+    auto target = m_server->getSession(targetFd);
 
     if (!target)
     {
-        ClientSession *admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(
                 Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found"));
@@ -81,7 +81,7 @@ void AdminCommands::mute(int adminFd, const std::string &targetNick, int duratio
     if (!hasAdminRight(adminFd))
     {
         LOG_INFO("Mute failed: fd=" + std::to_string(adminFd) + " has no admin rights");
-        ClientSession *admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(
                 Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "No admin rights"));
@@ -90,7 +90,7 @@ void AdminCommands::mute(int adminFd, const std::string &targetNick, int duratio
     std::string anik = adminNick(adminFd);
     int targetFd = m_server->getFdByNickname(targetNick);
     LOG_INFO("Mute: targetFd=" + std::to_string(targetFd) + " for " + targetNick);
-    ClientSession *target = m_server->getSession(targetFd);
+    auto target = m_server->getSession(targetFd);
     if (!target) {
         LOG_INFO("Mute failed: target session is null");
         return;
@@ -114,7 +114,7 @@ void AdminCommands::unmute(int adminFd, const std::string &targetNick)
         return;
 
     int targetFd = m_server->getFdByNickname(targetNick);
-    ClientSession *s = m_server->getSession(targetFd);
+    auto s = m_server->getSession(targetFd);
     s->setMuted(false, 0);
     s->sendPacket(Builder::makeSystemNotify("You have been unmuted."));
     AUDIT(AuditEventType::ADMIN, adminNick(adminFd), targetNick,
@@ -126,7 +126,7 @@ void AdminCommands::ban(int adminFd, const std::string &targetNick, const std::s
 {
     if (!hasAdminRight(adminFd))
     {
-        ClientSession *admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(
                 Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "No admin rights"));
@@ -135,7 +135,7 @@ void AdminCommands::ban(int adminFd, const std::string &targetNick, const std::s
 
     std::string anik = adminNick(adminFd);
     int targetFd = m_server->getFdByNickname(targetNick);
-    ClientSession *target = m_server->getSession(targetFd);
+    auto target = m_server->getSession(targetFd);
     if (!target)
         return;
 
@@ -162,7 +162,7 @@ void AdminCommands::promote(int adminFd, const std::string &targetNick)
 {
     if (!hasAdminRight(adminFd, true))
     {
-        ClientSession *admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin)
             admin->sendPacket(
                 Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Only OWNER can promote"));
@@ -171,7 +171,7 @@ void AdminCommands::promote(int adminFd, const std::string &targetNick)
 
     std::string anik = adminNick(adminFd);
     int targetFd = m_server->getFdByNickname(targetNick);
-    ClientSession *target = m_server->getSession(targetFd);
+    auto target = m_server->getSession(targetFd);
     if (!target)
         return;
 
@@ -189,7 +189,7 @@ void AdminCommands::demote(int adminFd, const std::string &targetNick)
         return;
     std::string anik = adminNick(adminFd);
     int targetFd = m_server->getFdByNickname(targetNick);
-    ClientSession *target = m_server->getSession(targetFd);
+    auto target = m_server->getSession(targetFd);
     if (!target)
         return;
     target->setRole(UserRole::USER);
@@ -201,7 +201,7 @@ void AdminCommands::demote(int adminFd, const std::string &targetNick)
 
 void AdminCommands::broadcast(int adminFd, const std::string& message) {
     if (!hasAdminRight(adminFd)) {
-        ClientSession* admin = m_server->getSession(adminFd);
+        auto admin = m_server->getSession(adminFd);
         if (admin) admin->sendPacket(
             Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "No admin rights"));
         return;

@@ -29,7 +29,7 @@ std::string RoomManager::nickFromFd(int fd)
 {
     if (!m_server)
         return "";
-    ClientSession *s = m_server->getSession(fd);
+    auto s = m_server->getSession(fd);
     return s ? s->nickname() : "";
 }
 
@@ -111,7 +111,7 @@ ErrorCode RoomManager::joinRoom(int fd, const std::string &nickname, const std::
 
     if (m_server)
     {
-        ClientSession *sess = m_server->getSession(fd);
+        auto sess = m_server->getSession(fd);
         if (sess)
             sess->setRoom(roomName);
     }
@@ -150,7 +150,7 @@ void RoomManager::leaveRoom(int fd, const std::string& nickname, const std::stri
     }
 
     if (m_server) {
-        ClientSession* sess = m_server->getSession(fd);
+        auto sess = m_server->getSession(fd);
         if (sess) sess->setRoom(m_defaultRoom);
     }
 }
@@ -181,7 +181,7 @@ void RoomManager::broadcastToRoom(const std::string& room, const Packet& pkt,
     if (!m_server) return;
     for (int fd : members) {
         if (fd == excludeFd) continue;
-        ClientSession* sess = m_server->getSession(fd);
+        auto sess = m_server->getSession(fd);
         if (sess) sess->sendPacket(pkt);
     }
 }
@@ -242,7 +242,7 @@ void RoomManager::sendHistoryToClient(int fd, const std::string& room, int n) {
     auto entries = h->getRecent(n);
     if (entries.empty()) return;
 
-    ClientSession* sess = m_server->getSession(fd);
+    auto sess = m_server->getSession(fd);
     if (!sess) return;
 
     Packet histPkt = h->serializeForClient(entries);
