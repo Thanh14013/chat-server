@@ -275,6 +275,18 @@ void CommandHandler::handleAdminCommand(const Command &cmd)
         j["target"] = cmd.args[0];
         j["demote"] = true;
     }
+    else if (cmd.type == CommandType::CMD_BROADCAST)
+    {
+        if (cmd.args.empty())
+            return;
+        type = MessageType::MSG_ADMIN_BROADCAST;
+        std::string text = "";
+        for (size_t i = 0; i < cmd.args.size(); i++)
+        {
+            text += cmd.args[i] + (i == cmd.args.size() - 1 ? "" : " ");
+        }
+        j["message"] = text;
+    }
     else
     {
         return;

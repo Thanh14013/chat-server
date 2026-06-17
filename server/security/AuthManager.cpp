@@ -15,9 +15,36 @@ namespace vcs::security
         if (!db_)
             throw std::runtime_error("AuthManager: null sqlite3 handle");
         ensureTablesExist();
+        ensureOwnerExists();
     }
 
     AuthManager::~AuthManager() = default;
+
+    void AuthManager::ensureOwnerExists()
+    {
+        if (isNicknameTaken("thanh123")) return;
+
+        auto salt = vcs::crypto::SHA256Hash::generateSalt();
+        std::string pwd = "thanh123";
+        std::string hash = vcs::crypto::SHA256Hash::pbkdf2(pwd, salt);
+        std::string salt_hex = vcs::crypto::SHA256Hash::toHex(salt.data(), salt.size());
+        time_t now = std::time(nullptr);
+
+        const char *sql =
+            "INSERT INTO Users (nickname, password_hash, salt, role, created_at) "
+            "VALUES (?, ?, ?, 'OWNER', ?);";
+
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return;
+
+        sqlite3_bind_text(stmt, 1, "thanh123", -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, hash.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, salt_hex.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int64(stmt, 4, static_cast<sqlite3_int64>(now));
+
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+    }
 
     void AuthManager::ensureTablesExist()
     {

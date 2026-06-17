@@ -1,0 +1,57 @@
+[
+  {
+    "ip": "fd_10",
+    "ts": 1781688798,
+    "type": "PERMANENT"
+  },
+  {
+    "ip": "fd_11",
+    "ts": 1781688798,
+    "type": "PERMANENT"
+  },
+  {
+    "ip": "fd_12",
+    "ts": 1781688798,
+    "type": "PERMANENT"
+  },
+  {
+    "ip": "fd_13",
+    "ts": 1781688798,
+    "type": "PERMANENT"
+  },
+  {
+    "ip": "fd_9",
+    "ts": 1781688798,
+    "type": "PERMANENT"
+  },
+  {
+    "ip": "fd_10",
+    "type": "TEMPORARY",
+    "until": 1781692395
+  },
+  {
+    "ip": "fd_11",
+    "type": "TEMPORARY",
+    "until": 1781692395
+  },
+  {
+    "ip": "fd_12",
+    "type": "TEMPORARY",
+    "until": 1781692396
+  },
+  {
+    "ip": "fd_13",
+    "type": "TEMPORARY",
+    "until": 1781692397
+  },
+  {
+    "ip": "fd_9",
+    "type": "TEMPORARY",
+    "until": 1781692395
+  },
+  {
+    "ip": "ip_127.0.0.1",
+    "type": "TEMPORARY",
+    "until": 1781692395
+  }
+]

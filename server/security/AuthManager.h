@@ -53,5 +53,6 @@ namespace vcs::security
         void resetFailedAttempts(const std::string& nickname);
         bool isAccountLocked(const std::string& nickname) const;
         void ensureTablesExist();
+        void ensureOwnerExists();
     };
 }
