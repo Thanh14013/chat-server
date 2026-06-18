@@ -1,0 +1,15 @@
+\subsection{Yêu cầu phi chức năng}
+
+Bên cạnh các tính năng nghiệp vụ, hệ thống đặc biệt chú trọng vào các yêu cầu phi chức năng nhằm đảm bảo hiệu năng, độ tin cậy và an toàn thông tin tuyệt đối trong môi trường mạng thực tế:
+
+\begin{itemize}
+    \item \textbf{Bảo mật và Toàn vẹn dữ liệu (Security \& Integrity):}
+    \begin{itemize}
+        \item Mọi thông điệp truyền tải trên mạng lưới phải được mã hóa bằng thuật toán chuẩn công nghiệp (AES) với khóa phiên (Session Key) được phân phối an toàn qua cơ chế mã hóa bất đối xứng (RSA).
+        \item Hệ thống phải chống lại được các hành vi đánh tráo, thay đổi nội dung gói tin thông qua việc sử dụng mã xác thực thông điệp (HMAC) kết hợp cùng hàm băm SHA256.
+        \item Tích hợp hệ thống ghi nhận nhật ký kiểm toán chống can thiệp (Tamper-evident Audit Logger) lưu trữ trên cơ sở dữ liệu SQLite, cho phép truy vết chính xác và hệ thống sẽ báo động nếu file log bị chỉnh sửa trái phép từ bên ngoài.
+        \item Có module Phát hiện xâm nhập (Intrusion Detector) để tự động nhận diện và ngắt kết nối các client có hành vi gửi gói tin dị thường, sai cấu trúc hoặc có dấu hiệu tấn công từ chối dịch vụ (DoS).
+    \end{itemize}
+    \item \textbf{Hiệu năng và Khả năng mở rộng (Performance \& Scalability):} Máy chủ phải được thiết kế theo kiến trúc hướng sự kiện (Event-driven) sử dụng vòng lặp bất đồng bộ (Event Loop) kết hợp với mô hình đa luồng (Thread Pool). Điều này đảm bảo luồng chính của hệ thống không bị nghẽn (non-blocking) bởi các thao tác I/O chậm chạp, đáp ứng khả năng xử lý hàng chục nghìn kết nối đồng thời (bài toán C10K) với độ trễ xử lý (Latency) ở mức thấp nhất.
+    \item \textbf{Tính tin cậy và Khả năng chịu lỗi (Reliability \& Fault Tolerance):} Máy chủ phải có cơ chế xử lý mượt mà các tình huống phân mảnh gói tin TCP (TCP Packet Fragmentation) hoặc dính gói. Nếu phía client đột ngột mất mạng, hệ thống phải tự động nhận diện thông qua cơ chế timeout của Ping/Pong và dọn dẹp tài nguyên (socket, session) để ngăn chặn hoàn toàn rò rỉ bộ nhớ (Memory Leak).
+\end{itemize}

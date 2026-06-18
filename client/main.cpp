@@ -5,7 +5,11 @@
 #include <cstdlib>
 #include <cstdint>
 #include <csignal>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <unistd.h>
+#endif
 
 ConnectionManager* g_mgr = nullptr;
 
@@ -13,13 +17,23 @@ void signalHandler(int signum) {
     if (g_mgr) {
         g_mgr->stop();
     }
+#ifndef _WIN32
     // Force std::getline to unblock by closing stdin
     ::close(STDIN_FILENO);
+#endif
 }
 
 int main(int argc, char* argv[]){
     std::string host = "127.0.0.1";
     uint16_t port = 9000;
+
+#ifdef _WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        std::cerr << "WSAStartup failed." << std::endl;
+        return 1;
+    }
+#endif
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -43,5 +57,8 @@ int main(int argc, char* argv[]){
 
     mgr.stop();
     client.disconnect();
+#ifdef _WIN32
+    WSACleanup();
+#endif
     return 0;
 }

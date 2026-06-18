@@ -1,8 +1,12 @@
 #include "Packet.h"
 #include "../../common/Constants.h"
 #include <cstring>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <unistd.h>
 #include <sys/socket.h>
+#endif
 
 uint32_t computeCRC32(const std::vector<uint8_t> &data)
 {
@@ -43,7 +47,11 @@ static bool recvAll(int fd, uint8_t *buf, size_t len)
     size_t received = 0;
     while (received < len)
     {
+#ifdef _WIN32
+        ssize_t n = recv(fd, reinterpret_cast<char*>(buf + received), static_cast<int>(len - received), 0);
+#else
         ssize_t n = recv(fd, buf + received, len - received, 0);
+#endif
         if (n <= 0)
             return false;
         received += n;

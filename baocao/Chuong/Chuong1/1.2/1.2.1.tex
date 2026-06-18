@@ -1,0 +1,15 @@
+\subsection{Yêu cầu chức năng}
+
+Dựa trên mục tiêu xây dựng một nền tảng trò chuyện bảo mật toàn diện, hệ thống cần đáp ứng các nhóm yêu cầu chức năng cốt lõi sau:
+
+\begin{itemize}
+    \item \textbf{Quản lý phiên kết nối và người dùng:} Hệ thống phải hỗ trợ người dùng kết nối (Connect), ngắt kết nối (Disconnect) và duy trì trạng thái hoạt động thông qua cơ chế nhịp tim (Ping/Pong). Hệ thống cũng cần cho phép người dùng tra cứu danh sách những tài khoản đang online và xem thông tin chi tiết (Whois) của một người dùng cụ thể.
+    \item \textbf{Giao tiếp và Nhắn tin:}
+    \begin{itemize}
+        \item \textit{Nhắn tin cá nhân (Private Chat):} Cho phép hai người dùng trao đổi thông điệp trực tiếp với nhau một cách bảo mật.
+        \item \textit{Nhắn tin nhóm (Room Chat):} Hỗ trợ tính năng tra cứu danh sách phòng (List Rooms), tạo phòng mới (Create Room), tham gia (Join), rời phòng (Leave) và gửi tin nhắn quảng bá (Broadcast) tới tất cả các thành viên trong phòng.
+    \end{itemize}
+    \item \textbf{Truyền tải tệp tin (File Transfer):} Hệ thống cần tích hợp tính năng gửi và nhận tệp tin P2P hoặc thông qua server. Quá trình này bao gồm các bước kiểm soát chặt chẽ: gửi yêu cầu truyền tệp (File Request), chấp nhận/từ chối (Accept/Reject), và truyền dữ liệu theo từng khối (File Data) để không gây nghẽn luồng thông điệp chính.
+    \item \textbf{Quản trị hệ thống (Admin Commands):} Cung cấp đặc quyền cho quản trị viên thực hiện các thao tác kiểm duyệt, quản lý cộng đồng như: kích xuất người dùng (Kick), cấm chat (Mute), cấm truy cập (Ban), thăng cấp quản trị (Promote) và gửi thông báo toàn hệ thống (System Broadcast).
+    \item \textbf{Thiết lập bảo mật sơ khởi:} Chức năng tự động thực hiện bắt tay mật mã (Crypto Handshake) ngay khi có kết nối mới nhằm trao đổi khóa công khai và thiết lập kênh truyền mã hóa trước khi bất kỳ dữ liệu nghiệp vụ nào được phép lưu thông.
+\end{itemize}

@@ -1,10 +1,26 @@
 #include "TcpClient.h"
 #include "../security/CertVerifier.h"
 #include "../../common/MessageTypes.h"
+#ifdef _WIN32
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+#define CLOSE_SOCKET closesocket
+#ifndef SHUT_RDWR
+#define SHUT_RDWR SD_BOTH
+#endif
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#define CLOSE_SOCKET ::close
+#endif
 #include <cstring>
 #include <iostream>
 #include <chrono>
@@ -25,16 +41,21 @@ bool TcpClient::tryConnect(const std::string &host, uint16_t port)
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    if (::inet_pton(AF_INET, host.c_str(), &addr.sin_addr) <= 0)
+#ifdef _WIN32
+    addr.sin_addr.s_addr = inet_addr(host.c_str());
+    if (addr.sin_addr.s_addr == INADDR_NONE)
+#else
+    if (inet_pton(AF_INET, host.c_str(), &addr.sin_addr) <= 0)
+#endif
     {
-        ::close(m_fd);
+        CLOSE_SOCKET(m_fd);
         m_fd = -1;
         return false;
     }
 
     if (::connect(m_fd, (sockaddr *)&addr, sizeof(addr)) < 0)
     {
-        ::close(m_fd);
+        CLOSE_SOCKET(m_fd);
         m_fd = -1;
         return false;
     }
@@ -79,7 +100,7 @@ void TcpClient::disconnect()
     if (m_fd >= 0)
     {
         ::shutdown(m_fd, SHUT_RDWR);
-        ::close(m_fd);
+        CLOSE_SOCKET(m_fd);
         m_fd = -1;
     }
     if (m_recvThread.joinable()) {
@@ -124,7 +145,7 @@ bool TcpClient::sendPacket(const Packet &pkt)
     ssize_t len = static_cast<ssize_t>(bytes.size());
     while (total < len)
     {
-        ssize_t n = ::send(m_fd, bytes.data() + total, len - total, MSG_NOSIGNAL);
+        ssize_t n = ::send(m_fd, reinterpret_cast<const char*>(bytes.data() + total), static_cast<int>(len - total), MSG_NOSIGNAL);
         if (n <= 0)
             return false;
         total += n;

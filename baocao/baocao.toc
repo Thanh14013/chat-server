@@ -1,0 +1,34 @@
+\selectlanguage *{vietnamese}
+\contentsline {chapter}{Danh sách hình vẽ}{iii}{chapter*.1}%
+\contentsline {chapter}{Danh sách bảng}{iv}{chapter*.1}%
+\contentsline {chapter}{Bảng từ viết tắt}{v}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}KHẢO SÁT VÀ PHÂN TÍCH YÊU CẦU}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Khảo sát hiện trạng}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Phân tích yêu cầu hệ thống}{2}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Yêu cầu chức năng}{2}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Yêu cầu phi chức năng}{2}{subsection.1.2.2}%
+\contentsline {chapter}{\numberline {2}NỀN TẢNG LÝ THUYẾT VÀ CÔNG NGHỆ SỬ DỤNG}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Kiến trúc mạng và giao thức}{4}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Mô hình Client-Server}{4}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Giao thức TCP/IP}{4}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Công nghệ mã hóa và bảo mật}{4}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Mã hóa đối xứng AES}{4}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Mã hóa bất đối xứng RSA}{4}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Hàm băm SHA256 và xác thực HMAC}{4}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Công cụ và Thư viện phát triển}{4}{section.2.3}%
+\contentsline {chapter}{\numberline {3}PHÂN TÍCH THIẾT KẾ, TRIỂN KHAI VÀ ĐÁNH GIÁ}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Kiến trúc tổng thể hệ thống}{5}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Kiến trúc Server}{5}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Kiến trúc Client}{5}{subsection.3.1.2}%
+\contentsline {section}{\numberline {3.2}Thiết kế giao thức giao tiếp}{5}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Cấu trúc gói tin}{5}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Luồng xử lý thông điệp}{5}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Thiết kế cơ chế bảo mật}{5}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Cơ chế trao đổi khóa (Key Exchange)}{5}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Xác thực chứng chỉ số}{5}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Triển khai và Đánh giá}{5}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Môi trường triển khai}{5}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Đánh giá kết quả đạt được}{5}{subsection.3.4.2}%
+\contentsline {chapter}{\numberline {4}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{6}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Kết luận}{6}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Hướng phát triển}{6}{section.4.2}%

@@ -24,7 +24,11 @@ namespace vcs::client
         const char *home = std::getenv("HOME");
         std::string dir = home ? std::string(home) + "/.vcs_chat" : "tmp/.vcs_chat";
 
-        mkdir(dir.c_str(), 755);
+#ifdef _WIN32
+        mkdir(dir.c_str());
+#else
+        mkdir(dir.c_str(), 0755);
+#endif
 
         return dir + "/known_servers.json";
     }
