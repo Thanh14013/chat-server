@@ -249,6 +249,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
     case MessageType::MSG_USER_LIST_RESPONSE:
     case MessageType::MSG_USER_LISTALL_RESPONSE:
     case MessageType::MSG_ROOM_LIST_RESPONSE:
+    case MessageType::MSG_ADMIN_ROOM_INFO_RESPONSE:
     {
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())

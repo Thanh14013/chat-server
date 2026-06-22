@@ -25,11 +25,11 @@ private:
     void handleCreate(const Command &cmd);
     void handleMsg(const Command &cmd);
     void handleSend(const Command &cmd);
-    void handleWhois(const Command &cmd);
-    void handleHelp(const Command &cmd);
+    void handleWhois(const Command& cmd);
+    void handleHelp(const Command& cmd);
     void handleAccept(const Command& cmd);
     void handleReject(const Command& cmd);
-
-    // Admin commands
-    void handleAdminCommand(const Command &cmd);
+    void handleAdminCommand(const Command& cmd);
+    void handleDeleteRoom(const Command& cmd);
+    void handleRoomsAdmin(const Command& cmd);
 };

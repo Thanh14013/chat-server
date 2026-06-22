@@ -147,6 +147,13 @@ void IntrusionDetector::permBan(const std::string& ip, const std::string& reason
     exportBanList();
 }
 
+void IntrusionDetector::permBanNick(const std::string& nick, const std::string& reason) {
+    std::lock_guard<std::mutex> lk(m_mutex);
+    m_bannedNicks.insert(nick);
+    LOG_WARN("Manual perm ban for Nickname: " + nick + " reason=" + reason);
+    exportBanList();
+}
+
 void IntrusionDetector::unban(const std::string& ip) {
     std::lock_guard<std::mutex> lk(m_mutex);
     m_permBans.erase(ip);
@@ -156,7 +163,19 @@ void IntrusionDetector::unban(const std::string& ip) {
         it->second.threat_score = 0;
         it->second.temp_ban_count = 0;
     }
-    LOG_INFO("IDS unban: " + ip);
+    LOG_INFO("IDS unban IP: " + ip);
+}
+
+void IntrusionDetector::unbanNick(const std::string& nick) {
+    std::lock_guard<std::mutex> lk(m_mutex);
+    m_bannedNicks.erase(nick);
+    LOG_INFO("IDS unban Nickname: " + nick);
+    exportBanList();
+}
+
+bool IntrusionDetector::isBannedNick(const std::string& nick) {
+    std::lock_guard<std::mutex> lk(m_mutex);
+    return m_bannedNicks.count(nick) > 0;
 }
 
 void IntrusionDetector::addWhitelist(const std::string& ip) {
@@ -192,6 +211,11 @@ void IntrusionDetector::exportBanList(const std::string& path) {
         e["until"] = (long long)until;
         banned.push_back(e);
     }
+    for (auto& nick : m_bannedNicks) {
+        json e; e["nick"] = nick; e["type"] = "NICKNAME";
+        e["ts"] = (long long)std::time(nullptr);
+        banned.push_back(e);
+    }
     std::ofstream ofs(path);
     if (ofs.is_open()) ofs << banned.dump(2);
 }
@@ -206,14 +230,17 @@ void IntrusionDetector::loadBanList(const std::string& path) {
     for (auto& entry : j) {
         std::string ip   = entry.value("ip", "");
         std::string type = entry.value("type", "");
-        if (ip.empty()) continue;
-        if (type == "PERMANENT") m_permBans.insert(ip);
-        else if (type == "TEMPORARY") {
+        if (type == "PERMANENT" && !ip.empty()) m_permBans.insert(ip);
+        else if (type == "TEMPORARY" && !ip.empty()) {
             time_t until = (time_t)entry.value("until", (long long)0);
             if (until > std::time(nullptr)) m_tempBans[ip] = until;
         }
+        else if (type == "NICKNAME") {
+            std::string nick = entry.value("nick", "");
+            if (!nick.empty()) m_bannedNicks.insert(nick);
+        }
     }
-    LOG_INFO("Ban list loaded: " + std::to_string(m_permBans.size()) + " perm bans.");
+    LOG_INFO("Ban list loaded: " + std::to_string(m_permBans.size()) + " IP bans, " + std::to_string(m_bannedNicks.size()) + " Nick bans.");
 }
 
 std::string IntrusionDetector::exportCEF(const std::string& ip,

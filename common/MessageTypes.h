@@ -20,6 +20,7 @@ enum class MessageType : uint8_t {
     MSG_ROOM_LIST_REQUEST    = 0x22,
     MSG_ROOM_LIST_RESPONSE   = 0x23,
     MSG_ROOM_CREATE          = 0x24,
+    MSG_ROOM_DELETE          = 0x25,
 
     MSG_USER_LIST_REQUEST    = 0x30,
     MSG_USER_LIST_RESPONSE   = 0x31,
@@ -44,6 +45,9 @@ enum class MessageType : uint8_t {
     MSG_ADMIN_BAN            = 0x62,
     MSG_ADMIN_PROMOTE        = 0x63,
     MSG_ADMIN_BROADCAST      = 0x64,
+    MSG_ADMIN_ROOM_INFO_REQUEST  = 0x65,
+    MSG_ADMIN_ROOM_INFO_RESPONSE = 0x66,
+    MSG_ADMIN_UNKICK         = 0x67,
 
     MSG_ERROR                = 0xFF
 };

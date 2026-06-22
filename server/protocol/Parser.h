@@ -19,6 +19,7 @@ struct ParsedPrivate {
 
 struct ParsedRoomOp {
     std::string room_name;
+    std::string password;
 };
 
 namespace Parser {
@@ -28,5 +29,6 @@ namespace Parser {
     ParsedPrivate  parseChatPrivate(const Packet& pkt);
     ParsedRoomOp   parseRoomJoin(const Packet& pkt);
     ParsedRoomOp   parseRoomCreate(const Packet& pkt);
+    ParsedRoomOp   parseRoomDelete(const Packet& pkt);
     std::string    payloadToString(const Packet& pkt);
 }

@@ -24,6 +24,7 @@ bool Database::open(const std::string &path)
     }
     sqlite3_exec(m_db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
     sqlite3_exec(m_db, "PRAGMA synchronous=NORMAL;", nullptr, nullptr, nullptr);
+    sqlite3_exec(m_db, "PRAGMA foreign_keys=ON;", nullptr, nullptr, nullptr);
     m_open = true;
     LOG_INFO("Database opened: " + path);
     return createTables();
@@ -103,8 +104,29 @@ bool Database::createTables()
             hash       TEXT    NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS Rooms (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_name     TEXT    NOT NULL UNIQUE,
+            password_hash TEXT    NOT NULL,
+            salt          TEXT    NOT NULL,
+            creator_nick  TEXT    NOT NULL,
+            created_at    INTEGER NOT NULL,
+            FOREIGN KEY(creator_nick) REFERENCES Users(nickname) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS RoomBans (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_name     TEXT    NOT NULL,
+            nickname      TEXT    NOT NULL,
+            created_at    INTEGER NOT NULL,
+            FOREIGN KEY(room_name) REFERENCES Rooms(room_name) ON DELETE CASCADE,
+            FOREIGN KEY(nickname) REFERENCES Users(nickname) ON DELETE CASCADE,
+            UNIQUE(room_name, nickname)
+        );
+
         CREATE INDEX IF NOT EXISTS idx_chat_room_ts ON ChatHistory(room, timestamp);
         CREATE INDEX IF NOT EXISTS idx_audit_ts     ON AuditLog(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_roombans     ON RoomBans(room_name);
     )";
 
     char *errMsg = nullptr;

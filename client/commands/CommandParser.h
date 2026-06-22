@@ -19,6 +19,7 @@ enum class CommandType{
     CMD_REJECT,
     // Admin
     CMD_KICK,
+    CMD_UNKICK,
     CMD_MUTE,
     CMD_UNMUTE,
     CMD_BAN,
@@ -27,6 +28,8 @@ enum class CommandType{
     CMD_DEMOTE,
     CMD_BROADCAST,
     CMD_SHUTDOWN,
+    CMD_DELETE_ROOM,
+    CMD_ROOMS_ADMIN,
 
     // Unknown or regular text
     CMD_UNKNOWN,

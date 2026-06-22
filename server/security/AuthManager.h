@@ -40,6 +40,22 @@ namespace vcs::security
         SessionToken::Role getUserRole(const std::string& nickname) const;
 
         void removeSessionByFd(int fd);
+
+        struct RoomData {
+            std::string name;
+            std::string creator;
+            bool has_password;
+        };
+
+        ErrorCode createRoomDb(const std::string& room_name, const std::string& password, const std::string& creator_nick);
+        ErrorCode verifyRoomPasswordDb(const std::string& room_name, const std::string& password);
+        ErrorCode deleteRoomDb(const std::string& room_name);
+        std::string getRoomCreatorDb(const std::string& room_name);
+        std::vector<RoomData> loadAllRoomsFromDb();
+
+        ErrorCode banUserFromRoomDb(const std::string& room_name, const std::string& nickname);
+        ErrorCode unbanUserFromRoomDb(const std::string& room_name, const std::string& nickname);
+        std::vector<std::string> getBannedUsersForRoomDb(const std::string& room_name);
     
     private:
         sqlite3* db_;

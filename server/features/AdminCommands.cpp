@@ -5,6 +5,7 @@
 #include "../security/AuditLogger.h"
 #include "../utils/Logger.h"
 #include "../../common/ErrorCodes.h"
+#include "../security/IntrusionDetector.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 
@@ -71,8 +72,25 @@ void AdminCommands::kick(int adminFd, const std::string &targetNick, const std::
     AUDIT_D(AuditEventType::ADMIN, anik, targetNick, "KICK",
             AuditResult::SUCCESS, target->ip(), reason);
 
-    target->disconnect("You were kicked: " + reason);
+    m_server->kickFromRoom(targetFd, anik, reason);
     LOG_INFO("KICK: admin=" + anik + " target=" + targetNick + " reason=" + reason);
+}
+
+void AdminCommands::unkick(int adminFd, const std::string& targetNick, const std::string& room) {
+    if (!hasAdminRight(adminFd)) {
+        auto admin = m_server->getSession(adminFd);
+        if (admin) admin->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "No admin rights"));
+        return;
+    }
+
+    std::string anik = adminNick(adminFd);
+    m_server->unkickFromRoom(targetNick, anik, room);
+    
+    auto admin = m_server->getSession(adminFd);
+    if (admin) admin->sendPacket(Builder::makeSystemNotify(targetNick + " was unkicked from #" + room));
+    
+    AUDIT(AuditEventType::ADMIN, anik, targetNick, "UNKICK", AuditResult::SUCCESS);
+    LOG_INFO("UNKICK: admin=" + anik + " target=" + targetNick + " room=" + room);
 }
 
 void AdminCommands::mute(int adminFd, const std::string &targetNick, int durationSec)
@@ -140,7 +158,8 @@ void AdminCommands::ban(int adminFd, const std::string &targetNick, const std::s
         return;
 
     std::string ip = target->ip();
-    persistBan(ip, reason);
+    IntrusionDetector::instance().permBan(ip, reason);
+    IntrusionDetector::instance().permBanNick(targetNick, reason);
     AUDIT_D(AuditEventType::ADMIN, anik, targetNick, "BAN", AuditResult::SUCCESS, ip, reason);
     m_server->broadcastToRoom(target->currentRoom(), Builder::makeSystemNotify(targetNick + " has been banned by " + anik));
 
@@ -152,7 +171,8 @@ void AdminCommands::unban(int adminFd, const std::string &ipOrNick)
 {
     if (!hasAdminRight(adminFd))
         return;
-    removeBan(ipOrNick);
+    IntrusionDetector::instance().unban(ipOrNick);
+    IntrusionDetector::instance().unbanNick(ipOrNick);
     AUDIT(AuditEventType::ADMIN, adminNick(adminFd), ipOrNick,
           "UNBAN", AuditResult::SUCCESS);
     LOG_INFO("UNBAN: " + ipOrNick);
@@ -214,39 +234,4 @@ void AdminCommands::broadcast(int adminFd, const std::string& message) {
     AUDIT_D(AuditEventType::ADMIN, anik, "", "BROADCAST",
             AuditResult::SUCCESS, "", message.substr(0, 128));
     LOG_INFO("BROADCAST by " + anik + ": " + message);
-}
-
-void AdminCommands::persistBan(const std::string& ip, const std::string& reason) {
-    json banList = json::array();
-    std::ifstream ifs("ban_list.json");
-    if (ifs.is_open()) {
-        try { ifs >> banList; } catch (...) {}
-    }
-
-    json entry;
-    entry["ip"]     = ip;
-    entry["reason"] = reason;
-    entry["ts"]     = (long long)std::time(nullptr);
-    banList.push_back(entry);
-
-    std::ofstream ofs("ban_list.json");
-    ofs << banList.dump(2);
-}
-
-void AdminCommands::removeBan(const std::string& ipOrNick) {
-    std::ifstream ifs("ban_list.json");
-    if (!ifs.is_open()) return;
-
-    json banList;
-    try { ifs >> banList; } catch (...) { return; }
-    ifs.close();
-
-    json updated = json::array();
-    for (auto& entry : banList) {
-        std::string ip = entry.value("ip", "");
-        if (ip != ipOrNick) updated.push_back(entry);
-    }
-
-    std::ofstream ofs("ban_list.json");
-    ofs << updated.dump(2);
 }

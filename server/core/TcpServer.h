@@ -28,6 +28,8 @@ class TcpServer {
 
         void broadcastToRoom(const std::string& room, const Packet& pkt, int excludeFd = -1);
         void broadcastToAll(const Packet& pkt, int excludeFd = -1);
+        void kickFromRoom(int targetFd, const std::string& adminNick, const std::string& reason);
+        void unkickFromRoom(const std::string& targetNick, const std::string& adminNick, const std::string& room);
 
         std::shared_ptr<ClientSession> getSession(int fd);
         int getFdByNickname(const std::string& nick);
@@ -53,7 +55,10 @@ class TcpServer {
         void handleRoomListRequest(int fd);
         void handleRoomJoin(int fd, const Packet& pkt);
         void handleRoomCreate(int fd, const Packet& pkt);
+        void handleRoomDelete(int fd, const Packet& pkt);
         void handleRoomLeave(int fd);
+        void handleAdminRoomInfo(int fd);
+        void handleAdminUnkick(int fd, const Packet& pkt);
 
         bool isNicknameTaken(const std::string& nick);
         bool isNicknameValid(const std::string& nick);
@@ -64,9 +69,15 @@ class TcpServer {
         int m_maxClients;
         std::atomic<bool> m_running;
 
+        struct RoomInfo {
+            std::string creator_nick;
+            std::set<int> members;
+            std::set<std::string> banned_nicks;
+        };
+
         std::unordered_map<int, std::shared_ptr<ClientSession>> m_sessions;
         std::unordered_map<std::string, int> m_nicknames; // nickname -> fd
-        std::map<std::string, std::set<int>> m_rooms;
+        std::map<std::string, RoomInfo> m_rooms;
         mutable std::shared_mutex m_sessionsMutex;
         mutable std::shared_mutex m_roomsMutex;
 

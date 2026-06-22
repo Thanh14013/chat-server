@@ -127,6 +127,7 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
 }
 
 void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
+    (void)receiverFd;
     if (!m_server) return;
 
     json j;
@@ -149,6 +150,7 @@ void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
 }
 
 void FileTransfer::handleReject(int receiverFd, const std::string& payloadJson) {
+    (void)receiverFd;
     if (!m_server) return;
 
     json j;

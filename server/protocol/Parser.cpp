@@ -76,6 +76,7 @@ namespace Parser
         {
             auto j = json::parse(payloadToString(pkt));
             result.room_name = j.value("room", "general");
+            result.password = j.value("password", "");
         }
         catch (...)
         {
@@ -84,6 +85,21 @@ namespace Parser
     }
 
     ParsedRoomOp parseRoomCreate(const Packet &pkt)
+    {
+        ParsedRoomOp result;
+        try
+        {
+            auto j = json::parse(payloadToString(pkt));
+            result.room_name = j.value("room", "");
+            result.password = j.value("password", "");
+        }
+        catch (...)
+        {
+        }
+        return result;
+    }
+
+    ParsedRoomOp parseRoomDelete(const Packet &pkt)
     {
         ParsedRoomOp result;
         try

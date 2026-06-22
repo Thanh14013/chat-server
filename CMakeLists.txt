@@ -83,6 +83,11 @@ if(NOT (WIN32 OR CMAKE_CROSSCOMPILING))
     target_link_libraries(test_protocol OpenSSL::SSL OpenSSL::Crypto Threads::Threads)
     add_test(NAME test_protocol COMMAND test_protocol)
 
+    add_executable(test_auth_manager tests/test_auth_manager.cpp ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
+    target_include_directories(test_auth_manager PRIVATE ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
+    target_link_libraries(test_auth_manager OpenSSL::SSL OpenSSL::Crypto Threads::Threads ${SQLITE3_LIBRARIES})
+    add_test(NAME test_auth_manager COMMAND test_auth_manager)
+
     add_executable(test_ratelimit tests/test_ratelimit.cpp ${SERVER_SOURCES} ${PROTOCOL_SOURCES} ${CRYPTO_SOURCES})
     target_include_directories(test_ratelimit PRIVATE ${CMAKE_SOURCE_DIR}/server ${SQLITE3_INCLUDE_DIRS})
     target_link_libraries(test_ratelimit OpenSSL::SSL OpenSSL::Crypto Threads::Threads ${SQLITE3_LIBRARIES})

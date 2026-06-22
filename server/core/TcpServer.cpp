@@ -98,7 +98,17 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
     
     m_running = true;
     const auto &cfg = Config::instance().get();
-    m_rooms[cfg.default_room] = {};
+    auto rooms_db = m_authManager->loadAllRoomsFromDb();
+    for (const auto& r : rooms_db) {
+        RoomInfo info;
+        info.creator_nick = r.creator;
+        auto banned = m_authManager->getBannedUsersForRoomDb(r.name);
+        for(const auto& b : banned) info.banned_nicks.insert(b);
+        m_rooms[r.name] = info;
+    }
+    if (m_rooms.find(cfg.default_room) == m_rooms.end()) {
+        m_rooms[cfg.default_room] = {"system", {}, {}};
+    }
 
     AdminCommands::instance().initialize(this);
     FileTransfer::instance().initialize(this);
@@ -238,7 +248,32 @@ void TcpServer::onPacketReceived(int fd, const Packet& pkt){
     });
 }
 
-void TcpServer::handlePacket(int fd, const Packet& pkt){
+void TcpServer::handlePacket(int fd, const Packet& raw_pkt){
+    Packet pkt = raw_pkt;
+    if (pkt.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_HELLO) &&
+        pkt.header.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_KEY_ACCEPT)) {
+        if (vcs::security::CryptoEngine::getInstance().hasSession(fd)) {
+            try {
+                pkt.payload = vcs::security::CryptoEngine::getInstance().decryptPayload(fd, pkt.payload);
+            } catch (const std::exception& e) {
+                LOG_ERROR("Decryption failed for fd=" + std::to_string(fd) + ": " + e.what());
+                auto sess = getSession(fd);
+                if (sess) {
+                    IntrusionDetector::instance().reportViolation(sess->ip(), ViolationType::HMAC_FAILURE);
+                    sess->disconnect();
+                }
+                return;
+            }
+        } else {
+            if (Config::instance().get().enable_encryption) {
+                LOG_ERROR("Unencrypted packet received before handshake for fd=" + std::to_string(fd));
+                auto sess = getSession(fd);
+                if (sess) sess->disconnect();
+                return;
+            }
+        }
+    }
+
     auto type = static_cast<MessageType>(pkt.header.msg_type);
     std::string payload(pkt.payload.begin(), pkt.payload.end());
     switch (type) {
@@ -269,7 +304,9 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
         case MessageType::MSG_ROOM_LIST_REQUEST: handleRoomListRequest(fd);     break;
         case MessageType::MSG_ROOM_JOIN:         handleRoomJoin(fd, pkt);       break;
         case MessageType::MSG_ROOM_CREATE:       handleRoomCreate(fd, pkt);     break;
+        case MessageType::MSG_ROOM_DELETE:       handleRoomDelete(fd, pkt);     break;
         case MessageType::MSG_ROOM_LEAVE:        handleRoomLeave(fd);           break;
+        case MessageType::MSG_ADMIN_ROOM_INFO_REQUEST: handleAdminRoomInfo(fd); break;
         case MessageType::MSG_WHOIS_REQUEST: {
             auto j = nlohmann::json::parse(payload, nullptr, false);
             std::string target = j.value("target", "");
@@ -331,6 +368,11 @@ void TcpServer::handlePacket(int fd, const Packet& pkt){
             if (!j.is_discarded()) AdminCommands::instance().broadcast(fd, j.value("message",""));
             break;
         }
+        case MessageType::MSG_ADMIN_UNKICK: {
+            auto j = nlohmann::json::parse(payload, nullptr, false);
+            if (!j.is_discarded()) AdminCommands::instance().unkick(fd, j.value("target",""), j.value("room",""));
+            break;
+        }
 
         // File Transfer
         case MessageType::MSG_FILE_REQUEST:  FileTransfer::instance().handleRequest (fd, payload); break;
@@ -388,6 +430,12 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         return;
     }
 
+    if (IntrusionDetector::instance().isBannedNick(parsed.nickname)) {
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_PERMISSION_DENIED, "Your nickname is permanently banned."));
+        onClientDisconnected(fd);
+        return;
+    }
+
     const auto& cfg = Config::instance().get();
     sess->setNickname(parsed.nickname);
     sess->setRoom(cfg.default_room);
@@ -405,7 +453,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        m_rooms[cfg.default_room].insert(fd);
+        m_rooms[cfg.default_room].members.insert(fd);
     }
 
     sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
@@ -452,7 +500,7 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        m_rooms[cfg.default_room].insert(fd);
+        m_rooms[cfg.default_room].members.insert(fd);
     }
 
     sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
@@ -494,6 +542,11 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
     auto sender = getSession(fd);
     if (!sender || !sender->isAuthenticated()) return;
+
+    if (sender->isMuted()){
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You are muted"));
+        return;
+    }
 
     auto parsed = Parser::parseChatPrivate(pkt);
     if (parsed.to.empty() || parsed.message.empty()) return;
@@ -558,12 +611,29 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
     std::string newRoom = parsed.room_name;
     if (newRoom.empty()) return;
 
+    const auto& cfg = Config::instance().get();
+    if (newRoom != cfg.default_room) {
+        ErrorCode err = m_authManager->verifyRoomPasswordDb(newRoom, parsed.password);
+        if (err == ErrorCode::ERR_ROOM_NOT_FOUND) {
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room not found"));
+            return;
+        }
+        if (err != ErrorCode::ERR_OK) {
+            sess->sendPacket(Builder::makeError(err, "Incorrect room password"));
+            return;
+        }
+    }
+
     std::string oldRoom = sess->currentRoom();
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        if (m_rooms.count(oldRoom)) m_rooms[oldRoom].erase(fd);
-        m_rooms[newRoom].insert(fd);
+        if (m_rooms.count(newRoom) && m_rooms[newRoom].banned_nicks.count(sess->nickname())) {
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "You are banned from this room"));
+            return;
+        }
+        if (m_rooms.count(oldRoom)) m_rooms[oldRoom].members.erase(fd);
+        m_rooms[newRoom].members.insert(fd);
     }
 
     sess->setRoom(newRoom);
@@ -571,6 +641,80 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
     broadcastToRoom(oldRoom, Builder::makeSystemNotify(sess->nickname() + " left #" + oldRoom), fd);
     broadcastToRoom(newRoom, Builder::makeSystemNotify(sess->nickname() + " joined #" + newRoom), fd);
     sess->sendPacket(Builder::makeSystemNotify("You joined #" + newRoom));   
+}
+
+void TcpServer::handleRoomDelete(int fd, const Packet& pkt) {
+    auto sess = getSession(fd);
+    if (!sess || !sess->isAuthenticated()) return;
+
+    auto parsed = Parser::parseRoomDelete(pkt);
+    std::string roomName = parsed.room_name;
+    const auto& cfg = Config::instance().get();
+
+    if (roomName == cfg.default_room) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Cannot delete default room"));
+        return;
+    }
+
+    std::string creator = m_authManager->getRoomCreatorDb(roomName);
+    if (creator.empty()) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room not found"));
+        return;
+    }
+
+    bool isAdmin = (sess->role() == UserRole::ADMIN || sess->role() == UserRole::OWNER);
+    if (creator != sess->nickname() && !isAdmin) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Only creator or admin can delete this room"));
+        return;
+    }
+
+    std::set<int> membersToKick;
+    {
+        std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
+        if (m_rooms.count(roomName)) {
+            membersToKick = m_rooms[roomName].members;
+            m_rooms.erase(roomName);
+        }
+    }
+
+    m_authManager->deleteRoomDb(roomName);
+    broadcastToRoom(roomName, Builder::makeSystemNotify("Room #" + roomName + " has been deleted."), -1);
+
+    for (int memberFd : membersToKick) {
+        auto mSess = getSession(memberFd);
+        if (mSess) {
+            {
+                std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
+                m_rooms[cfg.default_room].members.insert(memberFd);
+            }
+            mSess->setRoom(cfg.default_room);
+            mSess->sendPacket(Builder::makeSystemNotify("You were moved to #" + cfg.default_room + " because your room was deleted."));
+            broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(mSess->nickname() + " joined #" + cfg.default_room), memberFd);
+        }
+    }
+    
+    sess->sendPacket(Builder::makeSystemNotify("Room #" + roomName + " deleted successfully."));
+}
+
+void TcpServer::handleAdminRoomInfo(int fd) {
+    auto sess = getSession(fd);
+    if (!sess || !sess->isAuthenticated() || (sess->role() != UserRole::ADMIN && sess->role() != UserRole::OWNER)) {
+        if (sess) sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Admin only"));
+        return;
+    }
+
+    nlohmann::json j = nlohmann::json::array();
+    {
+        std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
+        for (const auto& [rname, rinfo] : m_rooms) {
+            nlohmann::json item;
+            item["room"] = rname;
+            item["creator"] = rinfo.creator_nick;
+            item["count"] = rinfo.members.size();
+            j.push_back(item);
+        }
+    }
+    sess->sendPacket(Builder::makeAdminRoomInfoResponse(j.dump()));
 }
 
 void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
@@ -591,11 +735,46 @@ void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
             sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Max rooms reached"));
             return;
         }
-        m_rooms[roomName] = {};
+        
+        ErrorCode err = m_authManager->createRoomDb(roomName, parsed.password, sess->nickname());
+        if (err != ErrorCode::ERR_OK) {
+            sess->sendPacket(Builder::makeError(err, "Failed to create room"));
+            return;
+        }
+        
+        m_rooms[roomName] = {sess->nickname(), {}, {}};
     }
 
     sess->sendPacket(Builder::makeSystemNotify("Room #" + roomName + " created"));
     LOG_INFO("Room created: #" + roomName + " by " + sess->nickname());
+}
+
+void TcpServer::kickFromRoom(int targetFd, const std::string& adminNick, const std::string& reason) {
+    auto target = getSession(targetFd);
+    if (!target) return;
+    std::string room = target->currentRoom();
+    const auto& cfg = Config::instance().get();
+    if (room != cfg.default_room) {
+        {
+            std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
+            m_rooms[room].members.erase(targetFd);
+            m_rooms[room].banned_nicks.insert(target->nickname());
+            m_authManager->banUserFromRoomDb(room, target->nickname());
+            m_rooms[cfg.default_room].members.insert(targetFd);
+        }
+        target->setRoom(cfg.default_room);
+        target->sendPacket(Builder::makeSystemNotify("You were kicked to #" + cfg.default_room + " by " + adminNick + ": " + reason));
+        broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(target->nickname() + " was kicked here from #" + room), targetFd);
+    }
+}
+
+void TcpServer::unkickFromRoom(const std::string& targetNick, const std::string& adminNick, const std::string& room) {
+    std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
+    if (m_rooms.count(room)) {
+        if (m_rooms[room].banned_nicks.erase(targetNick) > 0) {
+            m_authManager->unbanUserFromRoomDb(room, targetNick);
+        }
+    }
 }
 
 void TcpServer::handleRoomLeave(int fd){
@@ -613,8 +792,8 @@ void TcpServer::handleRoomLeave(int fd){
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        m_rooms[oldRoom].erase(fd);
-        m_rooms[defRoom].insert(fd);
+        m_rooms[oldRoom].members.erase(fd);
+        m_rooms[defRoom].members.insert(fd);
     }
 
     sess->setRoom(defRoom);
@@ -646,10 +825,19 @@ void TcpServer::removeSession(int fd) {
     if (m_authManager) m_authManager->removeSessionByFd(fd);
     vcs::security::CryptoEngine::getInstance().removeSession(fd);
 
+    std::string room_to_remove;
     {
-        std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        for (auto& [rname, members] : m_rooms) {
-            members.erase(fd);
+        std::shared_lock<std::shared_mutex> slock(m_sessionsMutex);
+        auto it = m_sessions.find(fd);
+        if (it != m_sessions.end()) {
+            room_to_remove = it->second->currentRoom();
+        }
+    }
+
+    if (!room_to_remove.empty()) {
+        std::unique_lock<std::shared_mutex> rlock(m_roomsMutex);
+        if (m_rooms.count(room_to_remove)) {
+            m_rooms[room_to_remove].members.erase(fd);
         }
     }
     std::unique_lock<std::shared_mutex> lock(m_sessionsMutex);
@@ -669,7 +857,7 @@ void TcpServer::broadcastToRoom(const std::string& room, const Packet& pkt, int 
         std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
         auto it = m_rooms.find(room);
         if (it == m_rooms.end()) return;
-        members = it->second;
+        members = it->second.members;
     }
     std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);
     for (int fd : members) {
@@ -708,7 +896,7 @@ std::vector<std::shared_ptr<ClientSession>> TcpServer::getSessionsInRoom(const s
     {
         std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
         auto it = m_rooms.find(room);
-        if (it != m_rooms.end()) members = it->second;
+        if (it != m_rooms.end()) members = it->second.members;
     }
     std::vector<std::shared_ptr<ClientSession>> result;
     std::shared_lock<std::shared_mutex> lock(m_sessionsMutex);

@@ -11,6 +11,7 @@ namespace Builder {
     Packet makeChatBroadcast(const std::string& sender, const std::string& room, const std::string& message);
     Packet makeUserListResponse(const std::string& jsonList);
     Packet makeRoomListResponse(const std::string& jsonList);
+    Packet makeAdminRoomInfoResponse(const std::string& jsonList);
     Packet makePing();
     Packet makePong();
     Packet makeError(ErrorCode code, const std::string& detail);

@@ -70,29 +70,7 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
 
         Packet pkt;
         pkt.header = hdr;
-        if (hdr.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_HELLO) &&
-            hdr.msg_type != static_cast<uint8_t>(MessageType::MSG_CRYPTO_KEY_ACCEPT)) {
-            if (vcs::security::CryptoEngine::getInstance().hasSession(m_fd)) {
-                try {
-                    pkt.payload = vcs::security::CryptoEngine::getInstance().decryptPayload(m_fd, payload);
-                } catch (const std::exception& e) {
-                    LOG_ERROR("Decryption failed for fd=" + std::to_string(m_fd) + ": " + e.what());
-                    IntrusionDetector::instance().reportViolation(m_ip, ViolationType::HMAC_FAILURE);
-                    disconnect();
-                    return;
-                }
-            } else {
-                if (Config::instance().get().enable_encryption) {
-                    LOG_ERROR("Unencrypted packet received before handshake for fd=" + std::to_string(m_fd));
-                    disconnect();
-                    return;
-                } else {
-                    pkt.payload = std::move(payload);
-                }
-            }
-        } else {
-            pkt.payload = std::move(payload);
-        }
+        pkt.payload = std::move(payload);
         m_server->onPacketReceived(m_fd, pkt);
 
         offset += totalPacketSize;

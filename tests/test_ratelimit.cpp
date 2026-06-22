@@ -108,6 +108,32 @@ TEST(ids_cef_format) {
     ASSERT_TRUE(cef.find("VCS") != std::string::npos);
 }
 
+TEST(ids_nickname_ban_blocks) {
+    IntrusionDetector& ids = IntrusionDetector::instance();
+    ids.permBanNick("bad_user", "test nick ban");
+    ASSERT_TRUE(ids.isBannedNick("bad_user"));
+    ASSERT_FALSE(ids.isBannedNick("good_user"));
+    ids.unbanNick("bad_user");
+}
+
+TEST(ids_nickname_unban_restores) {
+    IntrusionDetector& ids = IntrusionDetector::instance();
+    ids.permBanNick("evil_user", "test");
+    ASSERT_TRUE(ids.isBannedNick("evil_user"));
+    ids.unbanNick("evil_user");
+    ASSERT_FALSE(ids.isBannedNick("evil_user"));
+}
+
+TEST(ids_multiple_failed_auth_triggers_ban) {
+    IntrusionDetector& ids = IntrusionDetector::instance();
+    ids.unban("10.0.0.99");
+    for (int i = 0; i < 10; i++) {
+        ids.reportViolation("10.0.0.99", ViolationType::FAILED_AUTH);
+    }
+    ASSERT_EQ(ids.checkIP("10.0.0.99"), IPStatus::BLOCKED);
+    ids.unban("10.0.0.99");
+}
+
 int main() {
     return run_all_tests("Rate Limiter & IDS Tests");
 }

@@ -41,6 +41,12 @@ void CommandHandler::handleCommand(const Command &cmd)
     case CommandType::CMD_CREATE:
         handleCreate(cmd);
         break;
+    case CommandType::CMD_DELETE_ROOM:
+        handleDeleteRoom(cmd);
+        break;
+    case CommandType::CMD_ROOMS_ADMIN:
+        handleRoomsAdmin(cmd);
+        break;
     case CommandType::CMD_MSG:
         handleMsg(cmd);
         break;
@@ -60,6 +66,7 @@ void CommandHandler::handleCommand(const Command &cmd)
         handleReject(cmd);
         break;
     case CommandType::CMD_KICK:
+    case CommandType::CMD_UNKICK:
     case CommandType::CMD_MUTE:
     case CommandType::CMD_UNMUTE:
     case CommandType::CMD_BAN:
@@ -103,6 +110,7 @@ void CommandHandler::handleJoin(const Command &cmd)
         return;
     json j;
     j["room"] = cmd.args[0];
+    if (cmd.args.size() > 1) j["password"] = cmd.args[1];
     std::string s = j.dump();
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_ROOM_JOIN, payload));
@@ -119,9 +127,25 @@ void CommandHandler::handleCreate(const Command &cmd)
         return;
     json j;
     j["room"] = cmd.args[0];
+    if (cmd.args.size() > 1) j["password"] = cmd.args[1];
     std::string s = j.dump();
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_ROOM_CREATE, payload));
+}
+
+void CommandHandler::handleDeleteRoom(const Command &cmd)
+{
+    if (cmd.args.empty()) return;
+    json j;
+    j["room"] = cmd.args[0];
+    std::string s = j.dump();
+    std::vector<uint8_t> payload(s.begin(), s.end());
+    m_client->sendPacket(Packet(MessageType::MSG_ROOM_DELETE, payload));
+}
+
+void CommandHandler::handleRoomsAdmin(const Command &cmd)
+{
+    m_client->sendPacket(Packet(MessageType::MSG_ADMIN_ROOM_INFO_REQUEST, {}));
 }
 
 void CommandHandler::handleMsg(const Command &cmd)
@@ -225,6 +249,16 @@ void CommandHandler::handleAdminCommand(const Command &cmd)
         j["target"] = cmd.args[0];
         if (cmd.args.size() > 1)
             j["reason"] = cmd.args[1];
+    }
+    else if (cmd.type == CommandType::CMD_UNKICK)
+    {
+        if (cmd.args.size() < 2) {
+            std::cout << "[SYSTEM] Usage: /unkick <user> <room>" << std::endl;
+            return;
+        }
+        type = MessageType::MSG_ADMIN_UNKICK;
+        j["target"] = cmd.args[0];
+        j["room"] = cmd.args[1];
     }
     else if (cmd.type == CommandType::CMD_MUTE)
     {

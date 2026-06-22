@@ -1,0 +1,337 @@
+[2026-06-22 04:02:28.806] [WARN ] [139634844694336] Config file not found: server_config.json. Using defaults.
+[2026-06-22 04:02:28.817] [INFO ] [139634844694336] Database opened: vcs_chat.db
+[2026-06-22 04:02:28.823] [INFO ] [139634844694336] Database tables ready.
+[2026-06-22 04:02:28.826] [INFO ] [139634844694336] Initializing Crypto Engine...
+[2026-06-22 04:02:29.500] [INFO ] [139634844694336] ThreadPool initialized with 32 workers.
+[2026-06-22 04:02:29.614] [CRIT ] [139634844694336] Bind failed on port 9000
+[2026-06-22 04:02:30.512] [INFO ] [139634844694336] End.
+[2026-06-22 04:07:01.245] [WARN ] [139818120316736] Config file not found: server_config.json. Using defaults.
+[2026-06-22 04:07:01.247] [INFO ] [139818120316736] Database opened: vcs_chat.db
+[2026-06-22 04:07:01.248] [INFO ] [139818120316736] Database tables ready.
+[2026-06-22 04:07:01.248] [INFO ] [139818120316736] Initializing Crypto Engine...
+[2026-06-22 04:07:01.768] [INFO ] [139818120316736] ThreadPool initialized with 32 workers.
+[2026-06-22 04:07:01.770] [INFO ] [139818120316736] Ban list loaded: 5 IP bans, 0 Nick bans.
+[2026-06-22 04:07:01.770] [INFO ] [139818120316736] Whitelist added: 127.0.0.1
+[2026-06-22 04:07:01.770] [INFO ] [139818120316736] Server starting...
+[2026-06-22 04:07:01.771] [INFO ] [139818120316736] Listening on 0.0.0.0:9000
+[2026-06-22 04:07:01.771] [INFO ] [139818120316736] Max clients: 256
+[2026-06-22 04:07:01.771] [INFO ] [139818120316736] Press Ctrl+C to stop
+[2026-06-22 04:07:03.264] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=1
+[2026-06-22 04:07:03.284] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=2
+[2026-06-22 04:07:03.304] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=3
+[2026-06-22 04:07:03.324] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=5
+[2026-06-22 04:07:03.324] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=4
+[2026-06-22 04:07:03.344] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=10
+[2026-06-22 04:07:03.345] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=5
+[2026-06-22 04:07:03.365] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=15
+[2026-06-22 04:07:03.365] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=6
+[2026-06-22 04:07:03.385] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=20
+[2026-06-22 04:07:03.385] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=7
+[2026-06-22 04:07:03.405] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=25
+[2026-06-22 04:07:03.405] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=8
+[2026-06-22 04:07:03.438] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=30
+[2026-06-22 04:07:03.438] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=9
+[2026-06-22 04:07:03.461] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=35
+[2026-06-22 04:07:03.461] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=10
+[2026-06-22 04:07:03.478] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=40
+[2026-06-22 04:07:03.478] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=11
+[2026-06-22 04:07:03.498] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=45
+[2026-06-22 04:07:03.498] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=12
+[2026-06-22 04:07:03.514] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=50
+[2026-06-22 04:07:03.514] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=13
+[2026-06-22 04:07:03.538] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=55
+[2026-06-22 04:07:03.538] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=14
+[2026-06-22 04:07:03.558] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=60
+[2026-06-22 04:07:03.559] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=15
+[2026-06-22 04:07:03.578] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=65
+[2026-06-22 04:07:03.579] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=16
+[2026-06-22 04:07:03.602] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=70
+[2026-06-22 04:07:03.602] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=17
+[2026-06-22 04:07:03.611] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=75
+[2026-06-22 04:07:03.612] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=18
+[2026-06-22 04:07:03.629] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=80
+[2026-06-22 04:07:03.629] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=19
+[2026-06-22 04:07:03.654] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=85
+[2026-06-22 04:07:03.655] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=20
+[2026-06-22 04:07:03.670] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=90
+[2026-06-22 04:07:03.671] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=21
+[2026-06-22 04:07:03.689] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=95
+[2026-06-22 04:07:03.690] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=22
+[2026-06-22 04:07:03.710] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=100
+[2026-06-22 04:07:03.710] [WARN ] [139818120316736] IDS TEMP BAN 1h: ip_127.0.0.1
+[2026-06-22 04:07:03.710] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=23
+[2026-06-22 04:07:03.730] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=105
+[2026-06-22 04:07:03.730] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=24
+[2026-06-22 04:07:03.750] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=110
+[2026-06-22 04:07:03.750] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=25
+[2026-06-22 04:07:03.770] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=115
+[2026-06-22 04:07:03.771] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=26
+[2026-06-22 04:07:03.791] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=120
+[2026-06-22 04:07:03.791] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=27
+[2026-06-22 04:07:03.811] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=125
+[2026-06-22 04:07:03.811] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=28
+[2026-06-22 04:07:03.831] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=130
+[2026-06-22 04:07:03.831] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=29
+[2026-06-22 04:07:03.852] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=135
+[2026-06-22 04:07:03.852] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=30
+[2026-06-22 04:07:03.872] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=140
+[2026-06-22 04:07:03.872] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=31
+[2026-06-22 04:07:03.892] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=145
+[2026-06-22 04:07:03.892] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=32
+[2026-06-22 04:07:03.912] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=150
+[2026-06-22 04:07:03.913] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=33
+[2026-06-22 04:07:03.933] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=155
+[2026-06-22 04:07:03.933] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=34
+[2026-06-22 04:07:03.953] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=160
+[2026-06-22 04:07:03.953] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=35
+[2026-06-22 04:07:03.973] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=165
+[2026-06-22 04:07:03.973] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=36
+[2026-06-22 04:07:03.993] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=170
+[2026-06-22 04:07:03.994] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=37
+[2026-06-22 04:07:04.014] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=175
+[2026-06-22 04:07:04.014] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=38
+[2026-06-22 04:07:04.034] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=180
+[2026-06-22 04:07:04.034] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=39
+[2026-06-22 04:07:04.054] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=185
+[2026-06-22 04:07:04.054] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=40
+[2026-06-22 04:07:04.074] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=190
+[2026-06-22 04:07:04.075] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=41
+[2026-06-22 04:07:04.095] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=195
+[2026-06-22 04:07:04.095] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=42
+[2026-06-22 04:07:04.115] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=200
+[2026-06-22 04:07:04.115] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=43
+[2026-06-22 04:07:04.135] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=205
+[2026-06-22 04:07:04.136] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=44
+[2026-06-22 04:07:04.156] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=210
+[2026-06-22 04:07:04.156] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=45
+[2026-06-22 04:07:04.176] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=215
+[2026-06-22 04:07:04.176] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=46
+[2026-06-22 04:07:04.196] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=220
+[2026-06-22 04:07:04.196] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=47
+[2026-06-22 04:07:04.216] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=225
+[2026-06-22 04:07:04.217] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=48
+[2026-06-22 04:07:04.237] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=230
+[2026-06-22 04:07:04.237] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=49
+[2026-06-22 04:07:04.257] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=235
+[2026-06-22 04:07:04.257] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=50
+[2026-06-22 04:07:04.277] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=240
+[2026-06-22 04:07:04.277] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=51
+[2026-06-22 04:07:04.297] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=245
+[2026-06-22 04:07:04.307] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=52
+[2026-06-22 04:07:04.317] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=250
+[2026-06-22 04:07:04.318] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=53
+[2026-06-22 04:07:04.338] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=255
+[2026-06-22 04:07:04.338] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=54
+[2026-06-22 04:07:04.358] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=260
+[2026-06-22 04:07:04.358] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=55
+[2026-06-22 04:07:04.378] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=265
+[2026-06-22 04:07:04.378] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=56
+[2026-06-22 04:07:04.398] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=270
+[2026-06-22 04:07:04.399] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=57
+[2026-06-22 04:07:04.422] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=275
+[2026-06-22 04:07:04.422] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=58
+[2026-06-22 04:07:04.442] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=280
+[2026-06-22 04:07:04.443] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=59
+[2026-06-22 04:07:04.462] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=285
+[2026-06-22 04:07:04.463] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=60
+[2026-06-22 04:07:04.483] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=290
+[2026-06-22 04:07:04.483] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=61
+[2026-06-22 04:07:04.503] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=295
+[2026-06-22 04:07:04.504] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=62
+[2026-06-22 04:07:04.524] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=300
+[2026-06-22 04:07:04.524] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=63
+[2026-06-22 04:07:04.544] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=305
+[2026-06-22 04:07:04.544] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=64
+[2026-06-22 04:07:04.564] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=310
+[2026-06-22 04:07:04.564] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=65
+[2026-06-22 04:07:04.584] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=315
+[2026-06-22 04:07:04.585] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=66
+[2026-06-22 04:07:04.605] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=320
+[2026-06-22 04:07:04.605] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=67
+[2026-06-22 04:07:04.625] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=325
+[2026-06-22 04:07:04.625] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=68
+[2026-06-22 04:07:04.645] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=330
+[2026-06-22 04:07:04.645] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=69
+[2026-06-22 04:07:04.665] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=335
+[2026-06-22 04:07:04.665] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=70
+[2026-06-22 04:07:04.686] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=340
+[2026-06-22 04:07:04.686] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=71
+[2026-06-22 04:07:04.706] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=345
+[2026-06-22 04:07:04.706] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=72
+[2026-06-22 04:07:04.726] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=350
+[2026-06-22 04:07:04.726] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=73
+[2026-06-22 04:07:04.746] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=355
+[2026-06-22 04:07:04.747] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=74
+[2026-06-22 04:07:04.767] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=360
+[2026-06-22 04:07:04.767] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=75
+[2026-06-22 04:07:04.787] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=365
+[2026-06-22 04:07:04.787] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=76
+[2026-06-22 04:07:04.807] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=370
+[2026-06-22 04:07:04.807] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=77
+[2026-06-22 04:07:04.827] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=375
+[2026-06-22 04:07:04.828] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=78
+[2026-06-22 04:07:04.848] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=380
+[2026-06-22 04:07:04.848] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=79
+[2026-06-22 04:07:04.868] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=385
+[2026-06-22 04:07:04.868] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=80
+[2026-06-22 04:07:04.888] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=390
+[2026-06-22 04:07:04.888] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=81
+[2026-06-22 04:07:04.908] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=395
+[2026-06-22 04:07:04.909] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=82
+[2026-06-22 04:07:04.929] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=400
+[2026-06-22 04:07:04.929] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=83
+[2026-06-22 04:07:04.949] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=405
+[2026-06-22 04:07:04.949] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=84
+[2026-06-22 04:07:04.969] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=410
+[2026-06-22 04:07:04.969] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=85
+[2026-06-22 04:07:04.989] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=415
+[2026-06-22 04:07:04.990] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=86
+[2026-06-22 04:07:05.010] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=420
+[2026-06-22 04:07:05.010] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=87
+[2026-06-22 04:07:05.030] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=425
+[2026-06-22 04:07:05.030] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=88
+[2026-06-22 04:07:05.050] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=430
+[2026-06-22 04:07:05.050] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=89
+[2026-06-22 04:07:05.070] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=435
+[2026-06-22 04:07:05.071] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=90
+[2026-06-22 04:07:05.091] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=440
+[2026-06-22 04:07:05.091] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=91
+[2026-06-22 04:07:05.111] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=445
+[2026-06-22 04:07:05.111] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=92
+[2026-06-22 04:07:05.131] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=450
+[2026-06-22 04:07:05.132] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=93
+[2026-06-22 04:07:05.152] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=455
+[2026-06-22 04:07:05.152] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=94
+[2026-06-22 04:07:05.172] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=460
+[2026-06-22 04:07:05.172] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=95
+[2026-06-22 04:07:05.192] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=465
+[2026-06-22 04:07:05.192] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=96
+[2026-06-22 04:07:05.212] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=470
+[2026-06-22 04:07:05.212] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=97
+[2026-06-22 04:07:05.240] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=475
+[2026-06-22 04:07:05.240] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=98
+[2026-06-22 04:07:05.262] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=480
+[2026-06-22 04:07:05.262] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=99
+[2026-06-22 04:07:05.278] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=485
+[2026-06-22 04:07:05.278] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=100
+[2026-06-22 04:07:05.306] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=490
+[2026-06-22 04:07:05.306] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=101
+[2026-06-22 04:07:05.321] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=495
+[2026-06-22 04:07:05.325] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=102
+[2026-06-22 04:07:05.333] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=500
+[2026-06-22 04:07:05.333] [CRIT ] [139818120316736] IDS PERM BAN: ip_127.0.0.1 score=500
+[2026-06-22 04:07:05.334] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=103
+[2026-06-22 04:07:05.353] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=505
+[2026-06-22 04:07:05.353] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=104
+[2026-06-22 04:07:05.374] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=510
+[2026-06-22 04:07:05.374] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=105
+[2026-06-22 04:07:05.394] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=515
+[2026-06-22 04:07:05.394] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=106
+[2026-06-22 04:07:05.414] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=520
+[2026-06-22 04:07:05.414] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=107
+[2026-06-22 04:07:05.434] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=525
+[2026-06-22 04:07:05.434] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=108
+[2026-06-22 04:07:05.454] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=530
+[2026-06-22 04:07:05.454] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=109
+[2026-06-22 04:07:05.475] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=535
+[2026-06-22 04:07:05.475] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=110
+[2026-06-22 04:07:05.495] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=540
+[2026-06-22 04:07:05.495] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=111
+[2026-06-22 04:07:05.515] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=545
+[2026-06-22 04:07:05.515] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=112
+[2026-06-22 04:07:05.535] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=550
+[2026-06-22 04:07:05.535] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=113
+[2026-06-22 04:07:05.556] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=555
+[2026-06-22 04:07:05.556] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=114
+[2026-06-22 04:07:05.576] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=560
+[2026-06-22 04:07:05.576] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=115
+[2026-06-22 04:07:05.596] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=565
+[2026-06-22 04:07:05.596] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=116
+[2026-06-22 04:07:05.616] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=570
+[2026-06-22 04:07:05.617] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=117
+[2026-06-22 04:07:05.637] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=575
+[2026-06-22 04:07:05.637] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=118
+[2026-06-22 04:07:05.657] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=580
+[2026-06-22 04:07:05.657] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=119
+[2026-06-22 04:07:05.677] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=585
+[2026-06-22 04:07:05.677] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=120
+[2026-06-22 04:07:05.697] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=590
+[2026-06-22 04:07:05.698] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=121
+[2026-06-22 04:07:05.718] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=595
+[2026-06-22 04:07:05.718] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=122
+[2026-06-22 04:07:05.738] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=600
+[2026-06-22 04:07:05.738] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=123
+[2026-06-22 04:07:05.758] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=605
+[2026-06-22 04:07:05.758] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=124
+[2026-06-22 04:07:05.778] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=610
+[2026-06-22 04:07:05.779] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=125
+[2026-06-22 04:07:05.799] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=615
+[2026-06-22 04:07:05.799] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=126
+[2026-06-22 04:07:05.819] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=620
+[2026-06-22 04:07:05.819] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=127
+[2026-06-22 04:07:05.839] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=625
+[2026-06-22 04:07:05.840] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=128
+[2026-06-22 04:07:05.860] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=630
+[2026-06-22 04:07:05.860] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=129
+[2026-06-22 04:07:05.880] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=635
+[2026-06-22 04:07:05.880] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=130
+[2026-06-22 04:07:05.900] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=640
+[2026-06-22 04:07:05.900] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=131
+[2026-06-22 04:07:05.920] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=645
+[2026-06-22 04:07:05.921] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=132
+[2026-06-22 04:07:05.941] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=650
+[2026-06-22 04:07:05.941] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=133
+[2026-06-22 04:07:05.961] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=655
+[2026-06-22 04:07:05.961] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=134
+[2026-06-22 04:07:05.981] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=660
+[2026-06-22 04:07:05.981] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=135
+[2026-06-22 04:07:06.001] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=665
+[2026-06-22 04:07:06.002] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=136
+[2026-06-22 04:07:06.022] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=670
+[2026-06-22 04:07:06.022] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=137
+[2026-06-22 04:07:06.042] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=675
+[2026-06-22 04:07:06.042] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=138
+[2026-06-22 04:07:06.062] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=680
+[2026-06-22 04:07:06.062] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=139
+[2026-06-22 04:07:06.082] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=685
+[2026-06-22 04:07:06.082] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=140
+[2026-06-22 04:07:06.103] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=690
+[2026-06-22 04:07:06.103] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=141
+[2026-06-22 04:07:06.123] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=695
+[2026-06-22 04:07:06.123] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=142
+[2026-06-22 04:07:06.143] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=700
+[2026-06-22 04:07:06.143] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=143
+[2026-06-22 04:07:06.163] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=705
+[2026-06-22 04:07:06.164] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=144
+[2026-06-22 04:07:06.187] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=710
+[2026-06-22 04:07:06.187] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=145
+[2026-06-22 04:07:06.207] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=715
+[2026-06-22 04:07:06.207] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=146
+[2026-06-22 04:07:06.227] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=720
+[2026-06-22 04:07:06.228] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=147
+[2026-06-22 04:07:06.248] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=725
+[2026-06-22 04:07:06.248] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=148
+[2026-06-22 04:07:06.268] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=730
+[2026-06-22 04:07:06.268] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=149
+[2026-06-22 04:07:06.288] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=735
+[2026-06-22 04:07:06.289] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=150
+[2026-06-22 04:07:06.308] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=740
+[2026-06-22 04:07:06.309] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=151
+[2026-06-22 04:07:06.329] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=745
+[2026-06-22 04:07:06.329] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=152
+[2026-06-22 04:07:06.349] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=750
+[2026-06-22 04:07:06.349] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=153
+[2026-06-22 04:07:06.369] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=755
+[2026-06-22 04:07:06.370] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=154
+[2026-06-22 04:07:06.389] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=760
+[2026-06-22 04:07:06.390] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=155
+[2026-06-22 04:07:06.410] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=765
+[2026-06-22 04:07:06.410] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=156
+[2026-06-22 04:07:06.430] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=770
+[2026-06-22 04:07:06.430] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=157
+[2026-06-22 04:07:06.450] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=775
+[2026-06-22 04:07:06.451] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=158
+[2026-06-22 04:07:06.471] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=780
+[2026-06-22 04:07:06.471] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=159
+[2026-06-22 04:07:06.491] [WARN ] [139818120316736] IDS violation: ip=ip_127.0.0.1 type=RATE_LIMIT_EXCEEDED score=785
+[2026-06-22 04:07:06.491] [WARN ] [139818120316736] Rate limit hit: key=ip_127.0.0.1 type=1 violations=160

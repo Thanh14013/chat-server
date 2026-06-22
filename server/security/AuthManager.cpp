@@ -151,7 +151,8 @@ namespace vcs::security
         vcs::crypto::SHA256Hash::SaltBytes salt{};
         std::copy_n(salt_bytes_vec.begin(), std::min(salt_bytes_vec.size(), salt.size()), salt.begin());
 
-        std::string computed_hash = vcs::crypto::SHA256Hash::pbkdf2(password, salt);
+        std::string pwd = password;
+        std::string computed_hash = vcs::crypto::SHA256Hash::pbkdf2(pwd, salt);
 
         bool match = (computed_hash.size() == stored_hash.size()) && (CRYPTO_memcmp(computed_hash.data(), stored_hash.data(), computed_hash.size()) == 0);
 
@@ -319,5 +320,143 @@ namespace vcs::security
         }
         sqlite3_finalize(stmt);
         return locked;
+    }
+
+    ErrorCode AuthManager::createRoomDb(const std::string& room_name, const std::string& password, const std::string& creator_nick) {
+        std::string hash = "";
+        std::string salt_hex = "";
+
+        if (!password.empty()) {
+            std::string pwd = password;
+            auto salt = vcs::crypto::SHA256Hash::generateSalt();
+            hash = vcs::crypto::SHA256Hash::pbkdf2(pwd, salt);
+            salt_hex = vcs::crypto::SHA256Hash::toHex(salt.data(), salt.size());
+        }
+
+        const char *sql = "INSERT INTO Rooms (room_name, password_hash, salt, creator_nick, created_at) VALUES (?, ?, ?, ?, ?);";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return ErrorCode::ERR_INTERNAL;
+
+        time_t now = std::time(nullptr);
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, hash.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, salt_hex.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 4, creator_nick.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int64(stmt, 5, static_cast<sqlite3_int64>(now));
+
+        int rc = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+
+        return (rc == SQLITE_DONE) ? ErrorCode::ERR_OK : ErrorCode::ERR_INTERNAL;
+    }
+
+    ErrorCode AuthManager::verifyRoomPasswordDb(const std::string& room_name, const std::string& password) {
+        const char *sql = "SELECT password_hash, salt FROM Rooms WHERE room_name = ? LIMIT 1;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return ErrorCode::ERR_INTERNAL;
+
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+
+        if (sqlite3_step(stmt) != SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            return ErrorCode::ERR_ROOM_NOT_FOUND;
+        }
+
+        std::string stored_hash(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)));
+        std::string salt_hex(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1)));
+        sqlite3_finalize(stmt);
+
+        if (stored_hash.empty()) return ErrorCode::ERR_OK; // No password required
+        if (password.empty()) return ErrorCode::ERR_AUTH_FAILED; // Password required but empty
+
+        auto salt_bytes_vec = vcs::crypto::SHA256Hash::fromHex(salt_hex);
+        vcs::crypto::SHA256Hash::SaltBytes salt{};
+        std::copy_n(salt_bytes_vec.begin(), std::min(salt_bytes_vec.size(), salt.size()), salt.begin());
+
+        std::string pwd = password;
+        std::string computed_hash = vcs::crypto::SHA256Hash::pbkdf2(pwd, salt);
+        bool match = (computed_hash.size() == stored_hash.size()) && (CRYPTO_memcmp(computed_hash.data(), stored_hash.data(), computed_hash.size()) == 0);
+
+        return match ? ErrorCode::ERR_OK : ErrorCode::ERR_AUTH_FAILED;
+    }
+
+    ErrorCode AuthManager::deleteRoomDb(const std::string& room_name) {
+        const char *sql = "DELETE FROM Rooms WHERE room_name = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return ErrorCode::ERR_INTERNAL;
+
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+        int rc = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+
+        return (rc == SQLITE_DONE) ? ErrorCode::ERR_OK : ErrorCode::ERR_INTERNAL;
+    }
+
+    std::string AuthManager::getRoomCreatorDb(const std::string& room_name) {
+        const char *sql = "SELECT creator_nick FROM Rooms WHERE room_name = ? LIMIT 1;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return "";
+
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+
+        std::string creator = "";
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            creator = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)));
+        }
+        sqlite3_finalize(stmt);
+        return creator;
+    }
+
+    std::vector<AuthManager::RoomData> AuthManager::loadAllRoomsFromDb() {
+        std::vector<RoomData> rooms;
+        const char *sql = "SELECT room_name, creator_nick, password_hash FROM Rooms;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return rooms;
+
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            RoomData r;
+            r.name = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)));
+            r.creator = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1)));
+            std::string pass_hash = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
+            r.has_password = !pass_hash.empty();
+            rooms.push_back(r);
+        }
+        sqlite3_finalize(stmt);
+        return rooms;
+    }
+
+    ErrorCode AuthManager::banUserFromRoomDb(const std::string& room_name, const std::string& nickname) {
+        const char *sql = "INSERT OR IGNORE INTO RoomBans (room_name, nickname, created_at) VALUES (?, ?, strftime('%s','now'));";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return ErrorCode::ERR_INTERNAL;
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, nickname.c_str(), -1, SQLITE_TRANSIENT);
+        int rc = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+        return (rc == SQLITE_DONE) ? ErrorCode::ERR_OK : ErrorCode::ERR_INTERNAL;
+    }
+
+    ErrorCode AuthManager::unbanUserFromRoomDb(const std::string& room_name, const std::string& nickname) {
+        const char *sql = "DELETE FROM RoomBans WHERE room_name = ? AND nickname = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return ErrorCode::ERR_INTERNAL;
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 2, nickname.c_str(), -1, SQLITE_TRANSIENT);
+        int rc = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+        return (rc == SQLITE_DONE) ? ErrorCode::ERR_OK : ErrorCode::ERR_INTERNAL;
+    }
+
+    std::vector<std::string> AuthManager::getBannedUsersForRoomDb(const std::string& room_name) {
+        std::vector<std::string> banned;
+        const char *sql = "SELECT nickname FROM RoomBans WHERE room_name = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return banned;
+        sqlite3_bind_text(stmt, 1, room_name.c_str(), -1, SQLITE_TRANSIENT);
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            banned.push_back(std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0))));
+        }
+        sqlite3_finalize(stmt);
+        return banned;
     }
 }

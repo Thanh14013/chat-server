@@ -11,6 +11,7 @@ public:
     void initialize(TcpServer *server);
 
     void kick(int adminFd, const std::string &targetNick, const std::string &reason);
+    void unkick(int adminFd, const std::string& targetNick, const std::string& room);
     void mute(int adminFd, const std::string &targetNick, int durationSec);
     void unmute(int adminFd, const std::string &targetNick);
     void ban(int adminFd, const std::string &targetNick, const std::string &reason);
@@ -23,8 +24,5 @@ private:
     AdminCommands() : m_server(nullptr) {};
     bool hasAdminRight(int adminFd, bool ownerOnly = false);
     std::string adminNick(int adminFd);
-    void persistBan(const std::string &ip, const std::string &reason);
-    void removeBan(const std::string &ipOrNick);
-
     TcpServer *m_server;
 };

@@ -47,8 +47,11 @@ public:
                          int fd = -1);
 
     void tempBan(const std::string& ip, int durationSec, const std::string& reason);
-    void permBan(const std::string& ip, const std::string& reason);
+    void permBan(const std::string& ip, const std::string& reason = "Manual ban");
+    void permBanNick(const std::string& nick, const std::string& reason = "Manual ban");
     void unban(const std::string& ip);
+    void unbanNick(const std::string& nick);
+    bool isBannedNick(const std::string& nick);
 
     void addWhitelist(const std::string& ip);
     void decayScores();
@@ -61,6 +64,8 @@ public:
 
 private:
     IntrusionDetector() = default;
+
+    std::set<std::string> m_bannedNicks;
 
     void checkThresholds(IPRecord& rec);
     std::string violationToStr(ViolationType type);

@@ -60,6 +60,11 @@ namespace Builder
         return makePacket(MessageType::MSG_ROOM_LIST_RESPONSE, jsonList);
     }
 
+    Packet makeAdminRoomInfoResponse(const std::string &jsonList)
+    {
+        return makePacket(MessageType::MSG_ADMIN_ROOM_INFO_RESPONSE, jsonList);
+    }
+
     Packet makePing()
     {
         return Packet(MessageType::MSG_PING, {});

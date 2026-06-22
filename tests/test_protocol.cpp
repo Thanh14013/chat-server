@@ -107,6 +107,17 @@ TEST(packet_sequence_num) {
     ASSERT_EQ(hdr.sequence_num, (uint32_t)42);
 }
 
+TEST(packet_large_payload) {
+    std::string large(60000, 'A');
+    std::vector<uint8_t> payload(large.begin(), large.end());
+    Packet pkt(MessageType::MSG_CHAT_SEND, payload);
+    auto bytes = packetToBytes(pkt);
+    
+    PacketHeader hdr;
+    std::memcpy(&hdr, bytes.data(), sizeof(PacketHeader));
+    ASSERT_EQ(hdr.payload_length, (uint32_t)60000);
+}
+
 int main() {
     return run_all_tests("Protocol Tests");
 }
