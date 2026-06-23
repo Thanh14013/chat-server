@@ -1,0 +1,12 @@
+\chapter*{TÓM TẮT NỘI DUNG DỰ ÁN}
+
+
+Đồ án trình bày việc thiết kế và phát triển hệ thống VCS SecureChat - một giải pháp truyền thông thời gian thực (Real-time Communication) theo mô hình Client-Server. Hệ thống được xây dựng hoàn toàn bằng ngôn ngữ C++ với mục tiêu đáp ứng đồng thời hai yêu cầu khắt khe: Hiệu năng xử lý đồng thời cao (High Concurrency) và An toàn thông tin đa lớp.
+
+Ở phía Máy chủ (Server), kiến trúc phần mềm được thiết kế dựa trên mô hình điều khiển sự kiện bất đồng bộ (Event-Driven) sử dụng \textit{epoll}, kết hợp cùng mô hình Thread Pool. Điều này cho phép Server xử lý bài toán C10K một cách tối ưu, không bị thắt nút cổ chai tại các luồng I/O mạng. Cơ sở dữ liệu SQLite được tích hợp cùng cơ chế Write-Ahead Logging (WAL) giúp đảm bảo tốc độ truy vấn thông tin người dùng và lịch sử hệ thống trong môi trường đa luồng.
+
+Về mặt Giao thức và Bảo mật, hệ thống loại bỏ các giao thức văn bản truyền thống để chuyển sang sử dụng giao thức truyền tải nhị phân tùy chỉnh (Custom Binary Protocol) với Header chứa mã kiểm lỗi CRC32. Quá trình bảo mật áp dụng mô hình mã hóa lai (Hybrid Crypto): sử dụng RSA-2048 để trao đổi khóa phiên một cách an toàn ở bước bắt tay (Handshake), sau đó toàn bộ payload giao tiếp được mã hóa và xác thực tính nguyên vẹn bằng chuẩn AES-256-GCM. 
+
+Ngoài ra, đồ án tập trung nghiên cứu và cài đặt một hệ sinh thái an ninh mạng chủ động ngay trong nhân máy chủ, bao gồm: module Hệ thống phát hiện xâm nhập (Intrusion Detector - IDS) để phân tích hành vi độc hại, bộ định tuyến giới hạn tốc độ (Rate Limiter) chống lại các cuộc tấn công DoS/Spam dựa trên thuật toán Token-Bucket, và Nhật ký kiểm toán (Audit Logger) lưu vết các thao tác nhạy cảm. Phía Client mang đến một giao diện dòng lệnh (CLI) nhẹ bén, hỗ trợ đa dạng tính năng nghiệp vụ từ nhắn tin cá nhân, phòng chat nhóm, truyền tải tập tin, đến các tập lệnh quản trị cao cấp (Admin Commands). 
+
+Kết quả đạt được là một nền tảng giao tiếp mạnh mẽ, hoạt động ổn định và đáp ứng các tiêu chuẩn bảo mật thực tế, có thể dễ dàng mở rộng và tích hợp thêm các dịch vụ vệ tinh trong tương lai.

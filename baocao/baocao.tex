@@ -1,4 +1,4 @@
-\documentclass[a4paper, oneside]{report}
+\documentclass[a4paper, twoside]{report}
 \usepackage[fontsize=13pt]{fontsize}
 
 % --- CÁC GÓI CƠ BẢN ---
@@ -19,10 +19,10 @@
 \usepackage{geometry} % Căn lề giấy
 \geometry{
     a4paper,
-    left=3cm,
-    right=2cm,
-    top=2.5cm,
-    bottom=2.5cm
+    inner=3.5cm,
+    outer=2.5cm,
+    top=2cm,
+    bottom=2cm
 }
 
 % --- THIẾT LẬP HEADER VÀ FOOTER ---
@@ -30,112 +30,137 @@
 \pagestyle{fancy}
 \fancyhf{} % Xóa các định dạng mặc định
 \fancyhead[R]{\leftmark} % Tên chương ở bên phải trên cùng
-\fancyfoot[R]{\thepage} % Số trang ở bên phải dưới cùng
+\fancyfoot[C]{\thepage} % Số trang ở giữa dưới cùng (hoặc đổi sang R tùy ý, đồ án twoside thường để C hoặc LE, RO)
 \renewcommand{\headrulewidth}{0.4pt} % Đường gạch dài ngăn cách header và body
 \renewcommand{\footrulewidth}{0pt}
 
-% --- THIẾT LẬP ĐỊNH DẠNG TÊN CHƯƠNG ---
+% --- THIẾT LẬP ĐỊNH DẠNG TÊN CHƯƠNG VÀ MỤC ---
 \usepackage{titlesec}
 \titleformat{\chapter}[block]
-  {\normalfont\large\bfseries\centering} % Căn giữa, in đậm, cỡ chữ vừa
+  {\normalfont\large\bfseries\centering} % Căn giữa, in đậm
   {CHƯƠNG \thechapter.} % "CHƯƠNG X."
   {0.5em} % Khoảng cách
-  {} % 
+  {\MakeUppercase} % Viết hoa toàn bộ
 \titlespacing*{\chapter}{0pt}{-20pt}{20pt} % Chỉnh khoảng cách trên/dưới
 
-% Căn chỉnh các mục con cho thẳng hàng (1.1, 1.1.1...)
-\setcounter{secnumdepth}{3}
+\titleformat{\section}
+  {\normalfont\normalsize\bfseries}
+  {\thesection}
+  {1em}{}
+  
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}
+  {1em}{}
+
+% Mục cấp 3: 1., 2...
+\renewcommand{\thesubsubsection}{\arabic{subsubsection}.}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsubsection}
+  {1em}{}
+
+% Mục cấp 4: a., b...
+\renewcommand{\theparagraph}{\alph{paragraph}.}
+\titleformat{\paragraph}
+  {\normalfont\normalsize\bfseries}
+  {\theparagraph}
+  {1em}{}
+
+% Căn chỉnh các mục con cho hiển thị số
+\setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{3}
 
 % --- THIẾT LẬP MỤC LỤC (TOC) ---
 \usepackage{tocloft}
 \renewcommand{\contentsname}{MỤC LỤC}
-\renewcommand{\cfttoctitlefont}{\hfill\large\bfseries}
+\renewcommand{\cfttoctitlefont}{\hfill\large\bfseries\MakeUppercase}
 \renewcommand{\cftaftertoctitle}{\hfill}
+
+% Chương trong mục lục: in đậm, có dấu chấm
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
 \renewcommand{\cftchappresnum}{CHƯƠNG }
 \renewcommand{\cftchapaftersnum}{.}
 \setlength{\cftchapnumwidth}{6.5em}
-\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-\renewcommand{\listfigurename}{DANH SÁCH HÌNH VẼ}
-\renewcommand{\listtablename}{DANH SÁCH BẢNG}
+
+% Lùi lề mục con
+\cftsetindents{section}{2cm}{1.2cm}
+\cftsetindents{subsection}{3.2cm}{1.5cm}
+
+% --- DANH MỤC HÌNH VÀ BẢNG ---
+\usepackage{chngcntr}
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+
+\renewcommand{\listfigurename}{DANH MỤC HÌNH VẼ}
+\renewcommand{\listtablename}{DANH MỤC BẢNG BIỂU}
+
+\renewcommand{\cftfigpresnum}{Hình }
+\renewcommand{\cftfigaftersnum}{: }
+\addtolength{\cftfignumwidth}{2.5em}
+
+\renewcommand{\cfttabpresnum}{Bảng }
+\renewcommand{\cfttabaftersnum}{: }
+\addtolength{\cfttabnumwidth}{2.5em}
 
 % Đường dẫn chứa hình ảnh
-\graphicspath{{HinhVe/}}
+\graphicspath{{Hinhve/}}
+
+% Danh sách tài liệu tham khảo (BibLaTeX)
+\usepackage[style=ieee]{biblatex}
+\addbibresource{Danh_sach_tai_lieu_tham_khao.bib}
+
+% Cấu hình code lstlisting
+\input{lstlisting.tex}
 
 \begin{document}
 
-% --- TRANG BÌA ---
-\begin{titlepage}
-    \begin{center}
-        \vspace*{3cm}
-        \Huge
-        \textbf{BÁO CÁO DỰ ÁN}\\
-        \vspace{1cm}
-        \Large
-        \textbf{HỆ THỐNG CHAT SERVER BẢO MẬT}\\
-        \vspace{3cm}
-        \Large
-        \textit{Người thực hiện:} Tên của bạn \\
-        \textit{Giáo viên hướng dẫn:} Tên GVHD \\
-        \vfill
-        \Large
-        Tháng 06 năm 2026
-    \end{center}
-\end{titlepage}
+% --- PHẦN MỞ ĐẦU: Không đánh số trang ---
+\pagenumbering{gobble}
 
-\pagenumbering{gobble} % Không đánh số trang cho phần tóm tắt
+% Trang bìa
+\input{Bia.tex}
 
-% Trang tóm tắt dự án
-\chapter*{TÓM TẮT NỘI DUNG DỰ ÁN}
-Dự án tập trung vào việc thiết kế và phát triển một hệ thống máy chủ trò chuyện trực tuyến (Chat Server) đa luồng, có khả năng mở rộng cao và được tích hợp các cơ chế bảo mật toàn diện. Hệ thống được xây dựng hoàn toàn bằng ngôn ngữ C++ dựa trên kiến trúc Client-Server thông qua giao thức TCP. Để tối ưu hóa hiệu năng và độ linh hoạt, dự án đã thiết kế một giao thức truyền tải tùy chỉnh (Custom Protocol) thay vì các giao thức văn bản thông thường. Giao thức này hỗ trợ đa dạng các nghiệp vụ thời gian thực như nhắn tin cá nhân, trò chuyện nhóm (room), truyền tải tệp tin, và các tập lệnh quản trị hệ thống (admin commands).
+% Các phần phụ đầu trang
+\input{Chuong/Tom_tat.tex}
 
-Điểm khác biệt cốt lõi của dự án nằm ở hệ thống an toàn thông tin nhiều lớp. Quá trình kết nối được bảo vệ bởi một quy trình bắt tay (Handshake) tùy chỉnh: sử dụng thuật toán bất đối xứng RSA để trao đổi khóa an toàn, sau đó áp dụng mã hóa đối xứng AES cho mọi dữ liệu truyền tải. Để chống lại việc giả mạo và đánh tráo gói tin, hệ thống sử dụng mã xác thực thông điệp HMAC kết hợp hàm băm SHA256. Không chỉ dừng lại ở mã hóa đường truyền, máy chủ còn được trang bị module Phát hiện xâm nhập (Intrusion Detector) để ngăn chặn các kết nối độc hại, cùng với hệ thống Nhật ký kiểm toán chống can thiệp (Tamper-evident Audit Logger) lưu trữ trên cơ sở dữ liệu SQLite, giúp đảm bảo tính minh bạch và an toàn tuyệt đối cho dữ liệu truy vết.
-
-Về mặt kiến trúc phần mềm, máy chủ vận hành dựa trên cơ chế vòng lặp sự kiện bất đồng bộ (Event Loop) kết hợp với mô hình Thread Pool, giúp giải quyết triệt để bài toán xử lý đồng thời lượng lớn kết nối (C10K) với độ trễ tối thiểu. Kết quả của dự án là một nền tảng giao tiếp mạnh mẽ, đáp ứng đầy đủ các tiêu chuẩn khắt khe về hiệu năng và an ninh mạng trong môi trường thực tế.
-
+% Các danh mục
 \clearpage
-
-% --- CÁC TRANG BAN ĐẦU: ĐÁNH SỐ LA MÃ THƯỜNG ---
-\pagenumbering{roman} % Đánh số trang la mã (i, ii, iii...)
+\pagenumbering{roman}
 \setcounter{page}{1}
-
-% Mục lục
 \tableofcontents
-\clearpage
 
-% Danh mục hình vẽ
+\clearpage
 \listoffigures
-\addcontentsline{toc}{chapter}{Danh sách hình vẽ}
-\clearpage
+\addcontentsline{toc}{chapter}{\listfigurename}
 
-% Danh mục bảng biểu
+\clearpage
 \listoftables
-\addcontentsline{toc}{chapter}{Danh sách bảng}
-\clearpage
+\addcontentsline{toc}{chapter}{\listtablename}
 
-% Bảng từ viết tắt
-\chapter*{BẢNG TỪ VIẾT TẮT}
-\addcontentsline{toc}{chapter}{Bảng từ viết tắt}
-\begin{longtable}{|l|l|}
-\hline
-\textbf{Từ viết tắt} & \textbf{Ý nghĩa} \\
-\hline
-TCP & Transmission Control Protocol \\
-TLS & Transport Layer Security \\
-AES & Advanced Encryption Standard \\
-RSA & Rivest-Shamir-Adleman \\
-\hline
-\end{longtable}
 \clearpage
+\input{Tu_viet_tat.tex}
 
-% --- NỘI DUNG CHÍNH: ĐÁNH SỐ Ả RẬP ---
-\pagenumbering{arabic} % Đánh số trang bắt đầu từ 1
+% --- PHẦN NỘI DUNG CHÍNH: ĐÁNH SỐ Ả RẬP ---
+\clearpage
+\pagenumbering{arabic}
 \setcounter{page}{1}
 
-% Include các chương từ các file riêng biệt
-\include{Chuong/Chuong1/chuong1}
-\include{Chuong/Chuong2/chuong2}
-\include{Chuong/Chuong3/chuong3}
-\include{Chuong/Chuong4/chuong4}
+% Include các chương (chỉnh lại đường dẫn mới)
+\include{Chuong/1_Mo_dau/chuong1}
+\include{Chuong/2_Nen_tang_ly_thuyet/chuong2}
+\include{Chuong/3_Phan_tich_thiet_ke/chuong3}
+\include{Chuong/4_Ket_luan/chuong4}
+
+% --- PHẦN CUỐI ---
+\clearpage
+\addcontentsline{toc}{chapter}{TÀI LIỆU THAM KHẢO}
+\printbibliography[title={TÀI LIỆU THAM KHẢO}]
+
+% \clearpage
+% \chapter*{PHỤ LỤC}
+% \addcontentsline{toc}{chapter}{PHỤ LỤC}
 
 \end{document}
