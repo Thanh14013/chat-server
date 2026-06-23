@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  23 JUN 2026 02:58
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  23 JUN 2026 03:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1020,7 +1020,7 @@ Underfull \vbox (badness 3803) has occurred while \output is active []
 
 
 
-]) (./Chuong/1_Mo_dau/1.2/1.2.tex (./Chuong/1_Mo_dau/1.2/1.2.1.tex
+]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1028,7 +1028,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[2]) (./Chuong/1_Mo_dau/1.2/1.2.2.tex)))
+[2]) (./Chuong/1_Mo_dau/1.2/1.2.tex (./Chuong/1_Mo_dau/1.2/1.2.1.tex
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1036,12 +1036,28 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[3]
+[3]) (./Chuong/1_Mo_dau/1.2/1.2.2.tex
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[4])))
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[5]
 \openout2 = `Chuong/2_Nen_tang_ly_thuyet/chuong2.aux'.
 
  (./Chuong/2_Nen_tang_ly_thuyet/chuong2.tex
 Chương 2.
-(./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.tex (./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.tex (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.2.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.3.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.tex (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.tex (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.tex (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.6.tex)) [4
+(./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.tex (./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.tex (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.2.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.2/2.2.3.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.tex (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.3/2.3.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.tex (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.tex (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.1.tex) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.2.tex)) (./Chuong/2_Nen_tang_ly_thuyet/2.6.tex)) [6
 
 
 
@@ -1054,7 +1070,7 @@ Chương 3.
 (./Chuong/3_Phan_tich_thiet_ke/3.1/3.1.tex (./Chuong/3_Phan_tich_thiet_ke/3.1/3.1.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.1/3.1.2.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.2/3.2.tex (./Chuong/3_Phan_tich_thiet_ke/3.2/3.2.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.2/3.2.2.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.3/3.3.tex (./Chuong/3_Phan_tich_thiet_ke/3.3/3.3.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.3/3.3.2.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.4/3.4.tex (./Chuong/3_Phan_tich_thiet_ke/3.4/3.4.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.4/3.4.2.tex) (./Chuong/3_Phan_tich_thiet_ke/3.4/3.4.3.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.5/3.5.tex (./Chuong/3_Phan_tich_thiet_ke/3.5/3.5.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.5/3.5.2.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.6/3.6.tex (./Chuong/3_Phan_tich_thiet_ke/3.6/3.6.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.6/3.6.2.tex) (./Chuong/3_Phan_tich_thiet_ke/3.6/3.6.3.tex)) (./Chuong/3_Phan_tich_thiet_ke/3.7/3.7.tex (./Chuong/3_Phan_tich_thiet_ke/3.7/3.7.1.tex) (./Chuong/3_Phan_tich_thiet_ke/3.7/3.7.2.tex)))
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [5
+ [7
 
 
 
@@ -1070,12 +1086,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[6]
+[8]
 \openout2 = `Chuong/4_Ket_luan/chuong4.aux'.
 
  (./Chuong/4_Ket_luan/chuong4.tex
 Chương 4.
-(./Chuong/4_Ket_luan/4.1.tex) (./Chuong/4_Ket_luan/4.2.tex)) [7
+(./Chuong/4_Ket_luan/4.1.tex) (./Chuong/4_Ket_luan/4.2.tex)) [9
 
 
 
@@ -1136,10 +1152,10 @@ Package logreq Info: Writing requests to 'baocao.run.xml'.
 Here is how much of TeX's memory you used:
  23501 strings out of 477763
  468251 string characters out of 5843920
- 1254677 words of memory out of 5000000
+ 1254678 words of memory out of 5000000
  43606 multiletter control sequences out of 15000+600000
  479129 words of font info for 92 fonts, out of 8000000 for 9000
  264 hyphenation exceptions out of 8191
  73i,12n,77p,1101b,3688s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on baocao.xdv (14 pages, 170896 bytes).
+Output written on baocao.xdv (16 pages, 200836 bytes).

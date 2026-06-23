@@ -1,14 +1,14 @@
 # Fdb version 3
-["biber baocao"] 1782181952 "baocao.bcf" "baocao.bbl" "baocao" 1782183514
-  "baocao.bcf" 1782183513 106356 684e4ff9289cea9535a9d60674892eeb "xelatex"
+["biber baocao"] 1782181952 "baocao.bcf" "baocao.bbl" "baocao" 1782184941
+  "baocao.bcf" 1782184940 106356 684e4ff9289cea9535a9d60674892eeb "xelatex"
   (generated)
   "baocao.bbl"
   "baocao.blg"
-["xdvipdfmx"] 1782183513 "baocao.xdv" "baocao.pdf" "baocao" 1782183514
-  "baocao.xdv" 1782183513 170896 b2bf63449cd9a24a8516b77c2ae164e1 "xelatex"
+["xdvipdfmx"] 1782184941 "baocao.xdv" "baocao.pdf" "baocao" 1782184941
+  "baocao.xdv" 1782184940 200836 0c62ee1277552a723b4ce34c9b88a0fa "xelatex"
   (generated)
   "baocao.pdf"
-["xelatex"] 1782183511 "/home/chat-server/baocao/baocao.tex" "baocao.xdv" "baocao" 1782183514
+["xelatex"] 1782184938 "/home/chat-server/baocao/baocao.tex" "baocao.xdv" "baocao" 1782184941
   "/etc/texmf/web2c/texmf.cnf" 1781751392 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/chat-server/baocao/baocao.tex" 1782183487 4871 a358700536ff961a8477ac8e92c37098 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -141,11 +141,11 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1781751965 3719663 8d338c4792aeb322e14bae4862a642b8 ""
   "Bia.tex" 1782183507 835 1f63924c64fa9337f9bf6dc496e329ee ""
-  "Chuong/1_Mo_dau/1.1.tex" 1782183341 3131 f7133b34bdfd27266d87d469aa8b5117 ""
+  "Chuong/1_Mo_dau/1.1.tex" 1782184934 7041 ce32e21138f011e34b26c9873f72f6b4 ""
   "Chuong/1_Mo_dau/1.2/1.2.1.tex" 1781755731 2345 3a1e121f56f2fa393f2464faae688db0 ""
   "Chuong/1_Mo_dau/1.2/1.2.2.tex" 1781755733 2580 3d2145abd60317d4b160f1c5f5fe6f81 ""
   "Chuong/1_Mo_dau/1.2/1.2.tex" 1782180171 115 fadc9483461c3696b8f6c9eebf0e1520 ""
-  "Chuong/1_Mo_dau/chuong1.aux" 1782183513 5263 c883c1deee2b2c311e3a84c2f606be4b "xelatex"
+  "Chuong/1_Mo_dau/chuong1.aux" 1782184940 5263 faea3817c63fcd727609c42620def3a3 "xelatex"
   "Chuong/1_Mo_dau/chuong1.tex" 1782179748 97 e45848165ddfaffd72130d6a93e59b0c ""
   "Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.1.tex" 1781753630 37 ee1c1f34d8395854ed60fc8f553c3971 ""
   "Chuong/2_Nen_tang_ly_thuyet/2.1/2.1.2.tex" 1781753630 32 207d9dde60a0ca0fcbac9262d3ea221f ""
@@ -164,7 +164,7 @@
   "Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.2.tex" 1782183129 49 16af1634e5daa2534dbbfc7b1575e880 ""
   "Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.tex" 1782183129 151 af66038330b63ab627d7f1258510d52d ""
   "Chuong/2_Nen_tang_ly_thuyet/2.6.tex" 1782183129 51 866bcda9310a8ec011a2e753cdbce932 ""
-  "Chuong/2_Nen_tang_ly_thuyet/chuong2.aux" 1782183513 6916 b7ccf958119921e03285bf7a6098f06e "xelatex"
+  "Chuong/2_Nen_tang_ly_thuyet/chuong2.aux" 1782184940 6916 47755f9cace2ebf0b5bbe6bc1c0e939c "xelatex"
   "Chuong/2_Nen_tang_ly_thuyet/chuong2.tex" 1782183129 326 ad2ec4fd9b4ca65c5a3a140e5b6ea420 ""
   "Chuong/3_Phan_tich_thiet_ke/3.1/3.1.1.tex" 1781753630 33 c1cd1acd37db3debdb9a7959bdcffe8f ""
   "Chuong/3_Phan_tich_thiet_ke/3.1/3.1.2.tex" 1781753630 33 709aa97e4778ec710cf3987026770905 ""
@@ -189,22 +189,22 @@
   "Chuong/3_Phan_tich_thiet_ke/3.7/3.7.1.tex" 1781753630 41 84b3d559b8f580537edf9b59a0d47f61 ""
   "Chuong/3_Phan_tich_thiet_ke/3.7/3.7.2.tex" 1781753630 53 a2365ea2e587fd369c7fb0e6e39ac4c0 ""
   "Chuong/3_Phan_tich_thiet_ke/3.7/3.7.tex" 1782183143 132 84ab0870233ff51d9fc8f53ac975895c ""
-  "Chuong/3_Phan_tich_thiet_ke/chuong3.aux" 1782183513 7851 1dece5f31bc39163a166d172892c33ad "xelatex"
+  "Chuong/3_Phan_tich_thiet_ke/chuong3.aux" 1782184940 7851 bca88c95a0bea44fbe340b70b2b12cdd "xelatex"
   "Chuong/3_Phan_tich_thiet_ke/chuong3.tex" 1782183129 387 1d55367b0bfe375e490c9cd18ae94bef ""
   "Chuong/4_Ket_luan/4.1.tex" 1781753630 23 20851f784a327fc4cd97d3f09faca7d4 ""
   "Chuong/4_Ket_luan/4.2.tex" 1781753630 33 358d360362c536093dbe663c6094ad78 ""
-  "Chuong/4_Ket_luan/chuong4.aux" 1782183513 4699 202cf484b9020b34c44c28741f6f7df6 "xelatex"
+  "Chuong/4_Ket_luan/chuong4.aux" 1782184940 4700 4b6003a9b1a4e3190f0f103643406618 "xelatex"
   "Chuong/4_Ket_luan/chuong4.tex" 1782179754 111 115e150bf1a609a3c287955f87e62839 ""
   "Chuong/Tom_tat.tex" 1782183237 2653 e8d978139245356e4b46344edf67377a ""
   "Tu_viet_tat.tex" 1782180982 314 1b459fddbb8f9c7ae2cd9b9ac8bddb5b ""
-  "baocao.aux" 1782183513 1440 28c73fa84b36b226bdf9442019bd72c3 "xelatex"
+  "baocao.aux" 1782184940 1440 696ad5eb9cd2b93c3815d86ee831e85f "xelatex"
   "baocao.bbl" 1782181953 466 ee04f40f768daeed26442158e95aba61 "biber baocao"
-  "baocao.lof" 1782183513 110 7c6ff480706ea56d1a41b6d02e9f27c3 "xelatex"
-  "baocao.lot" 1782183513 110 7c6ff480706ea56d1a41b6d02e9f27c3 "xelatex"
-  "baocao.out" 1782183513 12086 8f097f6576f5a06280b5b8102ba669a2 "xelatex"
-  "baocao.run.xml" 1782183513 2438 e79f621e5d9b1b2ee16607386b715a40 "xelatex"
+  "baocao.lof" 1782184940 110 7c6ff480706ea56d1a41b6d02e9f27c3 "xelatex"
+  "baocao.lot" 1782184940 110 7c6ff480706ea56d1a41b6d02e9f27c3 "xelatex"
+  "baocao.out" 1782184940 12086 8f097f6576f5a06280b5b8102ba669a2 "xelatex"
+  "baocao.run.xml" 1782184940 2438 e79f621e5d9b1b2ee16607386b715a40 "xelatex"
   "baocao.tex" 1782183487 4871 a358700536ff961a8477ac8e92c37098 ""
-  "baocao.toc" 1782183513 5427 ca54db0d47400d1f83e5cf4cbf47add2 "xelatex"
+  "baocao.toc" 1782184940 5427 1dd506870e120e7585c1acbfee3a092a "xelatex"
   "lstlisting.tex" 1782179371 836 f7e8790442b7440aa8b592728b3769a1 ""
   (generated)
   "Chuong/1_Mo_dau/chuong1.aux"
