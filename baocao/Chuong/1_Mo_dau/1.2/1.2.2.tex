@@ -1,15 +1,24 @@
 \subsection{Yêu cầu phi chức năng}
 
-Bên cạnh các tính năng nghiệp vụ, hệ thống đặc biệt chú trọng vào các yêu cầu phi chức năng nhằm đảm bảo hiệu năng, độ tin cậy và an toàn thông tin tuyệt đối trong môi trường mạng thực tế:
+Bên cạnh các tính năng nghiệp vụ cốt lõi, hệ thống đặc biệt chú trọng vào các yêu cầu phi chức năng nhằm đảm bảo năng lực vận hành, độ tin cậy và an toàn thông tin toàn diện trong môi trường thực tế:
 
-\begin{itemize}
-    \item \textbf{Bảo mật và Toàn vẹn dữ liệu (Security \& Integrity):}
-    \begin{itemize}
-        \item Mọi thông điệp truyền tải trên mạng lưới phải được mã hóa bằng thuật toán chuẩn công nghiệp (AES) với khóa phiên (Session Key) được phân phối an toàn qua cơ chế mã hóa bất đối xứng (RSA).
-        \item Hệ thống phải chống lại được các hành vi đánh tráo, thay đổi nội dung gói tin thông qua việc sử dụng mã xác thực thông điệp (HMAC) kết hợp cùng hàm băm SHA256.
-        \item Tích hợp hệ thống ghi nhận nhật ký kiểm toán chống can thiệp (Tamper-evident Audit Logger) lưu trữ trên cơ sở dữ liệu SQLite, cho phép truy vết chính xác và hệ thống sẽ báo động nếu file log bị chỉnh sửa trái phép từ bên ngoài.
-        \item Có module Phát hiện xâm nhập (Intrusion Detector) để tự động nhận diện và ngắt kết nối các client có hành vi gửi gói tin dị thường, sai cấu trúc hoặc có dấu hiệu tấn công từ chối dịch vụ (DoS).
+\begin{enumerate}
+    \item Hiệu năng và Khả năng mở rộng (Performance \& Scalability):
+    \begin{itemize}[label={-}]
+        \item Khả năng xử lý đồng thời: Kiến trúc máy chủ phải được thiết kế dựa trên cơ chế I/O đa kênh (I/O Multiplexing) thông qua API epoll kết hợp với mô hình Thread Pool. Thiết kế này đảm bảo luồng điều phối chính không bao giờ bị nghẽn (non-blocking), giải quyết hiệu quả bài toán C10K với khả năng duy trì hàng chục nghìn kết nối mà vẫn giữ độ trễ ở mức tối thiểu.
+        \item Tối ưu hóa băng thông truyền tải: Áp dụng giao thức mạng nhị phân tùy chỉnh (Custom Binary Protocol) thay thế cho văn bản thuần túy nhằm tối thiểu hóa kích thước gói tin, tiết kiệm băng thông và giảm thiểu hao phí CPU trong quá trình phân tích cú pháp (parsing).
     \end{itemize}
-    \item \textbf{Hiệu năng và Khả năng mở rộng (Performance \& Scalability):} Máy chủ phải được thiết kế theo kiến trúc hướng sự kiện (Event-driven) sử dụng vòng lặp bất đồng bộ (Event Loop) kết hợp với mô hình đa luồng (Thread Pool). Điều này đảm bảo luồng chính của hệ thống không bị nghẽn (non-blocking) bởi các thao tác I/O chậm chạp, đáp ứng khả năng xử lý hàng chục nghìn kết nối đồng thời (bài toán C10K) với độ trễ xử lý (Latency) ở mức thấp nhất.
-    \item \textbf{Tính tin cậy và Khả năng chịu lỗi (Reliability \& Fault Tolerance):} Máy chủ phải có cơ chế xử lý mượt mà các tình huống phân mảnh gói tin TCP (TCP Packet Fragmentation) hoặc dính gói. Nếu phía client đột ngột mất mạng, hệ thống phải tự động nhận diện thông qua cơ chế timeout của Ping/Pong và dọn dẹp tài nguyên (socket, session) để ngăn chặn hoàn toàn rò rỉ bộ nhớ (Memory Leak).
-\end{itemize}
+
+    \item Bảo mật và Toàn vẹn dữ liệu (Security \& Integrity):
+    \begin{itemize}[label={-}]
+        \item Mã hóa kênh truyền: Toàn bộ lưu lượng mạng lưới phải được mã hóa tải trọng theo tiêu chuẩn công nghiệp (AES-256-GCM), với khóa phiên (Session Key) được thỏa thuận và phân phối an toàn thông qua cơ chế mã hóa khóa công khai (RSA-2048).
+        \item Xác thực tính nguyên vẹn: Sử dụng mã kiểm lỗi (CRC32) và mã xác thực thông điệp (HMAC) trên từng gói tin để ngăn chặn mọi hành vi đánh tráo, sửa đổi trái phép dữ liệu trên đường truyền.
+        \item An toàn lưu trữ dữ liệu: Mật khẩu người dùng bắt buộc phải được băm một chiều an toàn trước khi lưu. Hệ thống cơ sở dữ liệu nội bộ (SQLite) phải áp dụng cơ chế ghi chép trước nhật ký (Write-Ahead Logging) để duy trì tính nhất quán, không làm hỏng file dữ liệu ngay cả khi hệ thống gặp sự cố đột ngột.
+    \end{itemize}
+
+    \item Tính tin cậy và Khả năng chịu lỗi (Reliability \& Fault Tolerance):
+    \begin{itemize}[label={-}]
+        \item Quản lý tài nguyên chặt chẽ: Tự động dọn dẹp và thu hồi toàn bộ tài nguyên (socket, phiên đăng nhập, vùng nhớ cấp phát) của các kết nối chết, ngắt kết nối đột ngột hoặc vi phạm thời gian chờ (Timeout). Quy trình này giúp triệt tiêu hoàn toàn rủi ro cạn kiệt bộ mô tả tệp (File Descriptor Exhaustion) và rò rỉ bộ nhớ (Memory Leak).
+        \item Khả năng phục hồi luồng dữ liệu mạng: Xây dựng bộ đệm mạng (Network Buffer) độc lập cho từng kết nối với năng lực tự động xử lý các rủi ro đặc thù của luồng truyền TCP, bao gồm hiện tượng phân mảnh gói tin (TCP Fragmentation) và dính gói (TCP Sticky Packets), đảm bảo quá trình đọc/ghi dữ liệu luôn trọn vẹn và không gây sụp đổ tiến trình.
+    \end{itemize}
+\end{enumerate}

@@ -1,15 +1,43 @@
 \subsection{Yêu cầu chức năng}
 
-Dựa trên mục tiêu xây dựng một nền tảng trò chuyện bảo mật toàn diện, hệ thống cần đáp ứng các nhóm yêu cầu chức năng cốt lõi sau:
+Dựa trên mục tiêu xây dựng một nền tảng trò chuyện bảo mật và hiệu năng cao, hệ thống cần đáp ứng các nhóm yêu cầu chức năng cốt lõi sau đây:
 
-\begin{itemize}
-    \item \textbf{Quản lý phiên kết nối và người dùng:} Hệ thống phải hỗ trợ người dùng kết nối (Connect), ngắt kết nối (Disconnect) và duy trì trạng thái hoạt động thông qua cơ chế nhịp tim (Ping/Pong). Hệ thống cũng cần cho phép người dùng tra cứu danh sách những tài khoản đang online và xem thông tin chi tiết (Whois) của một người dùng cụ thể.
-    \item \textbf{Giao tiếp và Nhắn tin:}
-    \begin{itemize}
-        \item \textit{Nhắn tin cá nhân (Private Chat):} Cho phép hai người dùng trao đổi thông điệp trực tiếp với nhau một cách bảo mật.
-        \item \textit{Nhắn tin nhóm (Room Chat):} Hỗ trợ tính năng tra cứu danh sách phòng (List Rooms), tạo phòng mới (Create Room), tham gia (Join), rời phòng (Leave) và gửi tin nhắn quảng bá (Broadcast) tới tất cả các thành viên trong phòng.
+\begin{enumerate}
+    \item Quản lý Tài khoản và Xác thực (Authentication \& Authorization): 
+    \begin{itemize}[label={-}]
+        \item Cung cấp tính năng Đăng ký (Register) và Đăng nhập (Login) an toàn. Mật khẩu người dùng không lưu bản rõ mà phải qua các hàm băm mật mã (như SHA256/bcrypt) để đảm bảo an toàn cơ sở dữ liệu.
+        \item Cấp phát thẻ định danh phiên (Session Token) sử dụng chữ ký điện tử HMAC, hỗ trợ cơ chế tự động phục hồi kết nối (Session Resumption) giúp người dùng giữ nguyên phiên đăng nhập khi mạng chập chờn.
     \end{itemize}
-    \item \textbf{Truyền tải tệp tin (File Transfer):} Hệ thống cần tích hợp tính năng gửi và nhận tệp tin P2P hoặc thông qua server. Quá trình này bao gồm các bước kiểm soát chặt chẽ: gửi yêu cầu truyền tệp (File Request), chấp nhận/từ chối (Accept/Reject), và truyền dữ liệu theo từng khối (File Data) để không gây nghẽn luồng thông điệp chính.
-    \item \textbf{Quản trị hệ thống (Admin Commands):} Cung cấp đặc quyền cho quản trị viên thực hiện các thao tác kiểm duyệt, quản lý cộng đồng như: kích xuất người dùng (Kick), cấm chat (Mute), cấm truy cập (Ban), thăng cấp quản trị (Promote) và gửi thông báo toàn hệ thống (System Broadcast).
-    \item \textbf{Thiết lập bảo mật sơ khởi:} Chức năng tự động thực hiện bắt tay mật mã (Crypto Handshake) ngay khi có kết nối mới nhằm trao đổi khóa công khai và thiết lập kênh truyền mã hóa trước khi bất kỳ dữ liệu nghiệp vụ nào được phép lưu thông.
-\end{itemize}
+
+    \item Quản lý phiên kết nối và Trạng thái (Session Management):
+    \begin{itemize}[label={-}]
+        \item Quản lý vòng đời socket (Connect, Disconnect) và duy trì tín hiệu sống sót thông qua cơ chế nhịp tim (Ping/Pong).
+        \item Hỗ trợ tra cứu danh sách người dùng đang trực tuyến (List Users) và xem thông tin hồ sơ của một tài khoản cụ thể (Whois).
+    \end{itemize}
+
+    \item Giao tiếp và Nhắn tin thời gian thực (Realtime Chatting):
+    \begin{itemize}[label={-}]
+        \item Nhắn tin cá nhân (Direct Message): Cho phép trao đổi thông điệp trực tiếp 1-1 với độ trễ tối thiểu.
+        \item Nhắn tin nhóm (Room Chat): Hỗ trợ danh sách phòng trò chuyện (List Rooms), cho phép người dùng tạo phòng mới (Create Room), tham gia (Join), rời phòng (Leave) và gửi tin nhắn quảng bá (Broadcast) tới toàn bộ thành viên.
+        \item Hỗ trợ truy vấn lịch sử trò chuyện đã được lưu trữ bền vững trong cơ sở dữ liệu.
+    \end{itemize}
+
+    \item Truyền tải tập tin (File Transfer):
+    \begin{itemize}[label={-}]
+        \item Cung cấp quy trình gửi/nhận tệp tin hai chiều với luồng kiểm soát rõ ràng: gửi yêu cầu truyền (File Request) và chờ phía nhận xác nhận (Accept/Reject).
+        \item Dữ liệu tệp được chia nhỏ và truyền theo từng khối (Chunking) để tránh việc một tệp tin dung lượng lớn chiếm dụng và gây tắc nghẽn luồng xử lý thông điệp chính của hệ thống.
+    \end{itemize}
+
+    \item Quản trị hệ thống (Admin Commands):
+    \begin{itemize}[label={-}]
+        \item Phân tách vai trò và cấp quyền Quản trị viên (Admin Privilege) để điều hành cộng đồng.
+        \item Tích hợp bộ công cụ xử lý vi phạm: kích xuất người dùng (Kick), cấm gửi tin nhắn (Mute), cấm truy cập vĩnh viễn (Ban IP/Username), thăng cấp quyền (Promote) và gửi thông báo khẩn cấp tới toàn server (System Broadcast).
+    \end{itemize}
+
+    \item Cơ chế phòng vệ và An ninh chủ động (Security):
+    \begin{itemize}[label={-}]
+        \item Bắt tay mật mã (Crypto Handshake): Tự động trao đổi khóa (Key Exchange) ngay khi khởi tạo kết nối để thiết lập kênh truyền mã hóa bảo mật trước khi cho phép trao đổi dữ liệu nghiệp vụ.
+        \item Ngăn chặn lạm dụng (Rate Limiting): Áp dụng thuật toán giới hạn tốc độ nhằm chống lại các nỗ lực tấn công từ chối dịch vụ (DoS) hoặc nhồi nhét tin nhắn rác (Spam).
+        \item Hệ thống phát hiện xâm nhập (IDS): Tự động ghi nhận và phân loại các vi phạm (sai mật khẩu, quét cổng, gửi gói tin dị dạng) để trừ điểm rủi ro, từ đó ra quyết định cấm (Ban) tạm thời hoặc vĩnh viễn đối với các IP độc hại.
+    \end{itemize}
+\end{enumerate}

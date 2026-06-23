@@ -14,8 +14,8 @@ Xuất phát từ những thách thức kỹ thuật và nhu cầu thực tiễn
 
 \subsubsection*{Mục tiêu của đề tài}
 Đề tài hướng tới việc nghiên cứu, thiết kế và phát triển hoàn chỉnh một hệ thống máy chủ truyền thông (Secure Chat Server) hiệu năng cao, ứng dụng mô hình Client-Server với các mục tiêu cụ thể như sau:
-\begin{itemize}
-    \item Tối ưu hóa hiệu năng xử lý đồng thời: Ứng dụng các công nghệ điều khiển sự kiện bất đồng bộ (I/O Multiplexing với \textit{epoll}) và mô hình Thread Pool để giải quyết triệt để bài toán C10K, đảm bảo hệ thống có thể duy trì hàng chục nghìn kết nối mạng với độ trễ tối thiểu và không xảy ra hiện tượng thắt cổ chai I/O.
+\begin{itemize}[label={-}]
+    \item Tối ưu hóa hiệu năng xử lý đồng thời: Ứng dụng các công nghệ điều khiển sự kiện bất đồng bộ (I/O Multiplexing với epoll) và mô hình Thread Pool để giải quyết triệt để bài toán C10K, đảm bảo hệ thống có thể duy trì hàng chục nghìn kết nối mạng với độ trễ tối thiểu và không xảy ra hiện tượng thắt cổ chai I/O.
     \item Thiết kế giao thức truyền tải tối ưu: Xây dựng một giao thức gói tin nhị phân tùy chỉnh (Custom Binary Protocol) nhằm loại bỏ chi phí phân tích cú pháp (parsing overhead) và tiết kiệm băng thông mạng so với các giao thức dựa trên văn bản thông thường.
     \item Tích hợp hệ sinh thái an ninh mạng đa lớp: Triển khai mô hình mã hóa lai (Hybrid Crypto) sử dụng RSA-2048 để trao đổi khóa và AES-256-GCM để mã hóa tải trọng (payload). Đồng thời, xây dựng các module bảo mật chủ động trực tiếp trong nhân máy chủ bao gồm: Hệ thống phát hiện xâm nhập (IDS), Cơ chế giới hạn lưu lượng (Rate Limiter sử dụng thuật toán Token-Bucket) và Hệ thống nhật ký kiểm toán (Audit Logger).
     \item Đảm bảo tính nhất quán dữ liệu: Sử dụng hệ quản trị cơ sở dữ liệu SQLite kết hợp với cơ chế Write-Ahead Logging (WAL) để đảm bảo an toàn dữ liệu và tối ưu tốc độ truy vấn trong môi trường đa luồng.
@@ -23,7 +23,7 @@ Xuất phát từ những thách thức kỹ thuật và nhu cầu thực tiễn
 
 \subsubsection*{Phạm vi nghiên cứu}
 Trong khuôn khổ của đồ án, phạm vi nghiên cứu và triển khai được giới hạn ở các khía cạnh sau:
-\begin{itemize}
+\begin{itemize}[label={-}]
     \item Phạm vi kiến trúc hệ thống: Tập trung chuyên sâu vào việc xây dựng kiến trúc lõi của phần mềm Máy chủ (Server-side) bằng ngôn ngữ C++ hiện đại. Phần mềm Máy khách (Client-side) được phát triển dưới dạng giao diện dòng lệnh (CLI), đóng vai trò như một công cụ tương tác thực tế để kiểm chứng hiệu quả của các tính năng nghiệp vụ.
     \item Phạm vi tính năng nghiệp vụ Hệ thống: triển khai đầy đủ các tính năng giao tiếp cốt lõi bao gồm: Nhắn tin cá nhân (Direct Message), Nhắn tin và quản lý phòng trò chuyện nhóm (Rooms), Truyền tải tập tin (File Transfer) và các Tập lệnh quản trị viên (Admin Commands).
     \item Phạm vi đánh giá và kiểm định: Đề tài tập trung đo lường năng lực xử lý (benchmark) dưới điều kiện tải cao và mô phỏng các kịch bản tấn công mạng cơ bản (như DoS, quét cổng, giả mạo gói tin) nhằm kiểm chứng năng lực phòng thủ của các module an ninh. Đề tài không mở rộng nghiên cứu sang việc phát triển giao diện đồ họa người dùng (GUI) hay các nền tảng ứng dụng di động.
