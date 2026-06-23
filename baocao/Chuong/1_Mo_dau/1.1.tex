@@ -1,5 +1,7 @@
 \section{Khảo sát hiện trạng}
 
+\subsection{Đặt vấn đề}
+
 Sự bùng nổ của mạng Internet và các thiết bị kết nối đã làm thay đổi hoàn toàn phương thức giao tiếp của con người. Các ứng dụng nhắn tin và gọi điện trực tuyến (Chat Applications) đã trở thành một công cụ không thể thiếu trong đời sống cá nhân cũng như trong quá trình vận hành doanh nghiệp. Các hệ thống lớn như Zalo, Messenger, Telegram hay WhatsApp hiện đang đáp ứng nhu cầu giao tiếp cho hàng tỷ người dùng thường xuyên trên toàn cầu.
 
 Tuy nhiên, đi kèm với sự phát triển nhanh chóng đó là những thách thức ngày càng nghiêm trọng về an toàn và bảo mật thông tin. Thực tế cho thấy, nhiều hệ thống giao tiếp hiện nay vẫn bộc lộ các lỗ hổng trong khâu lưu trữ và truyền tải dữ liệu. Các cuộc tấn công mạng nhằm đánh cắp danh tính (Identity Theft), nghe lén (Eavesdropping) hay tấn công trung gian (Man-in-the-Middle - MitM) ngày càng trở nên tinh vi. Một số giải pháp phổ biến thường phụ thuộc hoàn toàn vào các giao thức bảo mật lớp vận chuyển (như TLS/SSL) kết hợp với hạ tầng dịch vụ đám mây của bên thứ ba. Mặc dù các cơ chế này cung cấp mức độ bảo vệ cơ bản, nhưng chúng lại không đảm bảo được tính riêng tư tuyệt đối (Absolute Privacy) và không cho phép các tổ chức có yêu cầu an ninh khắt khe làm chủ hoàn toàn luồng dữ liệu của mình.
@@ -7,3 +9,5 @@ Tuy nhiên, đi kèm với sự phát triển nhanh chóng đó là những thá
 Thêm vào đó, nhiều nền tảng giao tiếp mã nguồn mở hiện có lại sử dụng các giao thức dựa trên văn bản (Text-based protocols) khá cồng kềnh, gây hao tốn băng thông và gặp nút thắt cổ chai khi phải xử lý đồng thời hàng chục nghìn kết nối (bài toán C10K). Quá trình ghi nhận nhật ký hệ thống (Logging) ở các nền tảng này cũng thường được lưu dưới dạng file văn bản thuần (plain-text) dễ bị chỉnh sửa và xóa dấu vết, thiếu đi cơ chế kiểm toán chặt chẽ để truy vết nguồn gốc khi xảy ra sự cố rò rỉ dữ liệu.
 
 Từ những hiện trạng nêu trên, việc nghiên cứu và tự xây dựng một hệ thống máy chủ trò chuyện (Chat Server) với kiến trúc đa luồng tối ưu, sử dụng giao thức truyền tải tự định nghĩa (Custom Protocol) cùng các lớp mã hóa bảo mật từ tận mức ứng dụng (áp dụng các thuật toán chuẩn như AES, RSA, HMAC) là vô cùng cấp thiết. Một giải pháp đồng bộ từ tầng mạng đến tầng ứng dụng không chỉ giúp làm chủ hoàn toàn công nghệ lõi mà còn tạo ra một môi trường giao tiếp đáng tin cậy, chống lại các hành vi giả mạo và cung cấp khả năng kiểm toán chống can thiệp (Tamper-evident Auditing).
+
+\subsection{Mục tiêu và phạm vi của đề tài}
