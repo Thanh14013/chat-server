@@ -1,1 +1,12 @@
 \subsection{Cơ sở dữ liệu SQLite}
+
+SQLite là một thư viện phần mềm mã nguồn mở cung cấp hệ quản trị cơ sở dữ liệu quan hệ (Relational Database Management System - RDBMS) với đặc trưng kiến trúc phi máy chủ (Serverless) và không yêu cầu cấu hình cài đặt (Zero-configuration). Khác biệt hoàn toàn với các hệ quản trị cơ sở dữ liệu tuân theo mô hình khách - chủ (Client-Server) truyền thống như PostgreSQL hay MySQL, SQLite nhúng trực tiếp công cụ xử lý cơ sở dữ liệu vào ứng dụng phần mềm dưới định dạng một thư viện liên kết. Toàn bộ cấu trúc lưu trữ bao gồm bảng (Tables), chỉ mục (Indices) và dữ liệu định tuyến đều được tổ chức và đóng gói vào một tệp tin vật lý duy nhất trên hệ thống lưu trữ đĩa (Disk Storage).
+
+Việc ứng dụng SQLite làm hạt nhân quản trị dữ liệu cho kiến trúc Secure Chat Server được củng cố bởi các tiêu chí kỹ thuật cụ thể sau:
+\begin{itemize}[label={-}]
+    \item Tối ưu hóa độ trễ giao tiếp (IPC Latency Elimination): Nhờ kiến trúc phi máy chủ, các lời gọi truy vấn cơ sở dữ liệu được thực thi trực tiếp dưới dạng các lệnh gọi hàm cục bộ (Local Function Calls) trong cùng một không gian bộ nhớ của tiến trình. Cấu trúc này triệt tiêu hoàn toàn chi phí truyền tải qua mạng và độ trễ giao tiếp liên tiến trình (Inter-process Communication), tối ưu hóa thời gian đáp ứng cho các thao tác đọc/ghi.
+    \item Tuân thủ nghiêm ngặt tiêu chuẩn ACID: Bất chấp dung lượng biên dịch nhỏ, SQLite triển khai đầy đủ các thuộc tính của một hệ thống giao dịch (Transaction): Tính nguyên tử (Atomicity), Tính nhất quán (Consistency), Tính cô lập (Isolation) và Tính bền vững (Durability). Các thuộc tính này cam kết tính toàn vẹn của dữ liệu hồ sơ người dùng và lịch sử tin nhắn ngay cả khi phát sinh sự cố mất điện phần cứng hoặc lỗi sập ứng dụng (Crash).
+    \item Khả năng tương thích chéo (Cross-platform Portability): Định dạng tệp dữ liệu của cơ sở dữ liệu SQLite được chuẩn hóa ở cấp độ tổ chức byte, cho phép quản trị viên sao chép, sao lưu hoặc di chuyển dữ liệu xuyên suốt giữa các nền tảng hệ điều hành (như Linux, Windows, macOS) mà không phụ thuộc vào tiến trình chuyển đổi định dạng phức tạp.
+\end{itemize}
+
+Trong sơ đồ kiến trúc tổng thể, module SQLite đóng vai trò là tầng lưu trữ bền vững (Persistence Layer), chịu trách nhiệm duy trì các thực thể dữ liệu nghiệp vụ cốt lõi, bao gồm: hồ sơ định danh (thông tin đăng nhập, chứng thư xác thực) và nhật ký hội thoại. Việc tương tác với cơ sở dữ liệu được phân phối trực tiếp cho tập hợp luồng làm việc (Worker Threads) thực thi trong chu trình xử lý tải trọng mạng.

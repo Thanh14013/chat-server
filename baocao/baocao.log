@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  24 JUN 2026 08:04
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  24 JUN 2026 09:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1251,11 +1251,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[14]) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.2.tex))
-(./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.tex
-(./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.1.tex)
-(./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.2.tex))
-(./Chuong/2_Nen_tang_ly_thuyet/2.6.tex))
+[14]) (./Chuong/2_Nen_tang_ly_thuyet/2.4/2.4.2.tex
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1264,7 +1260,49 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[15]
+[15])) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.tex
+(./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.1.tex
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[16]) (./Chuong/2_Nen_tang_ly_thuyet/2.5/2.5.2.tex
+Overfull \hbox (31.32176pt too wide) in paragraph at lines 3--4
+\TU/TimesNewRoman(0)/m/n/13 Write-Ahead Logging (WAL) là một phương pháp quản l
+ý giao dịch (Transaction Management)
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[17])) (./Chuong/2_Nen_tang_ly_thuyet/2.6.tex
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[18]))
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[19]
 \openout2 = `Chuong/3_Phan_tich_thiet_ke/chuong3.aux'.
 
  (./Chuong/3_Phan_tich_thiet_ke/chuong3.tex
@@ -1299,7 +1337,7 @@ Overfull \hbox (20.01767pt too wide) in paragraph at lines 1--1
 mance & Security Evaluation)| 
  []
 
-))) [16
+))) [20
 
 
 
@@ -1316,12 +1354,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[17]
+[21]
 \openout2 = `Chuong/4_Ket_luan/chuong4.aux'.
 
  (./Chuong/4_Ket_luan/chuong4.tex
 Chương 4.
-(./Chuong/4_Ket_luan/4.1.tex) (./Chuong/4_Ket_luan/4.2.tex)) [18
+(./Chuong/4_Ket_luan/4.1.tex) (./Chuong/4_Ket_luan/4.2.tex)) [22
 
 
 
@@ -1390,4 +1428,4 @@ Here is how much of TeX's memory you used:
  264 hyphenation exceptions out of 8191
  73i,12n,77p,1076b,3688s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on baocao.pdf (25 pages).
+Output written on baocao.pdf (29 pages).

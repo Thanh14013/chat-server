@@ -1,1 +1,10 @@
 \section{Công cụ và Thư viện phát triển}
+
+Quá trình xây dựng và phát triển dự án Secure Chat Server được triển khai dựa trên một hệ sinh thái các công cụ phần mềm và thư viện tiêu chuẩn, nhằm đảm bảo khả năng tối ưu hóa hiệu năng và tương thích chuyên sâu với kiến trúc hệ điều hành cục bộ:
+\begin{itemize}[label={-}]
+    \item Ngôn ngữ lập trình C++: Dự án ứng dụng ngôn ngữ C++ (dựa trên tiêu chuẩn C++17) làm công cụ lập trình lõi. Năng lực can thiệp vi mô vào không gian bộ nhớ kết hợp cùng các giao diện trừu tượng hóa cấp thấp của C++ đóng vai trò then chốt trong việc lập trình socket mạng và quản trị chu kỳ sống của luồng thực thi (Thread Lifecycle).
+    \item Hệ điều hành phân phối Linux (Linux Kernel): Máy chủ được thiết kế chuyên biệt để vận hành trong môi trường hệ điều hành Linux. Đặc điểm này xuất phát từ yêu cầu tích hợp trực tiếp Giao diện lập trình ứng dụng (API) \texttt{epoll} – một nền tảng I/O Multiplexing mang tính độc quyền của nhân Linux, phục vụ mục đích giải quyết kiến trúc tương tranh cấp độ cao.
+    \item Thư viện mật mã OpenSSL: Được chỉ định làm nền tảng cung cấp các bộ hàm sinh mật mã (Cryptographic Primitives). Toàn bộ các quy trình nghiệp vụ bảo mật cốt lõi, bao gồm khởi tạo cơ chế trao đổi khóa RSA-2048, mã hóa tải trọng phân đoạn AES-256-GCM, và thuật toán băm xác thực HMAC-SHA256 đều được liên kết trực tiếp với thư viện OpenSSL.
+    \item Thư viện cơ sở dữ liệu SQLite3: Thư viện ngôn ngữ C tĩnh (Static C Library) của SQLite3 được nhúng đồng thời vào mã nguồn dự án nhằm cung cấp năng lực xử lý dữ liệu phi máy chủ (Serverless). Module này thực thi nhiệm vụ phân tích ngữ pháp SQL, điều phối tệp vật lý lưu trữ, và bảo toàn thuộc tính giao dịch ACID dưới sự hỗ trợ của chế độ Write-Ahead Logging.
+    \item Hệ thống biên dịch GCC và Make: Quá trình dịch thuật mã nguồn tĩnh thành tệp thực thi nhị phân (Binary Executable) được triển khai thông qua Bộ trình dịch GNU (GNU Compiler Collection - GCC). Cấu trúc liên kết mã nguồn và quản trị sự phụ thuộc của các thư viện (Dependency Management) được cấu hình tự động thông qua các tập lệnh Makefile.
+\end{itemize}
