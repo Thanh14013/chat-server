@@ -2,7 +2,7 @@
 
 \subsection{Đặt vấn đề}
 
-Sự phát triển vượt bậc của hạ tầng mạng Internet và thiết bị di động đã gia tăng đáng kể nhu cầu giao tiếp trực tuyến. Trong bối cảnh đó, các ứng dụng truyền thông thời gian thực (Real-time Communication) đóng vai trò nền tảng trong việc duy trì luồng trao đổi thông tin liên tục và đa chiều. Thành phần cốt lõi của các hệ thống này là kiến trúc máy chủ (Chat Server) với năng lực xử lý cao, đảm nhiệm vai trò tiếp nhận, điều phối và định tuyến thông điệp song công (full-duplex) với độ trễ thấp giữa một số lượng lớn thiết bị máy khách (Client) phân tán.
+Sự phát triển nhanh chóng của hạ tầng mạng Internet và thiết bị di động đã gia tăng đáng kể nhu cầu giao tiếp trực tuyến. Trong bối cảnh đó, các ứng dụng truyền thông thời gian thực (Real-time Communication) đóng vai trò nền tảng trong việc duy trì luồng trao đổi thông tin liên tục và đa chiều. Thành phần cốt lõi của các hệ thống này là kiến trúc máy chủ (Chat Server) với năng lực xử lý cao, đảm nhiệm vai trò tiếp nhận, điều phối và định tuyến thông điệp song công (full-duplex) với độ trễ thấp giữa một số lượng lớn thiết bị máy khách (Client) phân tán.
 
 Tuy nhiên, việc thiết kế và triển khai một kiến trúc mạng đáp ứng yêu cầu trên đối mặt với nhiều thách thức kỹ thuật phức tạp, trong đó trọng tâm là bài toán tối ưu hiệu năng. Khi hệ thống phải duy trì hàng chục nghìn kết nối đồng thời (bài toán C10K), mô hình cấp phát luồng theo kết nối (thread-per-client) truyền thống thường bộc lộ những hạn chế cố hữu, gây ra hiện tượng thắt cổ chai I/O mạng (Network I/O Bottleneck) và suy kiệt tài nguyên phần cứng. Thêm vào đó, việc sử dụng các giao thức dựa trên văn bản (Text-based Protocol) làm gia tăng chi phí phân tích cú pháp (parsing overhead) và hao phí băng thông. Những vấn đề này đặt ra yêu cầu cấp thiết trong việc xây dựng hệ thống dựa trên các mô hình I/O đa kênh tiên tiến (I/O Multiplexing), kết hợp cùng thiết kế cấu trúc gói tin nhị phân (Binary Protocol) nhằm giảm thiểu kích thước dữ liệu và tối ưu hóa triệt để độ trễ truyền tải.
 
@@ -11,8 +11,9 @@ Bên cạnh năng lực xử lý đồng thời, việc bảo mật luồng dữ
 Xuất phát từ những thách thức kỹ thuật và nhu cầu thực tiễn nêu trên, việc nghiên cứu, thiết kế và phát triển một hệ thống “Secure Chat Server” hiệu năng cao là một định hướng cấp thiết. Đề tài đòi hỏi việc kiểm soát toàn diện kiến trúc hệ thống, từ phần tối ưu hóa I/O mạng, định tuyến thông điệp Client-Server tốc độ cao, cho đến việc triển khai các cơ chế bảo mật chuyên sâu đa lớp. Hướng tiếp cận này không chỉ giải quyết trọn vẹn bài toán vận hành thực tế mà còn đóng góp giá trị học thuật cao trong lĩnh vực lập trình hệ thống và an toàn thông tin.
 
 \subsection{Mục tiêu và phạm vi của đề tài}
+\begin{enumerate}
+\item {Mục tiêu của đề tài}
 
-\subsubsection*{Mục tiêu của đề tài}
 Đề tài hướng tới việc nghiên cứu, thiết kế và phát triển hoàn chỉnh một hệ thống máy chủ truyền thông (Secure Chat Server) hiệu năng cao, ứng dụng mô hình Client-Server với các mục tiêu cụ thể như sau:
 \begin{itemize}[label={-}]
     \item Tối ưu hóa hiệu năng xử lý đồng thời: Ứng dụng các công nghệ điều khiển sự kiện bất đồng bộ (I/O Multiplexing với epoll) và mô hình Thread Pool để giải quyết triệt để bài toán C10K, đảm bảo hệ thống có thể duy trì hàng chục nghìn kết nối mạng với độ trễ tối thiểu và không xảy ra hiện tượng thắt cổ chai I/O.
@@ -21,10 +22,13 @@ Xuất phát từ những thách thức kỹ thuật và nhu cầu thực tiễn
     \item Đảm bảo tính nhất quán dữ liệu: Sử dụng hệ quản trị cơ sở dữ liệu SQLite kết hợp với cơ chế Write-Ahead Logging (WAL) để đảm bảo an toàn dữ liệu và tối ưu tốc độ truy vấn trong môi trường đa luồng.
 \end{itemize}
 
-\subsubsection*{Phạm vi nghiên cứu}
+\item {Phạm vi nghiên cứu và triển khai}
+
 Trong khuôn khổ của đồ án, phạm vi nghiên cứu và triển khai được giới hạn ở các khía cạnh sau:
 \begin{itemize}[label={-}]
     \item Phạm vi kiến trúc hệ thống: Tập trung chuyên sâu vào việc xây dựng kiến trúc lõi của phần mềm Máy chủ (Server-side) bằng ngôn ngữ C++ hiện đại. Phần mềm Máy khách (Client-side) được phát triển dưới dạng giao diện dòng lệnh (CLI), đóng vai trò như một công cụ tương tác thực tế để kiểm chứng hiệu quả của các tính năng nghiệp vụ.
     \item Phạm vi tính năng nghiệp vụ Hệ thống: triển khai đầy đủ các tính năng giao tiếp cốt lõi bao gồm: Nhắn tin cá nhân (Direct Message), Nhắn tin và quản lý phòng trò chuyện nhóm (Rooms), Truyền tải tập tin (File Transfer) và các Tập lệnh quản trị viên (Admin Commands).
     \item Phạm vi đánh giá và kiểm định: Đề tài tập trung đo lường năng lực xử lý (benchmark) dưới điều kiện tải cao và mô phỏng các kịch bản tấn công mạng cơ bản (như DoS, quét cổng, giả mạo gói tin) nhằm kiểm chứng năng lực phòng thủ của các module an ninh. Đề tài không mở rộng nghiên cứu sang việc phát triển giao diện đồ họa người dùng (GUI) hay các nền tảng ứng dụng di động.
 \end{itemize}
+\end{enumerate}
+

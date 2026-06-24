@@ -6,9 +6,9 @@ Trong cấu trúc này, máy chủ đóng vai trò là một nút mạng có nă
 
 Việc ứng dụng mô hình Client-Server mang lại các ưu thế kỹ thuật vượt trội cho quá trình thiết kế hệ thống phần mềm:
 \begin{itemize}[label={-}]
-    \item \textbf{Tập trung hóa quản lý và Bảo mật (Centralized Security):} Toàn bộ dữ liệu nhạy cảm (như mật khẩu băm, lịch sử tin nhắn, khóa mã hóa) và logic nghiệp vụ lõi đều được lưu trữ và thực thi tại máy chủ. Thiết kế này giúp triệt tiêu rủi ro rò rỉ dữ liệu từ thiết bị đầu cuối và cho phép triển khai các lớp tường lửa, hệ thống phát hiện xâm nhập (IDS) một cách đồng bộ.
-    \item \textbf{Khả năng mở rộng (Scalability):} Nhờ tính tách biệt (decoupled), hệ thống dễ dàng được mở rộng bằng cách nâng cấp tài nguyên phần cứng tại máy chủ hoặc cấu hình cân bằng tải (Load Balancing) mà không đòi hỏi bất kỳ sự sửa đổi nào từ phía hàng ngàn phần mềm máy khách.
-    \item \textbf{Tính nhất quán dữ liệu (Data Consistency):} Việc mọi giao dịch dữ liệu đều đi qua một "nút thắt" trung tâm duy nhất là máy chủ giúp giải quyết triệt để vấn đề xung đột trạng thái dữ liệu (race conditions) so với các kiến trúc mạng ngang hàng (Peer-to-Peer).
+    \item Tập trung hóa quản lý và Bảo mật (Centralized Security): Toàn bộ dữ liệu nhạy cảm (như mật khẩu băm, lịch sử tin nhắn, khóa mã hóa) và logic nghiệp vụ lõi đều được lưu trữ và thực thi tại máy chủ. Thiết kế này giúp triệt tiêu rủi ro rò rỉ dữ liệu từ thiết bị đầu cuối và cho phép triển khai các lớp tường lửa, hệ thống phát hiện xâm nhập (IDS) một cách đồng bộ.
+    \item Khả năng mở rộng (Scalability): Nhờ tính tách biệt (decoupled), hệ thống dễ dàng được mở rộng bằng cách nâng cấp tài nguyên phần cứng tại máy chủ hoặc cấu hình cân bằng tải (Load Balancing) mà không đòi hỏi bất kỳ sự sửa đổi nào từ phía hàng ngàn phần mềm máy khách.
+    \item Tính nhất quán dữ liệu (Data Consistency): Việc mọi giao dịch dữ liệu đều đi qua một "nút thắt" trung tâm duy nhất là máy chủ giúp giải quyết triệt để vấn đề xung đột trạng thái dữ liệu (race conditions) so với các kiến trúc mạng ngang hàng (Peer-to-Peer).
 \end{itemize}
 
 Trong phạm vi của dự án này, máy chủ (Secure Chat Server) đóng vai trò trung tâm điều phối toàn bộ luồng giao tiếp mạng. Các máy khách (hoạt động dưới dạng giao diện dòng lệnh CLI) không thực hiện trao đổi dữ liệu trực tiếp với nhau. Mọi thông điệp giao tiếp đều bắt buộc phải được mã hóa và gửi đến máy chủ để thực hiện quá trình giải mã, kiểm duyệt nội dung, định tuyến (routing) và mã hóa lại trước khi phân phối đến đúng thiết bị đích.
