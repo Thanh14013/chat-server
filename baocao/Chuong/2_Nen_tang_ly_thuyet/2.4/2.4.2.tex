@@ -11,6 +11,6 @@ Trong số các thuật toán giới hạn định tuyến, thuật toán Token-
 
 Đối với cấu trúc của dự án Secure Chat Server, module Rate Limiter vận hành dựa trên thuật toán Token-Bucket được thiết kế để thực thi giới hạn lưu lượng trên phạm vi từng phiên kết nối độc lập (Per-connection Rate Limiting). Việc triển khai cơ chế này định hình các chức năng điều phối sau:
 \begin{itemize}[label={-}]
-    \item Giám sát vi mô: Hệ thống áp đặt giới hạn cấu trúc về số lượng thông điệp tải trọng và yêu cầu truy xuất cơ sở dữ liệu mà một máy khách có thể thực hiện. Chức năng này phong tỏa hoàn toàn các hành vi phát tán thư rác (Spamming) ở cấp độ ứng dụng, bảo vệ bộ đệm mạng (Network Buffer) khỏi nguy cơ tràn dữ liệu (Buffer Overflow).
+    \item Giám sát vi mô: Hệ thống áp đặt giới hạn cấu trúc về số lượng thông điệp tải trọng và yêu cầu truy xuất cơ sở dữ liệu mà một máy khách được phép thực hiện. Chức năng này phong tỏa hoàn toàn các hành vi phát tán thư rác (Spamming) ở cấp độ ứng dụng, bảo vệ bộ đệm mạng (Network Buffer) khỏi nguy cơ tràn dữ liệu (Buffer Overflow).
     \item Tích hợp Module An ninh: Thuật toán Rate Limiting được thiết kế để tương tác trực tiếp với Hệ thống phát hiện xâm nhập (IDS). Các sự kiện yêu cầu bị từ chối do vi phạm số lượng Token sẽ được ghi nhận và chuyển tiếp làm tham số đầu vào cho module IDS. Tần suất vi phạm băng thông cao sẽ dẫn đến sự gia tăng của chỉ số rủi ro (Risk Score), từ đó kích hoạt cơ chế cô lập IP tự động (Auto-banning) nhằm vô hiệu hóa hoàn toàn nguồn phát sinh lưu lượng độc hại.
 \end{itemize}
