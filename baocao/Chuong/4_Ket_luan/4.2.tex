@@ -1,1 +1,17 @@
-\section{Hướng phát triển}
+\section{Hướng phát triển tương lai}
+
+Mặc dù hệ thống phần mềm hiện tại đã đáp ứng xuất sắc các tiêu chuẩn khắt khe về mặt bảo mật và hiệu năng cốt lõi, nhưng để đưa sản phẩm tiến gần hơn đến quy mô thương mại hóa và tối ưu hóa trải nghiệm người dùng cuối, kiến trúc máy chủ vẫn còn không gian lớn để mở rộng. Dưới đây là các định hướng phát triển đầy tiềm năng trong tương lai:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Nâng cấp Giao thức Bảo mật chuyển tiếp hoàn hảo (Perfect Forward Secrecy - PFS):}
+    Hiện tại, hệ thống sử dụng thuật toán RSA truyền thống để mã hóa khóa phiên AES. Mặc dù bảo mật, nhưng mô hình này thiếu tính năng PFS. Trong tương lai, hệ thống sẽ được nâng cấp sử dụng thuật toán trao đổi khóa \textbf{Elliptic Curve Diffie-Hellman (ECDHE)}. Giao thức này đảm bảo mỗi phiên chat đều sở hữu một khóa độc lập, đồng nghĩa với việc ngay cả khi tin tặc đánh cắp được khóa bí mật dài hạn của máy chủ trong tương lai, các đoạn chat mã hóa thu thập được trong quá khứ vẫn không thể bị giải mã.
+
+    \item \textbf{Mã hóa đầu cuối (End-to-End Encryption - E2EE):}
+    Bên cạnh mã hóa tầng giao vận (Client-Server), hệ thống có thể tích hợp Giao thức Signal (Signal Protocol) nhằm cung cấp tính năng mã hóa E2EE cho các phòng trò chuyện cá nhân. Khi đó, máy chủ chỉ đóng vai trò mù (Blind Relay) để trung chuyển các chuỗi byte mã hóa mà không có khả năng đọc được nội dung tin nhắn gốc, nâng mức độ bảo vệ quyền riêng tư của người dùng lên cao nhất.
+
+    \item \textbf{Mở rộng hệ thống theo mô hình Cụm phân tán (Distributed Architecture):}
+    Khi lượng truy cập (Traffic) vượt quá giới hạn xử lý của cơ chế \texttt{epoll} trên một máy vật lý duy nhất, kiến trúc máy chủ nguyên khối (Monolithic) hiện tại cần được đập bỏ để nâng cấp thành mô hình Đa máy chủ (Cluster/Microservices). Việc tích hợp thêm \textbf{Redis Pub/Sub} hoặc \textbf{Apache Kafka} làm hệ thống trung chuyển thông điệp (Message Broker) giữa các Node máy chủ sẽ giúp hệ thống cân bằng tải (Load Balancing) dễ dàng và đủ sức phục vụ hàng triệu người dùng trực tuyến.
+
+    \item \textbf{Phát triển Giao diện Đồ họa (GUI) và Gọi đa phương tiện:}
+    Phiên bản Client hiện tại hoạt động hoàn toàn trên Giao diện dòng lệnh (CLI). Việc xây dựng một giao diện đồ họa hiện đại bằng bộ công cụ \texttt{Qt} (C++) hoặc \texttt{Electron/Tauri} sẽ giúp phần mềm tiếp cận được tệp người dùng phổ thông. Đồng thời, dự án có thể mở rộng tích hợp tiêu chuẩn \texttt{WebRTC} để hỗ trợ các tính năng cao cấp như gọi thoại (Voice Call) và gọi hình ảnh (Video Call) theo mô hình mạng ngang hàng (P2P), giảm thiểu tối đa gánh nặng băng thông cho máy chủ trung tâm.
+\end{enumerate}

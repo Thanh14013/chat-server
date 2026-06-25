@@ -16,6 +16,8 @@
 \setlength{\parskip}{6pt} % Khoảng cách giữa các đoạn
 \setlength{\parindent}{15pt} % Thụt lề đầu dòng
 \usepackage{longtable} % Bảng dài
+\usepackage{booktabs} % Kẻ bảng chuẩn IEEE/ACM
+\usepackage{array} % Tùy chỉnh căn lề và khoảng cách ô trong bảng
 \usepackage{geometry} % Căn lề giấy
 \geometry{
     a4paper,
@@ -24,6 +26,7 @@
     top=2.0cm,
     bottom=2.0cm
 }
+\flushbottom
 
 % --- THIẾT LẬP HEADER VÀ FOOTER ---
 \usepackage{fancyhdr}
@@ -76,7 +79,7 @@
 
 % Căn chỉnh các mục con cho hiển thị số
 \setcounter{secnumdepth}{4}
-\setcounter{tocdepth}{3}
+\setcounter{tocdepth}{2}
 
 % --- THIẾT LẬP MỤC LỤC (TOC) ---
 \usepackage{tocloft}
@@ -93,8 +96,8 @@
 \setlength{\cftchapnumwidth}{6.5em}
 
 % Lùi lề mục con
-\cftsetindents{section}{2cm}{1.2cm}
-\cftsetindents{subsection}{3.2cm}{1.5cm}
+\cftsetindents{section}{1.0cm}{1.0cm}
+\cftsetindents{subsection}{2.0cm}{1.2cm}
 
 % --- DANH MỤC HÌNH VÀ BẢNG ---
 \usepackage{chngcntr}
@@ -157,8 +160,8 @@
 
 % Include các chương (chỉnh lại đường dẫn mới)
 \include{Chuong/1_Mo_dau/chuong1}
-\include{Chuong/2_Nen_tang_ly_thuyet/chuong2}
-\include{Chuong/3_Phan_tich_thiet_ke/chuong3}
+\include{Chuong/2_Phan_tich_thiet_ke/chuong2}
+\include{Chuong/3_Trien_khai_danh_gia/chuong3}
 \include{Chuong/4_Ket_luan/chuong4}
 
 % --- PHẦN CUỐI ---

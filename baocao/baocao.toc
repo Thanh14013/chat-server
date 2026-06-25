@@ -8,50 +8,46 @@
 \contentsline {section}{\numberline {1.2}Phân tích yêu cầu hệ thống}{3}{section.1.2}%
 \contentsline {subsection}{\numberline {1.2.1}Yêu cầu chức năng}{3}{subsection.1.2.1}%
 \contentsline {subsection}{\numberline {1.2.2}Yêu cầu phi chức năng}{4}{subsection.1.2.2}%
-\contentsline {chapter}{\numberline {2}NỀN TẢNG LÝ THUYẾT VÀ CÔNG NGHỆ SỬ DỤNG}{6}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Kiến trúc mạng và giao thức}{6}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Mô hình Client-Server}{6}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Giao thức TCP/IP}{7}{subsection.2.1.2}%
-\contentsline {section}{\numberline {2.2}Công nghệ mã hóa và bảo mật}{8}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Mã hóa đối xứng AES}{8}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Mã hóa bất đối xứng RSA}{9}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Hàm băm SHA-256 và xác thực HMAC}{10}{subsection.2.2.3}%
-\contentsline {section}{\numberline {2.3}Công nghệ xử lý đồng thời và hiệu năng cao}{11}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}I/O Multiplexing và mô hình epoll}{11}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Mô hình Thread Pool}{13}{subsection.2.3.2}%
-\contentsline {section}{\numberline {2.4}Lý thuyết an ninh mạng}{14}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Hệ thống phát hiện xâm nhập (IDS)}{14}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Thuật toán Rate Limiting (Token-Bucket)}{15}{subsection.2.4.2}%
-\contentsline {section}{\numberline {2.5}Hệ thống lưu trữ và cơ sở dữ liệu}{16}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Cơ sở dữ liệu SQLite}{16}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Cơ chế Write-Ahead Logging (WAL)}{17}{subsection.2.5.2}%
-\contentsline {section}{\numberline {2.6}Công cụ và Thư viện phát triển}{18}{section.2.6}%
-\contentsline {chapter}{\numberline {3}PHÂN TÍCH THIẾT KẾ, TRIỂN KHAI VÀ ĐÁNH GIÁ HỆ THỐNG}{20}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Kiến trúc tổng thể hệ thống}{21}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Kiến trúc Server}{21}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Kiến trúc Client}{21}{subsection.3.1.2}%
-\contentsline {section}{\numberline {3.2}Thiết kế giao thức giao tiếp}{21}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Cấu trúc gói tin}{21}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Luồng xử lý thông điệp}{21}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}Thiết kế cơ chế bảo mật}{21}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Cơ chế trao đổi khóa (Key Exchange)}{21}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Xác thực người dùng và Phục hồi phiên (Auth \& Session Resumption)}{21}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}Thiết kế hệ sinh thái an ninh mạng chủ động}{21}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Hệ thống phát hiện xâm nhập (IDS)}{21}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Bộ định tuyến giới hạn tốc độ (Rate Limiter)}{21}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Nhật ký kiểm toán (Audit Logger)}{21}{subsection.3.4.3}%
-\contentsline {section}{\numberline {3.5}Thiết kế cơ sở dữ liệu}{21}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Sơ đồ thực thể liên kết (ERD)}{21}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}Quản lý người dùng và trạng thái}{21}{subsection.3.5.2}%
-\contentsline {section}{\numberline {3.6}Thiết kế logic tính năng nghiệp vụ}{21}{section.3.6}%
-\contentsline {subsection}{\numberline {3.6.1}Nhắn tin cá nhân và Bộ lọc nội dung (Direct Message \& Message Filter)}{21}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}Quản lý phòng Chat nhóm (Rooms)}{21}{subsection.3.6.2}%
-\contentsline {subsection}{\numberline {3.6.3}Cơ chế truyền tải tập tin (File Transfer)}{21}{subsection.3.6.3}%
-\contentsline {subsection}{\numberline {3.6.4}Các tập lệnh quản trị hệ thống (Admin Commands)}{21}{subsection.3.6.4}%
-\contentsline {section}{\numberline {3.7}Triển khai và Đánh giá}{21}{section.3.7}%
-\contentsline {subsection}{\numberline {3.7.1}Môi trường triển khai}{21}{subsection.3.7.1}%
-\contentsline {subsection}{\numberline {3.7.2}Kịch bản kiểm thử chức năng (Functional Testing)}{21}{subsection.3.7.2}%
-\contentsline {subsection}{\numberline {3.7.3}Đánh giá hiệu suất và Khả năng phòng thủ (Performance \& Security Evaluation)}{21}{subsection.3.7.3}%
-\contentsline {chapter}{\numberline {4}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{22}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Kết luận}{22}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Hướng phát triển}{22}{section.4.2}%
+\contentsline {chapter}{\numberline {2}PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}{6}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Kiến trúc tổng thể và Phân tích yêu cầu}{6}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Phân tích yêu cầu hệ thống}{6}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Kiến trúc tổng thể}{8}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Giao thức Mạng và Mô hình I/O}{12}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Mô hình Client-Server và I/O Multiplexing}{12}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Thiết kế Định dạng Gói tin}{13}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Thiết kế Cơ sở dữ liệu và Cơ chế Xác thực}{14}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Cấu trúc Lưu trữ Dữ liệu}{14}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Luồng Xác thực và Quản lý Phiên}{17}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Giao thức Mật mã và Tính bảo mật}{18}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Luồng Trao đổi khóa}{18}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Hệ thống Chức năng Cốt lõi}{20}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Luồng dữ liệu Trò chuyện và Quản lý phòng}{20}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Trung chuyển Tệp tin ẩn danh}{22}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Hệ thống Quản trị và Chống lạm dụng}{24}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Hàng rào Chống Spam và DDoS}{24}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Phân quyền RBAC và Quản trị}{26}{subsection.2.6.2}%
+\contentsline {chapter}{\numberline {3}TRIỂN KHAI VÀ ĐÁNH GIÁ HỆ THỐNG}{28}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Môi trường và Công nghệ Triển khai}{28}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Cấu hình Môi trường Hệ thống}{28}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Kịch bản biên dịch và vận hành}{30}{subsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về quy trình biên dịch}{30}{subsubsection.3.1.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Kịch bản biên dịch trong thực tế hệ thống}{30}{subsubsection.3.1.2.2}%
+\contentsline {subsubsection}{\numberline {3.}Chu trình vận hành và tham số dòng lệnh}{32}{subsubsection.3.1.2.3}%
+\contentsline {section}{\numberline {3.2}Kịch bản Kiểm thử và Đánh giá Hiệu năng}{33}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Tổng quan hệ thống Kiểm thử tự động}{33}{subsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về phương pháp luận kiểm thử}{33}{subsubsection.3.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.}Cấu trúc Test Framework trong thực tế mã nguồn}{34}{subsubsection.3.2.1.2}%
+\contentsline {subsection}{\numberline {3.2.2}Đánh giá giới hạn chịu tải}{35}{subsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về đánh giá hiệu năng}{35}{subsubsection.3.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Kịch bản đo lường thực tế hệ thống}{36}{subsubsection.3.2.2.2}%
+\contentsline {subsubsection}{\numberline {3.}Kết luận đánh giá hiệu năng}{37}{subsubsection.3.2.2.3}%
+\contentsline {section}{\numberline {3.3}Đánh giá Khả năng phòng thủ Hệ thống}{37}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Phòng thủ trước tấn công Từ chối dịch vụ}{37}{subsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công Từ chối dịch vụ}{37}{subsubsection.3.3.1.1}%
+\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ thực tế tại biên giới mạng}{38}{subsubsection.3.3.1.2}%
+\contentsline {subsection}{\numberline {3.3.2}Phòng thủ trước tấn công Tiêm nhiễm và Vượt quyền}{39}{subsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công XSS và Lỗ hổng kiểm soát}{39}{subsubsection.3.3.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ và cách ly rủi ro thực tế}{40}{subsubsection.3.3.2.2}%
+\contentsline {chapter}{\numberline {4}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{42}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Kết quả đạt được}{42}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Hướng phát triển tương lai}{43}{section.4.2}%

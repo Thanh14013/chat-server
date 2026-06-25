@@ -1,0 +1,197 @@
+\section{Môi trường và Công nghệ Triển khai}
+
+\subsection{Cấu hình Môi trường Hệ thống}
+
+\begin{enumerate}
+    \item \textbf{Cơ sở lý thuyết về Tương thích Nền tảng (Platform Compatibility) và I/O Phi đồng bộ}
+    
+    Trong phát triển phần mềm mạng hiệu năng cao, cơ chế Vào/Ra (I/O) quyết định giới hạn chịu tải của hệ thống. Các hệ điều hành lõi Linux/Unix cung cấp API \texttt{epoll} với độ phức tạp $O(1)$, cho phép theo dõi hàng chục nghìn Socket đồng thời mà không bị thắt nút cổ chai (Bottleneck) như hàm \texttt{select()} $O(N)$ cổ điển. Ngược lại, nền tảng Windows sử dụng kiến trúc hoàn toàn khác là \texttt{IOCP} (I/O Completion Ports). Do sự phân mảnh API này, các máy chủ phân tán (Distributed Servers) thường được ưu tiên triển khai độc quyền trên Linux để tối ưu hóa hiệu năng và độ ổn định.
+    
+    Đối với quy trình Xây dựng (Build Process), lý thuyết Quản trị Cấu hình (Configuration Management) khuyến nghị sử dụng các Hệ thống Siêu biên dịch (Meta-Build Systems) như CMake. Thay vì viết cứng các tệp \texttt{Makefile} phụ thuộc vào một hệ điều hành cụ thể, CMake cung cấp lớp trừu tượng (Abstraction Layer) để tự động sinh ra kịch bản biên dịch bản địa (Native Build Scripts) tương thích chéo nền tảng.
+
+    \item \textbf{Kiến trúc Biên dịch trong tệp \texttt{CMakeLists.txt}}
+    
+    Hệ thống được thiết kế thành một Monorepo (Kho lưu trữ mã nguồn tập trung) quản lý chung cả \texttt{vcs\_server} và \texttt{vcs\_client}. Việc phân mảnh nền tảng được định tuyến chặt chẽ thông qua các cờ CMake:
+    
+    \begin{itemize}
+        \item \textbf{Máy chủ (Server-Side):} Bị khóa chặt (Vendor Lock-in) vào môi trường POSIX (Ubuntu/CentOS). Lệnh \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))} trong cấu hình CMake sẽ ngăn chặn hoàn toàn việc build Server trên Windows nhằm đảm bảo module \texttt{epoll} hoạt động chuẩn xác và an toàn nhất.
+        
+        \item \textbf{Máy khách (Client-Side):} Được thiết kế đa nền tảng (Cross-platform). Nếu biến \texttt{WIN32} được kích hoạt, CMake sẽ tự động tiến hành liên kết tĩnh (Static Linking) với các thư viện lõi của Microsoft gồm \texttt{wsock32}, \texttt{ws2\_32} (Winsock API cho mạng) và \texttt{crypt32} (dành cho chứng chỉ bảo mật).
+        
+        \item \textbf{Quản lý Phụ thuộc (Dependency Injection):} Dự án ép buộc chuẩn \texttt{C++17} (\texttt{CMAKE\_CXX\_STANDARD 17}) cùng các cờ tối ưu hóa cấp độ cao \texttt{-Wall -Wextra -O2}. Khâu đóng gói yêu cầu 4 thư viện lõi: \textbf{OpenSSL} (\texttt{libssl-dev}) cho mật mã lai, \textbf{SQLite3} (\texttt{libsqlite3-dev}) cho lưu trữ bền vững, \textbf{Threads} (POSIX Threads) cho xử lý đa luồng, và \textbf{nlohmann/json} cho phân tích Payload.
+    \end{itemize}
+\end{enumerate}
+
+Bảng \ref{tab:dependencies} liệt kê chi tiết các thành phần phụ thuộc (Dependencies) và vai trò của chúng trong biểu đồ kiến trúc hệ thống.
+
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{4cm}
+    >{\centering\arraybackslash}p{3cm}
+    >{\raggedright\arraybackslash}p{6cm}
+}
+    \caption[Bảng Ma trận Phụ thuộc Thư viện]{Bảng Ma trận Phụ thuộc Thư viện (Dependency Matrix)} \label{tab:dependencies} \\
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tên Thư viện}} & \multicolumn{1}{c}{\textbf{Loại Liên kết}} & \multicolumn{1}{c}{\textbf{Mục đích Kỹ thuật}} \\
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tên Thư viện}} & \multicolumn{1}{c}{\textbf{Loại Liên kết}} & \multicolumn{1}{c}{\textbf{Mục đích Kỹ thuật}} \\
+    \midrule
+    \endhead
+    
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+
+    \texttt{OpenSSL::SSL} \newline \texttt{OpenSSL::Crypto} & Động (Dynamic) & Khởi tạo môi trường Bắt tay Mật mã Lai (RSA) và mã hóa luồng khối (AES-GCM). Cung cấp hàm sinh số ngẫu nhiên an toàn CSPRNG. \\
+    \midrule
+    
+    \texttt{SQLite3} & Động (Dynamic) & Hệ quản trị cơ sở dữ liệu quan hệ cục bộ (Local RDBMS) phục vụ module \texttt{AuthManager} và lưu trữ \texttt{ChatHistory}. \\
+    \midrule
+
+    \texttt{Threads::Threads} & Hệ thống (System) & Khai thác POSIX Threads (pthreads) để vận hành các Worker Threads và vòng lặp Event Loop song song. \\
+    \midrule
+    
+    \texttt{nlohmann/json} & Header-only & Cung cấp bộ tuần tự hóa/giải tuần tự hóa (Serialize/Deserialize) các chuỗi JSON payload phi cấu trúc. \\
+    \midrule
+
+    \texttt{wsock32}, \texttt{ws2\_32} & Tĩnh (Static) \newline (Chỉ Windows) & Cung cấp API Windows Sockets để khởi tạo kết nối TCP thay thế cho Socket POSIX truyền thống ở phía Client. \\
+\end{longtable}
+
+\subsection[Kịch bản biên dịch và vận hành]{Kịch bản biên dịch và vận hành (Build \& Execution Pipeline)}
+
+\subsubsection[Cơ sở lý thuyết về quy trình biên dịch]{Cơ sở lý thuyết về quy trình biên dịch và hệ thống vận hành}
+
+Trong kỹ thuật phần mềm hiện đại, quy trình xây dựng (Build Process) đóng vai trò cốt lõi trong việc đảm bảo tính nhất quán, khả năng tái sử dụng và độ tin cậy của mã nguồn khi triển khai đa nền tảng. Hệ thống sử dụng \textbf{CMake} làm công cụ quản trị vòng đời biên dịch (Meta-build System). Điểm mạnh của CMake là khả năng trừu tượng hóa môi trường (Environment Abstraction), cho phép sinh ra các kịch bản biên dịch bản địa (Native Build Scripts) tương thích với nhiều hệ điều hành và trình biên dịch khác nhau.
+
+Bên cạnh đó, dự án ứng dụng mẫu thiết kế \textbf{Biên dịch ngoại tuyến (Out-of-Source Build)}. Cụ thể, thay vì đặt các tệp đối tượng trung gian (như \texttt{.o}, \texttt{.so}) trực tiếp vào cấu trúc mã nguồn, toàn bộ quá trình đóng gói được cô lập tại thư mục \texttt{build/}. Việc này duy trì tính tinh gọn của hệ thống quản lý phiên bản (Version Control System), đồng thời cho phép làm sạch không gian biên dịch (Clean Workspace) một cách tuyệt đối mà không gây rủi ro thất thoát dữ liệu. 
+
+Đối với quá trình vận hành, hệ thống tận dụng kỹ thuật \textbf{Biên dịch song song (Parallel Compilation)} thông qua cơ chế Đa xử lý đối xứng (SMP) của CPU. Bằng cách chia nhỏ các tác vụ biên dịch độc lập và thực thi đồng thời trên nhiều luồng xử lý tương ứng với số nhân vật lý, thời gian đóng gói phần mềm được tối ưu hóa đáng kể. 
+
+\subsubsection{Kịch bản biên dịch trong thực tế hệ thống}
+
+Kiến trúc biên dịch thực tế của dự án được kiểm soát thông qua tệp cấu hình \texttt{CMakeLists.txt} và kịch bản đóng gói \texttt{build\_all.sh}. Cấu hình yêu cầu chuẩn \texttt{C++17} kết hợp cùng các cờ tối ưu hóa \texttt{-Wall -Wextra -O2} nhằm kiểm duyệt lỗi tĩnh khắt khe và tăng cường hiệu suất mã nhị phân.
+
+Quá trình biên dịch được thiết kế thành hai phân luồng biệt lập:
+\begin{itemize}[label={-}]
+    \item \textbf{Phân luồng Máy chủ (Server-side):} Giới hạn biên dịch hoàn toàn trên môi trường lõi POSIX (Linux). Hệ thống khóa nền tảng (Vendor Lock-in) máy chủ thông qua cờ kiểm tra \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))}. Trình biên dịch sẽ liên kết trực tiếp với các thư viện lõi POSIX Threads, OpenSSL và hệ quản trị cơ sở dữ liệu \texttt{SQLITE3}.
+    \item \textbf{Phân luồng Máy khách (Client-side):} Hỗ trợ biên dịch chéo nền tảng (Cross-platform Compilation). Đối với môi trường Windows, tệp \texttt{mingw-toolchain.cmake} được sử dụng để định tuyến cấu trúc MinGW và liên kết tĩnh các thư viện mạng đặc thù của Microsoft như \texttt{wsock32}, \texttt{ws2\_32} cùng \texttt{crypt32}.
+\end{itemize}
+
+Bảng \ref{tab:build_commands} trình bày chi tiết các tập lệnh thực thi trong vòng đời biên dịch thực tế.
+
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{4cm}
+    >{\raggedright\arraybackslash}p{6cm}
+    >{\raggedright\arraybackslash}p{4.5cm}
+}
+    \caption{Các tập lệnh và tham số cấu hình trong chu trình biên dịch} \label{tab:build_commands} \\
+    \toprule
+    \multicolumn{1}{c}{\textbf{Giai đoạn}} & \multicolumn{1}{c}{\textbf{Tập lệnh (Command)}} & \multicolumn{1}{c}{\textbf{Mục đích kỹ thuật}} \\
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    \multicolumn{1}{c}{\textbf{Giai đoạn}} & \multicolumn{1}{c}{\textbf{Tập lệnh (Command)}} & \multicolumn{1}{c}{\textbf{Mục đích kỹ thuật}} \\
+    \midrule
+    \endhead
+    
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+
+    \textbf{1. Khởi tạo Không gian} & \texttt{mkdir -p build/linux \&\& cd build/linux} & Thiết lập môi trường biên dịch ngoại tuyến (Out-of-source Build) cho Linux. \\
+    \midrule
+    
+    \textbf{2. Thiết lập CMake} & \texttt{cmake ../..} & Phân tích \texttt{CMakeLists.txt}, định tuyến thư viện và cấu trúc \texttt{Makefile} bản địa. \\
+    \midrule
+
+    \textbf{3. Biên dịch Đa luồng} & \texttt{make -j\$(nproc)} & Kích hoạt biên dịch song song để giảm thiểu thời gian đóng gói nhị phân. \\
+    \midrule
+    
+    \textbf{4. Biên dịch Chéo Windows} & \texttt{cmake -DCMAKE\_TOOLCHAIN\_FILE=...} \newline \texttt{make -j\$(nproc) vcs\_client} & Triển khai biên dịch chéo ứng dụng Client cho nền tảng Windows trên máy chủ Linux. \\
+\end{longtable}
+
+[PLACEHOLDER\_HINH\_ANH\_KIEN\_TRUC\_BIEN\_DICH]
+
+\subsubsection[Chu trình vận hành và tham số dòng lệnh]{Chu trình vận hành và tham số dòng lệnh (Execution Lifecycle)}
+
+Sau khi hệ thống được đóng gói thành công, các tệp thực thi cuối cùng được nhúng hệ thống diễn dịch tham số dòng lệnh (Command-line Arguments). Cơ chế này cho phép quản trị viên cấp phát cấu hình linh hoạt trong thời gian chạy (Runtime) mà không đòi hỏi tái biên dịch mã nguồn.
+
+\textbf{1. Phân hệ vận hành Máy chủ (Server Execution)}
+
+Tệp thực thi \texttt{vcs\_server} chịu trách nhiệm khởi tạo kiến trúc đa luồng, cấp phát cơ sở dữ liệu và vận hành hệ thống Socket lắng nghe. Khi được khởi chạy, luồng \texttt{main()} sẽ tự động thiết lập thư mục \texttt{logs/} với phân quyền \texttt{0755} và khởi tạo cơ sở dữ liệu \texttt{vcs\_chat.db}.
+
+Bảng \ref{tab:server_args} mô tả chi tiết các tham số khởi động định tuyến của hệ thống máy chủ.
+
+\begin{longtable}{
+    >{\centering\arraybackslash}p{4cm}
+    >{\centering\arraybackslash}p{3cm}
+    >{\raggedright\arraybackslash}p{7cm}
+}
+    \caption{Các tham số dòng lệnh vận hành Máy chủ} \label{tab:server_args} \\
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
+    \midrule
+    \endhead
+    
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+
+    \texttt{--config <path>} & Chuỗi (String) & Nạp tệp cấu hình JSON khai báo các thông số như quy mô luồng (Thread Pool) và số lượng tối đa kết nối (Mặc định sử dụng \texttt{server\_config.json}). \\
+    \midrule
+    
+    \texttt{--port <port\_number>} & Số nguyên (Int) & Ghi đè cổng dịch vụ mạng (Network Port), thay thế thông số tương ứng trong tệp cấu hình JSON. \\
+    \midrule
+
+    \texttt{--verify-audit-log} & Cờ (Boolean) & Kích hoạt phương thức \texttt{AuditLogger::verifyChain()} nhằm kiểm tra tính toàn vẹn của chuỗi Nhật ký Kiểm toán. Tiến trình khởi động sẽ bị ngắt nếu phát hiện sự bất thường. \\
+\end{longtable}
+
+\textbf{2. Phân hệ vận hành Máy khách (Client Execution)}
+
+Ứng dụng \texttt{vcs\_client} xử lý việc thiết lập luồng giao tiếp bảo mật với máy chủ và cung cấp vòng lặp sự kiện tương tác người dùng thông qua \texttt{ConnectionManager}. Đối với hệ điều hành lõi Windows, trong giai đoạn khởi tạo (Initialization), trình khách sẽ tự động thực thi hàm \texttt{WSAStartup} để tải cấu trúc thư viện \texttt{winsock2} trước khi cấp phát Socket mạng.
+
+Bảng \ref{tab:client_args} thống kê cấu trúc tham số định tuyến hỗ trợ cho quá trình kết nối của máy khách.
+
+\begin{longtable}{
+    >{\centering\arraybackslash}p{4cm}
+    >{\centering\arraybackslash}p{3cm}
+    >{\raggedright\arraybackslash}p{7cm}
+}
+    \caption{Các tham số dòng lệnh kết nối Máy khách} \label{tab:client_args} \\
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
+    \midrule
+    \endhead
+    
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+
+    \texttt{--host <ip\_address>} & Chuỗi (String) & Định tuyến địa chỉ IPv4/IPv6 của máy chủ đích (Mặc định được khởi tạo tại vòng lặp cục bộ \texttt{127.0.0.1}). \\
+    \midrule
+    
+    \texttt{--port <port\_number>} & Số nguyên (Int) & Chỉ định cổng mạng giao tiếp của máy chủ đích (Mặc định thiết lập tại cổng \texttt{9000}). \\
+\end{longtable}
+
+[PLACEHOLDER\_HINH\_ANH\_CHU\_TRINH\_VAN\_HANH]

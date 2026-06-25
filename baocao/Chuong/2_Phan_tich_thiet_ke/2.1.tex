@@ -1,0 +1,176 @@
+\section{Kiến trúc tổng thể và Phân tích yêu cầu}
+
+\subsection{Phân tích yêu cầu hệ thống}
+
+Trong quá trình phát triển hệ thống truyền thông thời gian thực (Real-time Communication), phân tích yêu cầu là giai đoạn tiên quyết nhằm xác định năng lực xử lý và kiến trúc của máy chủ. Khác với mô hình tương tác yêu cầu - phản hồi (Request - Response) truyền thống, máy chủ trò chuyện (Chat Server) không chỉ cần đáp ứng các yêu cầu chức năng (Functional Requirements) mà còn phải tuân thủ nghiêm ngặt các yêu cầu phi chức năng (Non-Functional Requirements) như khả năng chịu tải cao, độ trễ thấp và bảo mật thông tin.
+
+\begin{enumerate}
+    \item Yêu cầu chức năng
+
+Hệ thống được thiết kế để phục vụ hai nhóm tác nhân (Actors) chính: Người dùng (User) và Quản trị viên (Admin). Đặc tả chi tiết các nhóm tính năng cốt lõi được trình bày tại Bảng 2.1.
+\end{enumerate}
+
+
+\renewcommand{\arraystretch}{1.4}
+    \begin{longtable}{
+        >{\raggedright\arraybackslash}p{4cm}
+        >{\centering\arraybackslash}p{2.4cm}
+        >{\raggedright\arraybackslash}p{9.6cm}
+    }
+        \caption{Đặc tả yêu cầu chức năng hệ thống} \label{tab:func_req} \\
+        \toprule
+        \multicolumn{1}{c}{\textbf{Nhóm chức năng}} & \multicolumn{1}{c}{\textbf{Tác nhân}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết}} \\
+        \midrule
+        \endfirsthead
+        
+        \toprule
+        \multicolumn{1}{c}{\textbf{Nhóm chức năng}} & \multicolumn{1}{c}{\textbf{Tác nhân}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết}} \\
+        \midrule
+        \endhead
+        
+        \bottomrule
+        \endfoot
+        
+        \bottomrule
+        \endlastfoot
+
+        Xác thực định danh & Người dùng & Cung cấp cơ chế đăng ký và đăng nhập qua kênh truyền bảo mật. Quản lý vòng đời phiên làm việc (Session Token) nhằm duy trì phiên xác thực của người dùng. \\
+        Nhắn tin trực tiếp & Người dùng & Hỗ trợ trao đổi thông điệp song công (Full-duplex) giữa hai người dùng (Direct Message). \\
+        Quản lý phòng trò chuyện & Người dùng & Khởi tạo, tham gia và quản lý trạng thái phòng trò chuyện (Rooms). Tích hợp cơ chế kiểm soát truy cập bằng mật khẩu cho các phòng riêng tư (Private Rooms). \\
+        Truyền tải tệp tin & Người dùng & Hỗ trợ truyền nhận tệp đa phương tiện thông qua cơ chế phân mảnh dữ liệu (Data Chunking), đảm bảo tính toàn vẹn dữ liệu trong quá trình truyền tải. \\
+        Quản trị hệ thống & Quản trị viên & Vận hành cơ chế kiểm soát truy cập dựa trên vai trò (Role-Based Access Control - RBAC) để quản lý tài khoản người dùng và giám sát trạng thái hệ thống. \\
+        Xử lý vi phạm & Quản trị viên & Thực thi các biện pháp kiểm soát: cấm gửi tin (Mute), ngắt kết nối (Kick), hoặc khóa tài khoản (Ban) đối với các hành vi vi phạm chính sách hoặc phát tán mã độc. \\
+    \end{longtable}
+    
+
+\begin{enumerate}[resume]
+    \item Yêu cầu phi chức năng
+    
+    Yêu cầu phi chức năng xác định các ràng buộc kỹ thuật đối với kiến trúc lõi, nhằm đảm bảo tính sẵn sàng, độ tin cậy và an toàn của hệ thống mạng.
+\end{enumerate}
+
+
+\renewcommand{\arraystretch}{1.4}
+    \begin{longtable}{
+        >{\raggedright\arraybackslash}p{4cm}
+        >{\raggedright\arraybackslash}p{11.5cm}
+    }
+        \caption{Đặc tả yêu cầu phi chức năng hệ thống} \label{tab:nonfunc_req} \\
+        \toprule
+        \multicolumn{1}{c}{\textbf{Tiêu chí}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết}} \\
+        \midrule
+        \endfirsthead
+        
+        \toprule
+        \multicolumn{1}{c}{\textbf{Tiêu chí}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết}} \\
+        \midrule
+        \endhead
+        
+        \bottomrule
+        \endfoot
+        
+        \bottomrule
+        \endlastfoot
+
+        Hiệu năng và bài toán C10K & Duy trì tính ổn định dưới tải trọng cao với số lượng lớn kết nối đồng thời. Yêu cầu ứng dụng mô hình I/O không chặn (Non-blocking I/O) và tối ưu hóa luồng xử lý. \\
+        Bảo mật và Mã hóa & Mã hóa toàn bộ lưu lượng mạng ở chế độ đầu cuối (End-to-End). Đảm bảo tính bí mật (Confidentiality) và tính toàn vẹn (Integrity) của luồng dữ liệu dựa trên các chuẩn mật mã hiện đại. \\
+        Phòng chống tấn công mạng & Tích hợp cơ chế giám sát và giới hạn lưu lượng (Rate Limiting) nhằm giảm thiểu rủi ro từ các cuộc tấn công từ chối dịch vụ (DoS), thư rác (Spam) và chèn mã độc. \\
+        Nhật ký và Kiểm toán & Ghi nhận toàn vẹn các sự kiện bảo mật, phân loại mức độ rủi ro và cung cấp dữ liệu định dạng chuẩn phục vụ quá trình kiểm toán (Audit Logging). \\
+    \end{longtable}
+    
+
+\subsection[Kiến trúc tổng thể]{Kiến trúc tổng thể (System Architecture)}
+
+Cơ sở lý thuyết để xây dựng kiến trúc hệ thống mạng máy chủ là mô hình Kiến trúc phân tầng (Layered Architecture) kết hợp với nguyên lý Tách biệt trách nhiệm (Separation of Concerns). Trong kỹ nghệ phần mềm, việc phân tách hệ thống thành các tầng độc lập giúp cô lập các rủi ro phát sinh, giảm thiểu sự phụ thuộc lẫn nhau (Coupling) và gia tăng tính gắn kết nội bộ (Cohesion) của từng phân hệ. Đối với các ứng dụng truyền thông thời gian thực, mô hình này cho phép tách biệt luồng xử lý I/O mạng cấp thấp khỏi các thuật toán nghiệp vụ cấp cao, từ đó tối ưu hóa khả năng mở rộng (Scalability) và đơn giản hóa quá trình bảo trì mã nguồn.
+
+Dựa trên nền tảng lý thuyết đó, kiến trúc tổng thể của hệ thống được thiết kế theo mô hình hướng thành phần (Component-Based) và được cấu trúc thành ba phân tầng chính. Quá trình xử lý vòng đời của một thông điệp (Message Lifecycle) sẽ đi tuần tự từ khâu tiếp nhận dạng luồng byte thô cho đến khâu thực thi nghiệp vụ cuối cùng.
+
+% PLACEHOLDER: Hình ảnh Sơ đồ Component Kiến trúc Tổng thể
+\begin{figure}[htbp]
+    \centering
+    % \includegraphics[width=1.0\textwidth]{diagram_component.png}
+    \caption{Sơ đồ Component Kiến trúc Tổng thể Hệ thống}
+    \label{fig:component_diagram}
+\end{figure}
+
+Việc ánh xạ từ mô hình lý thuyết sang kiến trúc thực tế được thể hiện qua các khối mã nguồn cốt lõi (Codebase). Bảng \ref{tab:arch_layers} trình bày tổng quan sự phân rã của các module tương ứng với từng phân tầng.
+
+
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{
+    >{\raggedright\arraybackslash}p{4.5cm}
+    >{\raggedright\arraybackslash}p{4cm}
+    >{\raggedright\arraybackslash}p{7cm}
+}
+    \caption{Phân rã các thành phần kiến trúc hệ thống} \label{tab:arch_layers} \\
+    \toprule
+    \multicolumn{1}{c}{\textbf{Phân tầng}} & \multicolumn{1}{c}{\textbf{Thành phần}} & \multicolumn{1}{c}{\textbf{Chức năng cốt lõi}} \\
+    \midrule
+    \endfirsthead
+    
+    \toprule
+    \multicolumn{1}{c}{\textbf{Phân tầng}} & \multicolumn{1}{c}{\textbf{Thành phần}} & \multicolumn{1}{c}{\textbf{Chức năng cốt lõi}} \\
+    \midrule
+    \endhead
+    
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+
+    \textbf{Tầng Mạng và Cốt lõi} & \texttt{TcpServer} & Cổng giao tiếp, quản lý vòng đời kết nối TCP. \\
+    & \texttt{EventLoop} & Điều phối sự kiện mạng phi đồng bộ (I/O Multiplexing). \\
+    & \texttt{ThreadPool} & Quản lý nhóm luồng thực thi tác vụ tính toán chuyên sâu. \\
+    & \texttt{ClientSession} & Lưu trữ và duy trì trạng thái của từng phiên kết nối khách. \\
+    \midrule
+    
+    \textbf{Tầng Bảo mật và Lọc} & \texttt{KeyExchange} & Đàm phán khóa mã hóa lai (Handshake). \\
+    & \texttt{CryptoEngine} & Thực thi mã hóa và giải mã luồng dữ liệu truyền tải. \\
+    & \texttt{RateLimiter} & Giới hạn tần suất yêu cầu, ngăn chặn hành vi ngập lụt mạng. \\
+    & \texttt{IntrusionDetector} & Dò tìm các mẫu dấu hiệu tấn công đã biết (Signatures). \\
+    & \texttt{MessageFilter} & Sàng lọc tải trọng (Payload), loại bỏ các ký tự độc hại. \\
+    & \texttt{AuditLogger} & Ghi nhận sự kiện bảo mật, phục vụ truy xuất kiểm toán. \\
+    \midrule
+
+    \textbf{Tầng Nghiệp vụ} & \texttt{AuthManager} & Kiểm soát định danh, xác thực và cấp phát mã phiên (Session). \\
+    & \texttt{RoomManager} & Quản lý không gian trò chuyện chung. \\
+    & \texttt{Room} & Xử lý đa nhiệm, phân phối thông điệp tới thành viên. \\
+    & \texttt{FileTransfer} & Điều phối luồng dữ liệu trung chuyển tệp tin đa phương tiện. \\
+    & \texttt{AdminCommands} & Xử lý tập lệnh đặc quyền quản trị hệ thống. \\
+\end{longtable}
+
+
+Chi tiết về thiết kế thực tiễn và cơ chế phối hợp giữa các thành phần trong từng phân tầng được trình bày cụ thể như sau:
+
+\begin{enumerate}
+    \item \textbf{Tầng Mạng và Cốt lõi (Network \& Core Layer)}
+    
+    Đây là lớp thấp nhất chịu trách nhiệm tương tác trực tiếp với giao diện giao tiếp mạng (Socket API) của hệ điều hành. Lớp này ứng dụng mô hình sự kiện bất đồng bộ nhằm loại bỏ hoàn toàn các rào cản về thắt cổ chai I/O.
+    \begin{itemize}[label={-}]
+        \item \textbf{\texttt{TcpServer}:} Đóng vai trò là cổng vào duy nhất (Entry Point) của máy chủ. Module này liên tục lắng nghe tại một cổng mạng được chỉ định, tiếp nhận các yêu cầu kết nối TCP từ máy khách, sau đó tiến hành khởi tạo và cấp phát các cấu trúc dữ liệu phiên làm việc tương ứng.
+        \item \textbf{\texttt{EventLoop}:} Đóng vai trò là hạt nhân của tầng mạng, triển khai mô hình I/O Multiplexing tiên tiến. Nó đảm nhiệm việc giám sát đồng thời hàng loạt các mô tả tệp (File Descriptor), thu nhận sự kiện mạng (đọc/ghi dữ liệu) và phân phối luồng xử lý đến các hàm gọi lại (Callbacks) một cách phi đồng bộ.
+        \item \textbf{\texttt{ThreadPool}:} Cung cấp cơ chế tái sử dụng tài nguyên tính toán thông qua một nhóm các luồng được khởi tạo sẵn (Pre-instantiated Threads). Các tác vụ chuyên sâu về CPU, chẳng hạn như tính toán khóa mật mã, được đẩy vào hàng đợi của ThreadPool để thực thi song song, đảm bảo không gây ách tắc cho vòng lặp sự kiện chính.
+        \item \textbf{\texttt{ClientSession}:} Là đại diện logic cho một kết nối vật lý đã được thiết lập. Module này quản lý vòng đời độc lập của từng máy khách, lưu trữ định danh mạng, bộ đệm dữ liệu riêng biệt và duy trì liên kết với khóa mã hóa phiên của hệ thống bảo mật.
+    \end{itemize}
+
+    \item \textbf{Tầng Bảo mật và Lọc (Security \& Filter Layer)}
+    
+    Được thiết kế dựa trên nguyên lý phòng thủ chiều sâu (Defense-in-Depth), lớp bảo mật đóng vai trò như một bức tường lửa nội tại. Toàn bộ dòng dữ liệu luân chuyển lên từ tầng mạng đều phải đi qua hàng rào kiểm duyệt tự động tại lớp này.
+    \begin{itemize}[label={-}]
+        \item \textbf{\texttt{KeyExchange} và \texttt{CryptoEngine}:} Bộ đôi module chuyên biệt về an toàn mật mã. \texttt{KeyExchange} xử lý cơ chế thỏa thuận khóa công khai/bí mật trong giai đoạn khởi tạo (Handshake), trong khi \texttt{CryptoEngine} thực thi quá trình giải mã hai chiều đối với nội dung thông điệp bằng các thuật toán khối đối xứng tốc độ cao.
+        \item \textbf{\texttt{RateLimiter}:} Áp dụng các thuật toán điều tiết lưu lượng để giám sát và hạn chế tần suất truy vấn từ mỗi kết nối. Module này chủ động cắt giảm các luồng dữ liệu dư thừa, bảo vệ hệ thống trước nguy cơ cạn kiệt tài nguyên do thư rác (Spam/DoS).
+        \item \textbf{\texttt{IntrusionDetector} và \texttt{MessageFilter}:} Thành phần phân tích bảo mật mức ứng dụng. Sau khi dữ liệu được giải mã, nó sẽ được quét qua \texttt{IntrusionDetector} để dò tìm các mẫu dấu hiệu tấn công đã biết. Các ký tự bất hợp lệ sẽ tiếp tục bị \texttt{MessageFilter} loại bỏ nhằm đảm bảo tính toàn vẹn của dữ liệu trước khi xử lý logic.
+        \item \textbf{\texttt{AuditLogger}:} Quản lý tiến trình lưu vết thông tin. Bất kỳ cảnh báo bảo mật nào phát sinh từ các bộ lọc đều được module này ghi nhận lại một cách toàn vẹn, đi kèm theo dấu thời gian (Timestamp) và địa chỉ IP gốc phục vụ truy xuất sau sự cố.
+    \end{itemize}
+
+    \item \textbf{Tầng Nghiệp vụ (Business Logic Layer)}
+    
+    Lớp cao nhất quản lý toàn bộ các tính năng dịch vụ cốt lõi nhằm đáp ứng yêu cầu giao tiếp của người dùng. Do dữ liệu ở tầng này đã được chuẩn hóa và loại bỏ các yếu tố rủi ro, các module nghiệp vụ hoàn toàn tập trung vào việc xử lý logic thuần túy.
+    \begin{itemize}[label={-}]
+        \item \textbf{\texttt{AuthManager}:} Phụ trách đối chiếu thông tin định danh của người dùng với cơ sở dữ liệu. Nó thực thi luồng công việc đăng ký, kiểm chứng độ phức tạp của mật khẩu và quản lý cấp phát các thẻ phiên đăng nhập (Session Token) hợp lệ.
+        \item \textbf{\texttt{RoomManager} và \texttt{Room}:} Cung cấp nền tảng quản lý không gian trò chuyện chung. \texttt{RoomManager} duy trì danh sách tham chiếu đa cấu trúc đến mọi phòng hiện có, trong khi \texttt{Room} đóng vai trò là một không gian đa nhiệm độc lập, xử lý các thao tác tham gia, rời bỏ và tự động phân phối thông điệp (Multicast) tới toàn bộ thành viên trực tuyến.
+        \item \textbf{\texttt{FileTransfer}:} Phân hệ trung chuyển lưu lượng chuyên biệt, chịu trách nhiệm tái tổ hợp các mảnh dữ liệu nhị phân thô thành các tập tin hoàn chỉnh. Nó cung cấp cơ chế tải lên và tải xuống an toàn, được cô lập khỏi luồng xử lý thông điệp văn bản tiêu chuẩn.
+        \item \textbf{\texttt{AdminCommands}:} Kênh thực thi các chính sách quản trị cấp cao. Module này sở hữu đặc quyền vô hiệu hóa phiên kết nối ngang hàng (Kick, Ban) hoặc điều chỉnh cấu hình định tuyến của bất kỳ người dùng nào đang tồn tại trong hệ thống, nhằm duy trì trật tự mạng.
+    \end{itemize}
+\end{enumerate}

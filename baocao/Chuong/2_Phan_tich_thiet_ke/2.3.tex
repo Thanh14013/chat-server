@@ -1,0 +1,99 @@
+\section{Thiết kế Cơ sở dữ liệu và Cơ chế Xác thực}
+
+\subsection{Cấu trúc Lưu trữ Dữ liệu}
+
+\begin{enumerate}
+    \item \textbf{Cơ sở lý thuyết về Tổ chức Cơ sở dữ liệu}
+    
+    Trong thiết kế hệ thống phần mềm, Cơ sở dữ liệu (Database) đóng vai trò là xương sống đảm bảo tính bền vững (Durability) của toàn bộ trạng thái hệ thống. Các hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) thường được thiết lập để tuân thủ nghiêm ngặt các thuộc tính ACID (Atomicity, Consistency, Isolation, Durability) nhằm duy trì tính toàn vẹn thông tin. Quá trình thiết kế Lược đồ dữ liệu (Database Schema) đòi hỏi kỹ sư phải ứng dụng các quy tắc Chuẩn hóa (Normalization), đạt tối thiểu Dạng chuẩn 3 (3NF) nhằm loại bỏ triệt để hiện tượng dị thường khi cập nhật (Update Anomalies) và giảm thiểu không gian dư thừa lưu trữ.
+    
+    Bên cạnh đó, trong bối cảnh máy chủ xử lý truyền thông thời gian thực với lưu lượng truy xuất I/O lớn từ hàng ngàn luồng kết nối đồng thời, cấu trúc lưu trữ cần một cơ chế khóa (Locking) tinh vi. Kỹ thuật Ghi trước Nhật ký (Write-Ahead Logging - WAL) là một giải pháp lý thuyết kinh điển giúp tách biệt luồng Đọc và Ghi, cho phép nhiều giao dịch truy vấn đọc được thực thi đồng thời mà không bị treo (Block) bởi một giao dịch ghi đang thao tác.
+
+    \item \textbf{Triển khai lược đồ cơ sở dữ liệu trong hệ thống}
+    
+    Đáp ứng các tiêu chuẩn lý thuyết khắt khe, hệ thống đã tích hợp thư viện SQLite3 dưới vai trò là một Engine RDBMS nội tại, loại bỏ hoàn toàn chi phí truyền tải qua mạng nội bộ (IPC overhead) đến một máy chủ CSDL bên ngoài. Ngay tại khâu khởi tạo kết nối (\texttt{Database::open()}), hệ thống đã kích hoạt chỉ thị \texttt{PRAGMA journal\_mode=WAL} để tối ưu hóa hiệu năng Đọc/Ghi đa luồng, đồng thời bật \texttt{PRAGMA foreign\_keys=ON} nhằm giao phó hoàn toàn trách nhiệm duy trì tính Toàn vẹn tham chiếu (Referential Integrity) cho nhân xử lý của SQLite.
+
+    Toàn bộ cấu trúc lưu trữ được phân rã thành năm bảng thực thể chính. Bảng \ref{tab:db_schema} minh họa chi tiết chức năng, cấu trúc khóa và các ràng buộc dữ liệu (Constraints) của từng bảng tương ứng với mã nguồn thực tế.
+\end{enumerate}
+
+    % PLACEHOLDER: Hình ảnh Sơ đồ ERD (đặt trước bảng để LaTeX tự động lấp đầy khoảng trắng)
+    \begin{figure}[htbp]
+        \centering
+        % \includegraphics[width=0.8\textwidth]{diagram_erd.png}
+
+        \caption[Sơ đồ Thực thể Liên kết của hệ thống CSDL]{Sơ đồ Thực thể Liên kết (ERD) của hệ thống CSDL}
+        \label{fig:erd_diagram}
+    \end{figure}
+
+
+\renewcommand{\arraystretch}{1.4}
+    \begin{longtable}{
+        >{\raggedright\arraybackslash}p{2.5cm}
+        >{\raggedright\arraybackslash}p{4cm}
+        >{\raggedright\arraybackslash}p{7.5cm}
+    }
+        \caption{Đặc tả các Bảng thực thể trong Cơ sở dữ liệu} \label{tab:db_schema} \\
+        \toprule
+        \multicolumn{1}{c}{\textbf{Tên Bảng}} & \multicolumn{1}{c}{\textbf{Khóa \& Chỉ mục (Index)}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết và Vai trò cốt lõi}} \\
+        \midrule
+        \endfirsthead
+        
+        \toprule
+        \multicolumn{1}{c}{\textbf{Tên Bảng}} & \multicolumn{1}{c}{\textbf{Khóa \& Chỉ mục (Index)}} & \multicolumn{1}{c}{\textbf{Mô tả chi tiết và Vai trò cốt lõi}} \\
+        \midrule
+        \endhead
+        
+        \bottomrule
+        \endfoot
+        
+        \bottomrule
+        \endlastfoot
+
+        \textbf{\texttt{Users}} & \texttt{PRIMARY KEY (id)} \newline \texttt{UNIQUE (nickname)} & Quản lý định danh người dùng. Bảo mật tuyệt đối bằng cách chỉ lưu trữ \texttt{password\_hash} và \texttt{salt}. Tích hợp các cờ bảo vệ chống hành vi dò quét tự động (Brute-force): \texttt{failed\_attempts} và \texttt{locked\_until}. \\
+        \midrule
+        
+        \textbf{\texttt{Rooms}} & \texttt{PRIMARY KEY (id)} \newline \texttt{UNIQUE (room\_name)} & Lưu trữ siêu dữ liệu của phòng trò chuyện. Hỗ trợ cấp phát mật khẩu độc lập qua băm mật mã. Ràng buộc khóa ngoại \texttt{creator\_nick} tới bảng \texttt{Users} kèm theo cơ chế xóa lan truyền (\texttt{ON DELETE CASCADE}). \\
+        \midrule
+        
+        \textbf{\texttt{RoomBans}} & \texttt{PRIMARY KEY (id)} \newline \texttt{idx\_roombans} & Bảng trung gian chuyên trách quản lý danh sách đen (Blacklist) của từng phòng độc lập. Đảm bảo tính duy nhất qua ràng buộc liên hợp \texttt{UNIQUE(room\_name, nickname)}. \\
+        \midrule
+
+        \textbf{\texttt{ChatHistory}} & \texttt{PRIMARY KEY (id)} \newline \texttt{idx\_chat\_room\_ts} & Lưu trữ nội dung thông điệp trao đổi. Áp dụng chỉ mục liên hợp (Composite Index) trên cụm trường \texttt{(room, timestamp)} nhằm tăng tốc vượt trội các truy vấn khôi phục lịch sử trò chuyện. \\
+        \midrule
+
+        \textbf{\texttt{AuditLog}} & \texttt{PRIMARY KEY (id)} \newline \texttt{idx\_audit\_ts} & Quản lý sổ cái nhật ký kiểm toán bảo mật. Ứng dụng mô hình "chuỗi khối băm" (Blockchain-lite): Mỗi bản ghi chứa trường \texttt{prev\_hash} tham chiếu trực tiếp đến mã băm của bản ghi tiền nhiệm, giúp vô hiệu hóa mọi nỗ lực can thiệp hoặc sửa đổi dữ liệu trái phép. \\
+    \end{longtable}
+    
+
+
+
+\subsection[Luồng Xác thực và Quản lý Phiên]{Luồng Xác thực và Quản lý Phiên (AuthManager)}
+
+\begin{enumerate}
+    \item \textbf{Cơ sở lý thuyết về Bảo mật Định danh và Phiên giao dịch}
+    
+    Trong các hệ thống phân tán, cơ chế xác thực (Authentication) và quản trị phiên (Session Management) là chốt chặn an ninh đầu tiên. Để phòng chống các dạng tấn công dò quét mật khẩu (Brute-force) hay tấn công bằng từ điển băm (Rainbow Tables), mật khẩu thô (Plain-text) tuyệt đối không được lưu trữ. Kỹ thuật Kéo giãn khóa (Key Stretching) thông qua hàm dẫn xuất PBKDF2 (Password-Based Key Derivation Function 2) kết hợp với muối mã hóa ngẫu nhiên (Cryptographic Salt) được sử dụng để gia tăng chi phí điện toán của kẻ tấn công theo cấp số nhân.
+    
+    Đối với quản lý phiên, việc truy vấn Cơ sở dữ liệu vật lý (Disk I/O) liên tục để kiểm tra trạng thái người dùng sẽ tạo ra "nút thắt cổ chai" (Bottleneck) về hiệu năng. Do đó, lý thuyết bảo mật hiện đại ưu tiên sử dụng mô hình Phiên không trạng thái (Stateless Session) dựa trên Chữ ký mã hóa (Cryptographic Signatures) như JWT (JSON Web Token). Bằng việc sử dụng mã xác thực thông điệp băm (HMAC), máy chủ có thể ủy quyền cho máy khách lưu trữ thông tin trạng thái mà vẫn đảm bảo tính toàn vẹn và chống giả mạo (Tamper-proof).
+
+    \item \textbf{Triển khai Luồng Xác thực và Quản lý Phiên trong mã nguồn}
+    
+    Hệ thống hiện thực hóa các nguyên lý trên thông qua hai module lõi: \texttt{AuthManager} (Quản lý luồng xác thực DB) và \texttt{SessionToken} (Bộ sinh và xác minh JWT-like). Cơ chế được vận hành theo ba pha chính:
+    
+    \begin{itemize}
+        \item \textbf{Pha 1: Khởi tạo định danh (Đăng ký/Đăng nhập):} Khi Client gửi gói tin \texttt{MSG\_CONNECT\_REQUEST}, \texttt{AuthManager} tiến hành trích xuất \texttt{nickname}. Trong tiến trình đăng ký, hệ thống gọi \texttt{SHA256Hash::generateSalt()} để tạo muối ngẫu nhiên, sau đó băm mật khẩu bằng hàm \texttt{SHA256Hash::pbkdf2()}. Nếu đăng nhập, hệ thống trích xuất \texttt{salt} từ DB và tính toán lại chuỗi băm để so sánh bằng hàm \texttt{CRYPTO\_memcmp()} nhằm phòng tránh rò rỉ thông tin qua thời gian tính toán (Timing Attack).
+        
+        \item \textbf{Pha 2: Cấp phát Token (Stateless Session):} Ngay khi xác thực DB thành công, máy chủ sẽ lập tức chấm dứt các truy vấn Disk I/O cho người dùng này. Lớp \texttt{SessionToken} tiến hành đóng gói các thông điệp định danh (Claims) bao gồm: \texttt{sub} (nickname), \texttt{role} (Quyền hạn), \texttt{exp} (Thời hạn tồn tại tối đa \texttt{SESSION\_LIFETIME\_SEC}) và \texttt{jti} (Mã định danh Token duy nhất). Khối dữ liệu này được băm cùng một Khóa bí mật (Secret Key) bằng thuật toán HMAC-SHA256 để tạo thành chuỗi Token trả về cho Client. Hệ thống đồng thời theo dõi số hiệu bộ mô tả tệp (File Descriptor - FD) đang gắn với Token này thông qua cấu trúc \texttt{active\_sessions\_}.
+        
+        \item \textbf{Pha 3: Khôi phục kết nối (Zero-roundtrip DB):} Đặc thù của mạng TCP là tính không ổn định, Client có thể bị rớt mạng và kết nối lại (Reconnect) qua một FD mới. Lúc này, Client không cần cung cấp mật khẩu, mà đính kèm chuỗi Token cũ vào gói \texttt{MSG\_RECONNECT}. \texttt{AuthManager::reconnectWithToken()} chỉ cần tính toán lại chữ ký HMAC trên RAM, nếu hợp lệ và không nằm trong danh sách đen (\texttt{blacklist\_}), hệ thống lập tức tái lập \texttt{ClientSession} với FD mới.
+        
+        \item \textbf{Pha 4: Thu hồi (Revocation) và Chống tấn công:} Nhược điểm lớn nhất của mô hình Stateless Token là không thể thu hồi tức thời. Hệ thống khắc phục điều này bằng cơ chế \texttt{SessionToken::revoke()} cho phép đưa mã \texttt{jti} vào danh sách đen lưu trên RAM tĩnh, ngăn chặn tấn công phát lại (Replay Attack) nếu Token bị lộ. Đồng thời, hàm \texttt{AuthManager::incrementFailedAttempts()} giới hạn số lần sai mật khẩu để bảo vệ tài khoản khỏi kỹ thuật Brute-force.
+    \end{itemize}
+\end{enumerate}
+
+% PLACEHOLDER: Hình ảnh Lược đồ tuần tự Xác thực
+\begin{figure}[htbp]
+    \centering
+    \caption[Lược đồ Trình tự luồng Xác thực và Khôi phục Phiên]{Lược đồ Trình tự luồng Xác thực và Khôi phục Phiên (Auth \& Reconnect)}
+    \label{fig:auth_sequence}
+\end{figure}
