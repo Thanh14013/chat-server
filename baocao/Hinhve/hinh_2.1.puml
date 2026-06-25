@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Kiến trúc tổng thể hệ thống (System Architecture)" {
+
+  component "Tầng Nghiệp vụ\n(Business Logic Layer)" as BusinessLayer {
+    [AuthManager]
+    [RoomManager]
+    [Room]
+    [FileTransfer]
+    [AdminCommands]
+
+    [RoomManager] *-- [Room]
+  }
+
+  component "Tầng Bảo mật và Lọc\n(Security & Filter Layer)" as SecurityLayer {
+    [KeyExchange]
+    [CryptoEngine]
+    [RateLimiter]
+    [IntrusionDetector]
+    [MessageFilter]
+    [AuditLogger]
+  }
+
+  component "Tầng Mạng và Cốt lõi\n(Network & Core Layer)" as NetworkLayer {
+    [TcpServer]
+    [EventLoop]
+    [ThreadPool]
+    [ClientSession]
+  }
+
+  NetworkLayer -up-> SecurityLayer : "Luồng dữ liệu thô\n(Byte Stream)"
+  SecurityLayer -up-> BusinessLayer : "Dữ liệu chuẩn hóa &\nđã qua kiểm duyệt"
+}
+
+@enduml

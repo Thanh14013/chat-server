@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  25 JUN 2026 07:42
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2026.6.18)  25 JUN 2026 09:37
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1145,6 +1145,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
 [7]
+File: Hinhve/hinh_2.1.png Graphic file (type bmp)
+<Hinhve/hinh_2.1.png>
+
 Overfull \hbox (21.77359pt too wide) in alignment at lines 104--109
  [] [] [] 
  []
@@ -1193,8 +1196,24 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
 [10]
-Overfull \hbox (10.34639pt too wide) in paragraph at lines 163--164
-\TU/TimesNewRoman(0)/m/n/13 ứng dụng. Sau khi dữ liệu được giải mã, nó sẽ được quét qua \TU/lmtt/m/n/13 IntrusionDetector
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[11]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[12]) (./Chuong/2_Phan_tich_thiet_ke/2.2.tex
+Overfull \hbox (1.03644pt too wide) in paragraph at lines 18--19
+[]\TU/TimesNewRoman(0)/m/n/13 Khởi tạo I/O Multiplexer: Lớp \TU/lmtt/m/n/13 TcpServer \TU/TimesNewRoman(0)/m/n/13 tạo một thể hiện (instance) của \TU/lmtt/m/n/13 epoll
  []
 
 
@@ -1204,17 +1223,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[11]) (./Chuong/2_Phan_tich_thiet_ke/2.2.tex
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 12.51117pt, for example:
-(fancyhdr)                \setlength{\headheight}{12.51117pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
-
-[12]
-Overfull \hbox (21.96474pt too wide) in paragraph at lines 21--22
-\TU/lmtt/m/n/13 | EPOLLRDHUP\TU/TimesNewRoman(0)/m/n/13 . Đồng thời, tầng bảo mật (\TU/lmtt/m/n/13 RateLimiter\TU/TimesNewRoman(0)/m/n/13 , \TU/lmtt/m/n/13 IntrusionDetector\TU/TimesNewRoman(0)/m/n/13 )
+[13]
+Overfull \hbox (33.85997pt too wide) in paragraph at lines 21--22
+\TU/TimesNewRoman(0)/m/n/13 Cấu trúc \TU/lmtt/m/n/13 clientFd \TU/TimesNewRoman(0)/m/n/13 được đăng ký vào \TU/lmtt/m/n/13 epoll \TU/TimesNewRoman(0)/m/n/13 kèm tập cờ \TU/lmtt/m/n/13 EPOLLIN | EPOLLRDHUP\TU/TimesNewRoman(0)/m/n/13 .
  []
 
 
@@ -1238,7 +1249,7 @@ Overfull \hbox (19.5472pt too wide) in alignment at lines 59--62
  []
 
 
-Overfull \hbox (19.5472pt too wide) in alignment at lines 62--69
+Overfull \hbox (19.5472pt too wide) in alignment at lines 62--74
  [] [] [] [] 
  []
 
@@ -1249,12 +1260,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[13]
-Overfull \hbox (14.64105pt too wide) in paragraph at lines 74--75
-[]\TU/TimesNewRoman(0)/b/n/13 Đóng gói và mã hóa (Tại Client): \TU/TimesNewRoman(0)/m/n/13 Khởi tạo đối tượng JSON, tuần tự hóa (Serialization)
- []
-
-) (./Chuong/2_Phan_tich_thiet_ke/2.3.tex
+[14]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1262,12 +1268,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[14]
+[15]) (./Chuong/2_Phan_tich_thiet_ke/2.3.tex
 Overfull \hbox (3.57494pt too wide) in paragraph at lines 14--15
 \TU/lmtt/m/n/13 journal_mode=WAL \TU/TimesNewRoman(0)/m/n/13 để tối ưu hóa hiệu năng Đọc/Ghi đa luồng, đồng thời bật \TU/lmtt/m/n/13 PRAGMA
  []
 
 
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[16]
 Overfull \hbox (3.9607pt too wide) in alignment at lines 34--39
  [] [] [] 
  []
@@ -1304,10 +1317,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[15]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
+[17]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1315,7 +1325,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[16]
+[18]) (./Chuong/2_Phan_tich_thiet_ke/2.4.tex
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1323,15 +1333,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[17]) (./Chuong/2_Phan_tich_thiet_ke/2.4.tex
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 12.51117pt, for example:
-(fancyhdr)                \setlength{\headheight}{12.51117pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
-
-[18]
+[19]
 Overfull \hbox (48.1111pt too wide) in paragraph at lines 14--15
 \TU/TimesNewRoman(0)/m/n/13 Encryption with Associated Data - AEAD), không chỉ cung cấp tính Bảo mật (Confidentiality)
  []
@@ -1353,7 +1355,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[19]) (./Chuong/2_Phan_tich_thiet_ke/2.5.tex
+[20]) (./Chuong/2_Phan_tich_thiet_ke/2.5.tex
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1361,7 +1363,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[20]
+[21]
 Overfull \hbox (89.38368pt too wide) in paragraph at lines 22--23
 \TU/TimesNewRoman(0)/m/n/13 được kích hoạt. Hàm này cấp phát một khóa đọc \TU/lmtt/m/n/13 std::shared_lock<std::shared_mutex>
  []
@@ -1383,11 +1385,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[21]
-Overfull \hbox (43.59077pt too wide) in paragraph at lines 83--84
-[]\TU/TimesNewRoman(0)/b/n/13 Pha 1: Yêu cầu và Xác thực (PENDING): \TU/TimesNewRoman(0)/m/n/13 Khi người gửi phát gói \TU/lmtt/m/n/13 MSG_FILE_REQUEST\TU/TimesNewRoman(0)/m/n/13 ,
- []
-
+[22]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1395,7 +1393,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[22]
+[23]
+Overfull \hbox (43.59077pt too wide) in paragraph at lines 83--84
+[]\TU/TimesNewRoman(0)/b/n/13 Pha 1: Yêu cầu và Xác thực (PENDING): \TU/TimesNewRoman(0)/m/n/13 Khi người gửi phát gói \TU/lmtt/m/n/13 MSG_FILE_REQUEST\TU/TimesNewRoman(0)/m/n/13 ,
+ []
+
+
 Overfull \hbox (96.3676pt too wide) in paragraph at lines 87--88
 \TU/TimesNewRoman(0)/m/n/13 các phần (Chunks) và gửi liên tục qua gói \TU/lmtt/m/n/13 MSG_FILE_DATA\TU/TimesNewRoman(0)/m/n/13 . Hàm \TU/lmtt/m/n/13 FileTransfer::handleData()
  []
@@ -1422,7 +1425,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[23]) (./Chuong/2_Phan_tich_thiet_ke/2.6.tex
+[24]) (./Chuong/2_Phan_tich_thiet_ke/2.6.tex
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[25]
 Overfull \hbox (12.95094pt too wide) in paragraph at lines 14--15
 []\TU/TimesNewRoman(0)/m/n/13 Hệ thống phòng thủ đa tầng này được điều phối bởi hai module độc lập là \TU/lmtt/m/n/13 RateLimiter
  []
@@ -1433,13 +1444,6 @@ Overfull \hbox (76.53825pt too wide) in paragraph at lines 17--18
  []
 
 
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 12.51117pt, for example:
-(fancyhdr)                \setlength{\headheight}{12.51117pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
-
-[24]
 Overfull \hbox (65.1129pt too wide) in paragraph at lines 21--23
 []\TU/TimesNewRoman(0)/b/n/13 Tầng 3: Biện pháp Trừng phạt lũy tiến (Progressive Penalty): \TU/TimesNewRoman(0)/m/n/13 Hàm \TU/lmtt/m/n/13 checkThresholds()
  []
@@ -1481,7 +1485,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[25]
+[26]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1489,7 +1493,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[26]
+[27]
 Overfull \hbox (3.17607pt too wide) in paragraph at lines 99--100
 []\TU/lmtt/m/n/13 /ban \TU/TimesNewRoman(0)/m/n/13 & \TU/lmtt/m/n/13 /unban\TU/TimesNewRoman(0)/m/n/13 : Tương tác trực tiếp với \TU/lmtt/m/n/13 IntrusionDetector::permBan()
  []
@@ -1504,7 +1508,6 @@ Overfull \hbox (8.36208pt too wide) in paragraph at lines 105--106
 \TU/TimesNewRoman(0)/m/n/13 Ví dụ, khi \TU/lmtt/m/n/13 OWNER \TU/TimesNewRoman(0)/m/n/13 dùng lệnh \TU/lmtt/m/n/13 /kick\TU/TimesNewRoman(0)/m/n/13 , hệ thống sẽ ghi lại \TU/lmtt/m/n/13 AuditEventType::ADMIN\TU/TimesNewRoman(0)/m/n/13 ,
  []
 
-))
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1512,7 +1515,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[27]
+[28]))
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 12.51117pt, for example:
+(fancyhdr)                \setlength{\headheight}{12.51117pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
+
+[29]
 \openout2 = `Chuong/3_Trien_khai_danh_gia/chuong3.aux'.
 
  (./Chuong/3_Trien_khai_danh_gia/chuong3.tex
@@ -1532,7 +1543,7 @@ Overfull \hbox (9.20258pt too wide) in paragraph at lines 17--18
 \TU/TimesNewRoman(0)/m/n/13 (Ubuntu/CentOS). Lệnh \TU/lmtt/m/n/13 if(NOT (WIN32 OR CMAKE_CROSSCOMPILING)) \TU/TimesNewRoman(0)/m/n/13 trong
  []
 
-[28
+[30
 
 
 
@@ -1549,7 +1560,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[29]
+[31]
 Overfull \hbox (20.27pt too wide) in paragraph at lines 76--77
 \TU/TimesNewRoman(0)/m/n/13 Kiến trúc biên dịch thực tế của dự án được kiểm soát thông qua tệp cấu hình \TU/lmtt/m/n/13 CMakeLists.txt
  []
@@ -1561,7 +1572,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[30]
+[32]
 Overfull \hbox (5.04631pt too wide) in paragraph at lines 81--82
 \TU/TimesNewRoman(0)/m/n/13 platform Compilation). Đối với môi trường Windows, tệp \TU/lmtt/m/n/13 mingw-toolchain.cmake
  []
@@ -1578,7 +1589,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[31]
+[33]
 Overfull \hbox (6.69899pt too wide) in paragraph at lines 160--160
  []|\TU/lmtt/m/n/13 --verify-audit-log| 
  []
@@ -1590,7 +1601,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[32]) (./Chuong/3_Trien_khai_danh_gia/3.2.tex
+[34]) (./Chuong/3_Trien_khai_danh_gia/3.2.tex
 Overfull \hbox (1.26561pt too wide) in paragraph at lines 7--8
 \TU/TimesNewRoman(0)/m/n/13 (Test-Driven Development - TDD) và hệ thống Tích hợp Liên tục (Continuous Integration
  []
@@ -1602,7 +1613,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[33]
+[35]
 Overfull \hbox (30.03932pt too wide) in paragraph at lines 17--18
 \TU/lmtt/m/n/13 test_framework.h\TU/TimesNewRoman(0)/m/n/13 . Hệ thống này cung cấp các hàm Macro tiêu chuẩn hóa như \TU/lmtt/m/n/13 ASSERT_TRUE\TU/TimesNewRoman(0)/m/n/13 ,
  []
@@ -1619,7 +1630,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[34]
+[36]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1627,7 +1638,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[35]
+[37]
 Overfull \hbox (45.77357pt too wide) in alignment at lines 103--108
  [] [] [] [] [] 
  []
@@ -1659,7 +1670,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[36]) (./Chuong/3_Trien_khai_danh_gia/3.3.tex
+[38]) (./Chuong/3_Trien_khai_danh_gia/3.3.tex
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1667,7 +1678,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[37]
+[39]
 Overfull \hbox (13.61188pt too wide) in paragraph at lines 22--23
 []\TU/TimesNewRoman(0)/b/n/13 Khóa tài nguyên sớm (Early Drop): \TU/TimesNewRoman(0)/m/n/13 Khi luồng dữ liệu tiến vào vòng lặp \TU/lmtt/m/n/13 epoll_wait\TU/TimesNewRoman(0)/m/n/13 ,
  []
@@ -1679,7 +1690,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[38]
+[40]
 Overfull \hbox (84.73074pt too wide) in alignment at lines 33--38
  [] [] [] 
  []
@@ -1711,7 +1722,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[39]
+[41]
 Overfull \hbox (0.42883pt too wide) in alignment at lines 87--92
  [] [] [] 
  []
@@ -1743,7 +1754,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[40]))
+[42]))
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1751,7 +1762,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[41]
+[43]
 \openout2 = `Chuong/4_Ket_luan/chuong4.aux'.
 
  (./Chuong/4_Ket_luan/chuong4.tex
@@ -1761,7 +1772,7 @@ Overfull \hbox (5.48325pt too wide) in paragraph at lines 16--17
 \TU/TimesNewRoman(0)/m/n/13 đổi khóa lai giữa phương thức bất đối xứng \TU/lmtt/m/n/13 RSA-2048 \TU/TimesNewRoman(0)/m/n/13 và đối xứng \TU/lmtt/m/n/13 AES-256-GCM\TU/TimesNewRoman(0)/m/n/13 ,
  []
 
-[42
+[44
 
 
 
@@ -1774,7 +1785,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[43]))
+[45]))
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 12.51117pt, for example:
@@ -1782,7 +1793,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-0.51117pt}.
 
-[44]
+[46]
 
 LaTeX Warning: Empty bibliography on input line 170.
 
@@ -1836,12 +1847,12 @@ Package logreq Info: Writing requests to 'baocao.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 23521 strings out of 477763
- 465436 string characters out of 5843920
- 1260996 words of memory out of 5000000
- 43722 multiletter control sequences out of 15000+600000
+ 23533 strings out of 477763
+ 465644 string characters out of 5843920
+ 1264996 words of memory out of 5000000
+ 43729 multiletter control sequences out of 15000+600000
  479145 words of font info for 94 fonts, out of 8000000 for 9000
  264 hyphenation exceptions out of 8191
  73i,12n,77p,1101b,3688s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on baocao.xdv (51 pages, 933672 bytes).
+Output written on baocao.xdv (53 pages, 949568 bytes).
