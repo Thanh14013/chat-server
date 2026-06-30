@@ -1,27 +1,27 @@
-\section{Đánh giá Khả năng phòng thủ Hệ thống}
+\section{Đánh giá Khả năng Phòng thủ Hệ thống}
 
-Hệ thống được phát triển với trọng tâm hướng đến Môi trường Zero-Trust (Không tin cậy bất kỳ ai). Khi hệ thống đối mặt với các cuộc tấn công diện rộng, lớp bảo mật phản ứng theo hai kịch bản sau:
+Hệ thống được phát triển theo mô hình bảo mật Zero-Trust. Lớp bảo mật được thiết kế để phản ứng với các kịch bản tấn công theo hai phương thức chính:
 
 \subsection[Phòng thủ trước tấn công Từ chối dịch vụ]{Phòng thủ trước tấn công Từ chối dịch vụ (DDoS)}
 
 \subsubsection[Cơ sở lý thuyết về tấn công Từ chối dịch vụ]{Cơ sở lý thuyết về tấn công Từ chối dịch vụ và thuật toán Token Bucket}
 
-Tấn công Từ chối dịch vụ (Denial of Service - DoS) và Từ chối dịch vụ Phân tán (DDoS) là một trong những hiểm họa nghiêm trọng nhất đối với máy chủ mạng. Mục tiêu của các cuộc tấn công này là tạo ra một lượng lớn lưu lượng truy cập hoặc yêu cầu giả mạo nhằm làm cạn kiệt tài nguyên hệ thống (CPU, RAM, Băng thông mạng), dẫn đến tình trạng máy chủ không thể phục vụ các người dùng hợp lệ.
+Tấn công Từ chối dịch vụ (Denial of Service - DoS) và Từ chối dịch vụ Phân tán (DDoS) có mục tiêu tạo ra lượng lớn lưu lượng truy cập giả mạo nhằm làm cạn kiệt tài nguyên hệ thống (CPU, RAM, băng thông).
 
-Đặc biệt, trong giao thức TCP, hình thức tấn công SYN Flood lợi dụng cơ chế bắt tay ba bước (Three-way Handshake) bằng cách gửi hàng loạt yêu cầu mở kết nối mà không bao giờ hoàn tất chu trình, làm cạn kiệt hàng đợi kết nối (Connection Queue) của hệ điều hành. Xa hơn, tại tầng Ứng dụng (Application Layer - Layer 7), kẻ tấn công có thể liên tục gửi các tải trọng rác nhằm bắt ép máy chủ phải tiêu tốn chu kỳ CPU để giải mã và phân tích cú pháp.
+Trong giao thức TCP, hình thức tấn công SYN Flood lợi dụng cơ chế bắt tay ba bước (Three-way Handshake) bằng cách gửi nhiều yêu cầu mở kết nối nhưng không hoàn tất chu trình, làm cạn kiệt hàng đợi kết nối (Connection Queue). Tại tầng Ứng dụng (Application Layer - Layer 7), hệ thống có thể bị quá tải do phải xử lý giải mã và phân tích cú pháp các tải trọng không hợp lệ.
 
-Để phòng chống hiểm họa này, cơ chế Giới hạn lưu lượng (Rate Limiting) là lớp phòng thủ tiên quyết. Thuật toán \textbf{Token Bucket (Thùng thẻ bài)} được ứng dụng rộng rãi nhờ khả năng cân bằng giữa việc duy trì lưu lượng ổn định và cho phép xử lý các xung đột biến ngắn hạn (Burst Traffic). Thuật toán hoạt động dựa trên nguyên lý: hệ thống sinh ra \textit{thẻ bài (token)} theo một tỷ lệ cố định và lưu vào thùng chứa có dung lượng giới hạn. Mỗi yêu cầu đến phải tiêu thụ một số thẻ bài nhất định; nếu thùng rỗng, yêu cầu sẽ bị từ chối ngay lập tức.
+Để phòng ngừa, cơ chế Giới hạn lưu lượng (Rate Limiting) được áp dụng làm lớp phòng thủ đầu tiên. Thuật toán Token Bucket được sử dụng để cân bằng giữa lưu lượng ổn định và các xung đột biến ngắn hạn (Burst Traffic). Nguyên lý hoạt động dựa trên việc hệ thống sinh ra thẻ (token) theo tỷ lệ cố định và lưu vào bộ đệm. Mỗi yêu cầu tiêu thụ một lượng thẻ nhất định; khi bộ đệm cạn, yêu cầu sẽ bị từ chối.
 
 \subsubsection{Cơ chế phòng thủ thực tế tại biên giới mạng}
 
-Hệ thống được thiết kế theo tư duy Zero-Trust, mọi lưu lượng đầu vào đều phải trải qua tầng kiểm duyệt trước khi được phân phối vào sâu trong vùng lõi. Dự án trực tiếp triển khai module \texttt{RateLimiter} hoạt động độc lập ngay tại điểm mút của \texttt{TcpServer}.
+Dựa trên mô hình Zero-Trust, toàn bộ lưu lượng đầu vào đều được kiểm duyệt thông qua module \texttt{RateLimiter} tích hợp tại lớp giao tiếp mạng \texttt{TcpServer}.
 
-Hành vi phòng thủ được kích hoạt cụ thể trong kịch bản một mạng máy tính ma (Botnet) cố gắng dội bom hàng nghìn yêu cầu rác vào cổng kết nối:
+Cơ chế phòng thủ được kích hoạt theo luồng xử lý sau:
 
 \begin{itemize}[label={-}]
-    \item \textbf{Khóa tài nguyên sớm (Early Drop):} Khi luồng dữ liệu tiến vào vòng lặp \texttt{epoll\_wait}, phương thức \texttt{RateLimiter::checkLimit()} sẽ lập tức đánh giá IP nguồn. Nếu IP này vượt quá ngưỡng giới hạn, gói tin sẽ bị vứt bỏ (Drop) ngay lập tức. Quan trọng hơn, tác vụ này diễn ra \textbf{trước} công đoạn giải mã AES (Decryption Bypass), qua đó triệt tiêu hoàn toàn rủi ro tiêu hao tài nguyên phần cứng cho các gói tin rác.
-    \item \textbf{Cấu hình Token Bucket linh hoạt:} Các thông số điều tiết được cấp phát riêng biệt cho từng loại tác vụ (Task Type). Chẳng hạn, tần suất cho phép đối với thông điệp trò chuyện (\texttt{RateLimitType::MSG\_CHAT}) là 5 tin nhắn/giây, trong khi tác vụ kết nối (\texttt{CONNECT}) hoặc xác thực (\texttt{AUTH}) bị siết chặt hơn ở mức 3 lần/giây nhằm chống dò mật khẩu hàng loạt (Brute-force).
-    \item \textbf{Cách ly và cấm IP:} Mọi lần cố tình vi phạm giới hạn dòng chảy đều kích hoạt cảnh báo tới \texttt{IntrusionDetector} để tính điểm đe dọa (Threat Score). Khi điểm số vượt qua ngưỡng an toàn, hệ thống thực thi lệnh ngắt Socket cưỡng chế và đẩy địa chỉ IP truy cập vào sổ đen (\texttt{banned\_ips}), cấm vĩnh viễn quyền truy cập tại mức nhân.
+    \item Khóa tài nguyên sớm (Early Drop): Trong vòng lặp \texttt{epoll\_wait}, phương thức \texttt{RateLimiter::checkLimit()} đánh giá địa chỉ IP nguồn. Gói tin từ IP vượt quá ngưỡng giới hạn sẽ bị hủy (Drop) trước công đoạn giải mã AES, giúp giảm tải tài nguyên xử lý cho các dữ liệu không hợp lệ.
+    \item Cấu hình Token Bucket: Các thông số giới hạn được cấp phát riêng theo loại tác vụ (Task Type). Tần suất tin nhắn trò chuyện (\texttt{RateLimitType::MSG\_CHAT}) được giới hạn ở 5 thông điệp/giây. Các tác vụ kết nối (\texttt{CONNECT}) hoặc xác thực (\texttt{AUTH}) được giới hạn ở mức 3 lần/giây để phòng ngừa phương thức tấn công vét cạn (Brute-force).
+    \item Cách ly địa chỉ IP: Vi phạm giới hạn lưu lượng sẽ được báo cáo cho \texttt{IntrusionDetector} để tính điểm đe dọa (Threat Score). Khi điểm số vượt ngưỡng, hệ thống ngắt Socket và bổ sung địa chỉ IP vào danh sách cấm (\texttt{banned\_ips}), từ chối quyền truy cập tiếp theo.
 \end{itemize}
 
 Bảng \ref{tab:ratelimit_config} thống kê các hạn mức giới hạn tốc độ được áp dụng để bảo vệ từng phân hệ chức năng.
@@ -33,12 +33,13 @@ Bảng \ref{tab:ratelimit_config} thống kê các hạn mức giới hạn tố
 }
     \caption[Cấu hình giới hạn tốc độ của hệ thống]{Cấu hình giới hạn tốc độ (Rate Limiting) của hệ thống} \label{tab:ratelimit_config} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Phân loại tác vụ (RateLimitType)}} & \multicolumn{1}{c}{\textbf{Ngưỡng giới hạn mặc định}} & \multicolumn{1}{c}{\textbf{Mục tiêu bảo vệ}} \\
+    \multicolumn{1}{c}{Phân loại tác vụ (RateLimitType)} & \multicolumn{1}{c}{Ngưỡng giới hạn} & \multicolumn{1}{c}{Mục tiêu bảo vệ} \\
     \midrule
     \endfirsthead
     
+        \caption[]{Cấu hình giới hạn tốc độ (Rate Limiting) của hệ thống (tiếp theo)} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Phân loại tác vụ (RateLimitType)}} & \multicolumn{1}{c}{\textbf{Ngưỡng giới hạn mặc định}} & \multicolumn{1}{c}{\textbf{Mục tiêu bảo vệ}} \\
+    \multicolumn{1}{c}{Phân loại tác vụ (RateLimitType)} & \multicolumn{1}{c}{Ngưỡng giới hạn} & \multicolumn{1}{c}{Mục tiêu bảo vệ} \\
     \midrule
     \endhead
     
@@ -48,13 +49,13 @@ Bảng \ref{tab:ratelimit_config} thống kê các hạn mức giới hạn tố
     \bottomrule
     \endlastfoot
 
-    \texttt{CONNECT} & 3 kết nối / giây & Chống lại kịch bản cạn kiệt tài nguyên mở Socket (TCP SYN Flood). \\
+    \texttt{CONNECT} & 3 kết nối / giây & Giảm thiểu nguy cơ cạn kiệt hàng đợi kết nối (TCP SYN Flood). \\
     \midrule
     
-    \texttt{AUTH} & 3 lần thử / giây & Ngăn chặn các nỗ lực dò đoán tổ hợp Mật khẩu/Tên đăng nhập (Brute-force Attack). \\
+    \texttt{AUTH} & 3 lần thử / giây & Ngăn chặn các nỗ lực tấn công vét cạn tổ hợp Mật khẩu/Tên đăng nhập (Brute-force Attack). \\
     \midrule
 
-    \texttt{MSG\_CHAT} & 5 thông điệp / giây & Phòng chống Spam nội dung làm nghẽn kênh truyền dẫn luồng Broadcast của phòng trò chuyện. \\
+    \texttt{MSG\_CHAT} & 5 thông điệp / giây & Phòng ngừa phát tán thông điệp hàng loạt làm nghẽn kênh truyền dẫn (Spam). \\
 \end{longtable}
 
 [PLACEHOLDER\_HINH\_ANH\_KIEN\_TRUC\_DDOS]
@@ -63,22 +64,22 @@ Bảng \ref{tab:ratelimit_config} thống kê các hạn mức giới hạn tố
 
 \subsubsection[Cơ sở lý thuyết về tấn công XSS và Lỗ hổng kiểm soát]{Cơ sở lý thuyết về tấn công XSS và Lỗ hổng kiểm soát truy cập}
 
-Tấn công Tiêm nhiễm (Injection), đặc biệt là Cross-Site Scripting (XSS), là phương thức tin tặc lợi dụng các lỗ hổng trong khâu kiểm duyệt dữ liệu đầu vào để chèn mã độc (thường là JavaScript hoặc HTML) vào luồng tin nhắn. Khi các người dùng khác nhận và hiển thị thông điệp này trên ứng dụng máy khách, mã lệnh sẽ tự động thực thi, có nguy cơ đánh cắp thông tin phiên đăng nhập (Session Hijacking) hoặc giả mạo thao tác của người dùng.
+Tấn công Tiêm nhiễm (Injection), đặc biệt là Cross-Site Scripting (XSS), xảy ra khi lỗ hổng trong kiểm duyệt dữ liệu đầu vào cho phép chèn mã độc (thường là JavaScript hoặc HTML) vào luồng thông điệp. Khi ứng dụng máy khách kết xuất dữ liệu này, mã lệnh sẽ thực thi, tạo ra nguy cơ chiếm đoạt phiên làm việc (Session Hijacking) hoặc thực hiện các thao tác giả mạo.
 
-Bên cạnh đó, Lỗ hổng Vượt quyền (Privilege Escalation) phát sinh khi cơ chế Kiểm soát truy cập (Access Control) được thiết kế lỏng lẻo. Kẻ tấn công ở vai trò người dùng thông thường (USER) có thể cố tình chế tạo (Forge) các gói tin mang mã lệnh quản trị (Ví dụ: lệnh cấm ngôn, khóa tài khoản) nhằm thao túng hệ thống và phá hoại tính toàn vẹn của nền tảng.
+Lỗ hổng Vượt quyền (Privilege Escalation) phát sinh do cơ chế Kiểm soát truy cập (Access Control) thiếu chặt chẽ. Kẻ tấn công với quyền hạn cơ bản (USER) có thể tạo các gói tin chứa mã lệnh quản trị để thao túng chức năng hệ thống và thay đổi trạng thái trái phép.
 
-\subsubsection{Cơ chế phòng thủ và cách ly rủi ro thực tế}
+\subsubsection{Cơ chế phòng thủ và cách ly rủi ro}
 
-Để vô hiệu hóa triệt để hai nhóm rủi ro trên, hệ thống được trang bị hai chốt chặn bảo mật ở tầng Ứng dụng: \texttt{MessageFilter} dành cho dữ liệu phi cấu trúc và mô hình \textbf{Kiểm soát truy cập dựa trên vai trò (Role-Based Access Control - RBAC)} dành cho các tác vụ đặc quyền.
+Để xử lý hai nhóm rủi ro trên, hệ thống tích hợp hai thành phần bảo mật tại tầng Ứng dụng: \texttt{MessageFilter} dành cho dữ liệu phi cấu trúc và mô hình Kiểm soát truy cập dựa trên vai trò (Role-Based Access Control - RBAC) dành cho tác vụ quản trị.
 
-Khi một tài khoản kết nối với vai trò \texttt{USER} có hành vi bất thường, luồng xử lý sẽ phản ứng theo cơ chế sau:
+Quy trình phản ứng bảo mật được thực thi như sau:
 \begin{itemize}[label={-}]
-    \item \textbf{Lọc dữ liệu đầu vào (Input Sanitization):} Mọi thông điệp trò chuyện trước khi được phân phối (Broadcast) đều phải đi qua bộ lọc \texttt{MessageFilter}. Thành phần này sử dụng hệ biểu thức chính quy (Regex) và cơ chế bóc tách ký tự để dò tìm, làm sạch hoàn toàn các thẻ HTML, mã Script và các ký tự điều khiển dị thường, chuyển đổi chúng thành dạng văn bản thuần túy (Plaintext) vô hại.
-    \item \textbf{Xác thực Đặc quyền (Authorization Check):} Khi máy chủ nhận được các gói tin yêu cầu thực thi nhóm lệnh \texttt{MSG\_ADMIN\_COMMAND}, bộ điều phối sẽ chuyển giao cho lớp \texttt{AdminCommands}. Tại đây, phương thức \texttt{hasAdminRight()} truy xuất trực tiếp thuộc tính \texttt{UserRole} lưu trên đối tượng \texttt{ClientSession} (vốn được xác định từ cơ sở dữ liệu trong pha đăng nhập). Nếu phát hiện thiếu cờ \texttt{ADMIN} hoặc \texttt{OWNER}, máy chủ lập tức gửi trả mã lỗi \texttt{ERR\_PERMISSION\_DENIED} và từ chối tác vụ.
-    \item \textbf{Hệ thống Chấm điểm Đe dọa (Threat Scoring):} Các hành vi cố tình chèn mã độc hoặc gửi gói tin dị dạng (\texttt{INVALID\_PACKET}, \texttt{INJECTION\_ATTEMPT}) đều kích hoạt cờ cảnh báo tới module \texttt{IntrusionDetector}. Mỗi vi phạm sẽ bị tích lũy một mức điểm đe dọa (Threat Score). Nếu tổng điểm vi phạm của một địa chỉ IP vượt ngưỡng \texttt{PERM\_BAN\_THRESHOLD} (500 điểm), IP đó sẽ bị ngắt kết nối cưỡng chế và ghi nhận vào sổ đen vĩnh viễn.
+    \item Lọc dữ liệu đầu vào (Input Sanitization): Các thông điệp trò chuyện được tiền xử lý qua \texttt{MessageFilter}. Thành phần này sử dụng biểu thức chính quy (Regex) và phân tích ký tự để loại bỏ hoặc chuyển đổi các thẻ HTML, mã Script và ký tự điều khiển thành văn bản thuần túy (Plaintext).
+    \item Xác thực Đặc quyền (Authorization Check): Yêu cầu thực thi lệnh quản trị (\texttt{MSG\_ADMIN\_COMMAND}) được bộ điều phối chuyển giao cho \texttt{AdminCommands}. Phương thức \texttt{hasAdminRight()} kiểm tra thuộc tính \texttt{UserRole} của đối tượng \texttt{ClientSession}. Nếu thuộc tính không bao gồm cờ \texttt{ADMIN} hoặc \texttt{OWNER}, máy chủ từ chối yêu cầu và trả về mã lỗi \texttt{ERR\_PERMISSION\_DENIED}.
+    \item Hệ thống Chấm điểm Đe dọa (Threat Scoring): Vi phạm liên quan đến chèn mã độc hoặc gửi gói tin dị dạng (\texttt{INVALID\_PACKET}, \texttt{INJECTION\_ATTEMPT}) được báo cáo tới \texttt{IntrusionDetector}. Mỗi vi phạm làm tăng điểm đe dọa (Threat Score). Nếu tổng điểm vượt ngưỡng \texttt{PERM\_BAN\_THRESHOLD} (500 điểm), kết nối sẽ bị ngắt và địa chỉ IP bị lưu vào danh sách cấm.
 \end{itemize}
 
-Bảng \ref{tab:threat_score} diễn giải ma trận điểm số rủi ro do hệ thống \texttt{IntrusionDetector} quy định nhằm định lượng mức độ nghiêm trọng của từng hành vi tấn công.
+Bảng \ref{tab:threat_score} mô tả ma trận điểm số rủi ro do \texttt{IntrusionDetector} quy định đối với từng hành vi vi phạm.
 
 \begin{longtable}{
     >{\raggedright\arraybackslash}p{4cm}
@@ -87,12 +88,13 @@ Bảng \ref{tab:threat_score} diễn giải ma trận điểm số rủi ro do h
 }
     \caption[Ma trận điểm số rủi ro của hệ thống phòng thủ]{Ma trận điểm số rủi ro (Threat Score) của hệ thống phòng thủ} \label{tab:threat_score} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Loại vi phạm (ViolationType)}} & \multicolumn{1}{c}{\textbf{Điểm rủi ro}} & \multicolumn{1}{c}{\textbf{Mô tả hành vi tấn công}} \\
+    \multicolumn{1}{c}{Loại vi phạm (ViolationType)} & \multicolumn{1}{c}{Điểm rủi ro} & \multicolumn{1}{c}{Mô tả hành vi tấn công} \\
     \midrule
     \endfirsthead
     
+        \caption[]{Ma trận điểm số rủi ro (Threat Score) của hệ thống phòng thủ (tiếp theo)} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Loại vi phạm (ViolationType)}} & \multicolumn{1}{c}{\textbf{Điểm rủi ro}} & \multicolumn{1}{c}{\textbf{Mô tả hành vi tấn công}} \\
+    \multicolumn{1}{c}{Loại vi phạm (ViolationType)} & \multicolumn{1}{c}{Điểm rủi ro} & \multicolumn{1}{c}{Mô tả hành vi tấn công} \\
     \midrule
     \endhead
     
@@ -105,13 +107,13 @@ Bảng \ref{tab:threat_score} diễn giải ma trận điểm số rủi ro do h
     \texttt{PORT\_SCAN} & 100 điểm & Cố tình dò quét cổng hoặc gửi dữ liệu khi chưa hoàn tất bắt tay giao thức (Handshake). \\
     \midrule
     
-    \texttt{INJECTION\_ATTEMPT} & 30 điểm & Cố tình chèn mã độc JavaScript/HTML vào trường văn bản đầu vào. \\
+    \texttt{INJECTION\_ATTEMPT} & 30 điểm & Chèn mã độc JavaScript/HTML vào trường văn bản đầu vào. \\
     \midrule
 
-    \texttt{INVALID\_PACKET} & 10 điểm & Gửi gói tin sai cấu trúc Header hoặc vượt quá kích thước cho phép. \\
+    \texttt{INVALID\_PACKET} & 10 điểm & Gói tin sai cấu trúc Header hoặc vượt kích thước cho phép. \\
     \midrule
 
-    \texttt{FAILED\_AUTH} & 10 điểm & Đăng nhập thất bại do sai tài khoản hoặc sử dụng chữ ký điện tử bất hợp lệ. \\
+    \texttt{FAILED\_AUTH} & 10 điểm & Đăng nhập thất bại do sai thông tin xác thực hoặc chữ ký điện tử không hợp lệ. \\
 \end{longtable}
 
 [PLACEHOLDER\_HINH\_ANH\_KIEN\_TRUC\_XSS]

@@ -1,43 +1,43 @@
 \subsection{Yêu cầu chức năng}
 
-Dựa trên mục tiêu xây dựng một nền tảng trò chuyện bảo mật và hiệu năng cao, hệ thống cần đáp ứng các nhóm yêu cầu chức năng cốt lõi sau đây:
+Hệ thống yêu cầu đáp ứng các nhóm chức năng cốt lõi sau:
 
 \begin{enumerate}
-    \item Quản lý Tài khoản và Xác thực (Authentication \& Authorization): 
+    \item Quản lý tài khoản và xác thực (Authentication \& Authorization): 
     \begin{itemize}[label={-}]
-        \item Cung cấp tính năng Đăng ký (Register) và Đăng nhập (Login) an toàn. Mật khẩu người dùng không lưu bản rõ mà phải qua các hàm băm mật mã (như SHA256/bcrypt) để đảm bảo an toàn cơ sở dữ liệu.
-        \item Cấp phát thẻ định danh phiên (Session Token) sử dụng chữ ký điện tử HMAC, hỗ trợ cơ chế tự động phục hồi kết nối (Session Resumption) giúp người dùng giữ nguyên phiên đăng nhập khi mạng chập chờn.
+        \item Đăng ký (Register) và đăng nhập (Login) an toàn. Mật khẩu được băm (SHA256/bcrypt) trước khi lưu trữ.
+        \item Cấp phát thẻ định danh phiên (Session Token) bằng HMAC, hỗ trợ tự động phục hồi kết nối (Session Resumption).
     \end{itemize}
 
-    \item Quản lý phiên kết nối và Trạng thái (Session Management):
+    \item Quản lý phiên kết nối và trạng thái (Session Management):
     \begin{itemize}[label={-}]
-        \item Quản lý vòng đời socket (Connect, Disconnect) và duy trì tín hiệu sống sót thông qua cơ chế nhịp tim (Ping/Pong).
-        \item Hỗ trợ tra cứu danh sách người dùng đang trực tuyến (List Users) và xem thông tin hồ sơ của một tài khoản cụ thể (Whois).
+        \item Quản lý vòng đời kết nối mạng (Connect, Disconnect) và duy trì tín hiệu sống sót (Ping/Pong).
+        \item Tra cứu danh sách người dùng trực tuyến (List Users) và thông tin hồ sơ (Whois).
     \end{itemize}
 
-    \item Giao tiếp và Nhắn tin thời gian thực (Realtime Chatting):
+    \item Giao tiếp và nhắn tin thời gian thực (Real-time Chatting):
     \begin{itemize}[label={-}]
-        \item Nhắn tin cá nhân (Direct Message): Cho phép trao đổi thông điệp trực tiếp 1-1 với độ trễ tối thiểu.
-        \item Nhắn tin nhóm (Room Chat): Hỗ trợ danh sách phòng trò chuyện (List Rooms), cho phép người dùng tạo phòng mới (Create Room), tham gia (Join), rời phòng (Leave) và gửi tin nhắn quảng bá (Broadcast) tới toàn bộ thành viên.
-        \item Hỗ trợ truy vấn lịch sử trò chuyện đã được lưu trữ bền vững trong cơ sở dữ liệu.
+        \item Nhắn tin cá nhân (Direct Message): Trao đổi thông điệp trực tiếp (1-1).
+        \item Nhắn tin nhóm (Room Chat): Liệt kê phòng (List Rooms), tạo phòng (Create Room), tham gia (Join), rời phòng (Leave) và phát đa hướng thông điệp (Broadcast).
+        \item Truy vấn lịch sử trò chuyện từ cơ sở dữ liệu.
     \end{itemize}
 
-    \item Truyền tải tập tin (File Transfer):
+    \item Truyền tải tệp tin (File Transfer):
     \begin{itemize}[label={-}]
-        \item Cung cấp quy trình gửi/nhận tệp tin hai chiều với luồng kiểm soát rõ ràng: gửi yêu cầu truyền (File Request) và chờ phía nhận xác nhận (Accept/Reject).
-        \item Dữ liệu tệp được chia nhỏ và truyền theo từng khối (Chunking) để tránh việc một tệp tin dung lượng lớn chiếm dụng và gây tắc nghẽn luồng xử lý thông điệp chính của hệ thống.
+        \item Hỗ trợ luồng điều khiển truyền tệp hai chiều: gửi yêu cầu (File Request) và xác nhận (Accept/Reject).
+        \item Truyền dữ liệu dạng phân mảnh (Chunking) để chống tắc nghẽn luồng thông điệp chính.
     \end{itemize}
 
     \item Quản trị hệ thống (Admin Commands):
     \begin{itemize}[label={-}]
-        \item Phân tách vai trò và cấp quyền Quản trị viên (Admin Privilege) để điều hành cộng đồng.
-        \item Tích hợp bộ công cụ xử lý vi phạm: kích xuất người dùng (Kick), cấm gửi tin nhắn (Mute), cấm truy cập vĩnh viễn (Ban IP/Username), thăng cấp quyền (Promote) và gửi thông báo khẩn cấp tới toàn server (System Broadcast).
+        \item Áp dụng cơ chế phân quyền quản trị viên (Admin Privilege).
+        \item Xử lý vi phạm: kích xuất (Kick), cấm gửi tin (Mute), cấm truy cập (Ban IP/Username), thăng cấp (Promote) và phát thông báo hệ thống (System Broadcast).
     \end{itemize}
 
-    \item Cơ chế phòng vệ và An ninh chủ động (Security):
+    \item An ninh và phòng vệ chủ động (Security):
     \begin{itemize}[label={-}]
-        \item Bắt tay mật mã (Crypto Handshake): Tự động trao đổi khóa (Key Exchange) ngay khi khởi tạo kết nối để thiết lập kênh truyền mã hóa bảo mật trước khi cho phép trao đổi dữ liệu nghiệp vụ.
-        \item Ngăn chặn lạm dụng (Rate Limiting): Áp dụng thuật toán giới hạn tốc độ nhằm chống lại các nỗ lực tấn công từ chối dịch vụ (DoS) hoặc nhồi nhét tin nhắn rác (Spam).
-        \item Hệ thống phát hiện xâm nhập (IDS): Tự động ghi nhận và phân loại các vi phạm (sai mật khẩu, quét cổng, gửi gói tin dị dạng) để trừ điểm rủi ro, từ đó ra quyết định cấm (Ban) tạm thời hoặc vĩnh viễn đối với các IP độc hại.
+        \item Bắt tay mật mã (Crypto Handshake): Trao đổi khóa (Key Exchange) khi khởi tạo kết nối để thiết lập kênh truyền bảo mật.
+        \item Giới hạn lưu lượng (Rate Limiting): Phòng chống tấn công từ chối dịch vụ (DoS) và thư rác (Spam).
+        \item Hệ thống phát hiện xâm nhập (IDS): Phân loại và ghi nhận vi phạm (sai mật khẩu, quét cổng, gói tin dị dạng) để áp dụng biện pháp khóa IP (Ban).
     \end{itemize}
 \end{enumerate}

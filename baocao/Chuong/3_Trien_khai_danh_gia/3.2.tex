@@ -1,33 +1,33 @@
 \section{Kịch bản Kiểm thử và Đánh giá Hiệu năng}
 
-\subsection[Tổng quan hệ thống Kiểm thử tự động]{Tổng quan hệ thống Kiểm thử tự động (Test Framework)}
+\subsection{Tổng quan Hệ thống Kiểm thử Tự động}
 
-\subsubsection{Cơ sở lý thuyết về phương pháp luận kiểm thử}
+\subsubsection{Cơ sở lý thuyết về Phương pháp luận Kiểm thử}
 
-Trong chu trình phát triển phần mềm hiện đại, Phương pháp Phát triển Hướng Kiểm thử (Test-Driven Development - TDD) và hệ thống Tích hợp Liên tục (Continuous Integration - CI) đóng vai trò then chốt trong việc duy trì độ ổn định và chất lượng mã nguồn. Thay vì triển khai kiểm thử thủ công (Manual Testing) vốn tiêu tốn tài nguyên và dễ phát sinh sai sót, hệ thống được trang bị một hệ sinh thái kiểm thử tự động (Automated Testing Framework) tích hợp trực tiếp vào quy trình đóng gói.
+Trong quy trình phát triển phần mềm, Phương pháp Phát triển Hướng Kiểm thử (Test-Driven Development - TDD) và hệ thống Tích hợp Liên tục (Continuous Integration - CI) hỗ trợ duy trì độ ổn định và chất lượng mã nguồn. Khác với phương pháp kiểm thử thủ công (Manual Testing), hệ thống áp dụng bộ kiểm thử tự động (Automated Testing Framework) được tích hợp trong quy trình biên dịch.
 
-Hệ thống được thiết kế bao gồm hai cấp độ kiểm thử chuyên sâu:
+Hệ thống được thiết kế với hai cấp độ kiểm thử:
 \begin{itemize}[label={-}]
-    \item \textbf{Kiểm thử Đơn vị (Unit Testing):} Được thực thi tại mức mã nguồn (Code-level) nhằm cô lập và xác thực tính đúng đắn của từng hàm hoặc thành phần (Module) cụ thể. Kỹ thuật này cho phép phát hiện sớm các lỗ hổng logic từ giai đoạn phát triển ban đầu (Shift-left Testing).
-    \item \textbf{Kiểm thử Tích hợp (Integration/E2E Testing):} Xác minh luồng giao tiếp dữ liệu liên thông giữa ứng dụng máy khách và máy chủ, mô phỏng các kịch bản tương tác thực tế dựa trên phương pháp hộp đen (Black-box Testing).
+    \item Kiểm thử Đơn vị (Unit Testing): Thực thi ở mức mã nguồn (Code-level) nhằm cô lập và xác thực tính đúng đắn của từng hàm hoặc thành phần (Module). Phương pháp này giúp phát hiện sớm các lỗi logic từ giai đoạn phát triển (Shift-left Testing).
+    \item Kiểm thử Tích hợp (Integration/E2E Testing): Đánh giá luồng giao tiếp dữ liệu liên thông giữa máy khách và máy chủ, mô phỏng các kịch bản tương tác thực tế theo phương pháp hộp đen (Black-box Testing).
 \end{itemize}
 
-\subsubsection{Cấu trúc Test Framework trong thực tế mã nguồn}
+\subsubsection{Cấu trúc Khung Kiểm thử}
 
-Thay vì phụ thuộc vào các thư viện bên thứ ba đồ sộ (như Google Test hay Catch2) làm gia tăng chi phí biên dịch, dự án đã tự chủ thiết kế một vi khung kiểm thử (Micro Test Framework) bằng C++ thuần túy thông qua các tệp nền tảng \texttt{TestMacro.h} và \texttt{test\_framework.h}. Hệ thống này cung cấp các hàm Macro tiêu chuẩn hóa như \texttt{ASSERT\_TRUE}, \texttt{ASSERT\_EQ}, và \texttt{ASSERT\_THROWS} để đánh giá các biểu thức logic tĩnh.
+Thay vì sử dụng các thư viện bên thứ ba (như Google Test hay Catch2) nhằm tối ưu chi phí biên dịch, dự án triển khai một vi khung kiểm thử (Micro Test Framework) bằng C++ thông qua các tệp \texttt{TestMacro.h} và \texttt{test\_framework.h}. Hệ thống cung cấp các hàm Macro tiêu chuẩn như \texttt{ASSERT\_TRUE}, \texttt{ASSERT\_EQ}, và \texttt{ASSERT\_THROWS} để đánh giá các biểu thức logic.
 
-Thông qua chỉ thị \texttt{enable\_testing()} được khai báo trong \texttt{CMakeLists.txt}, hệ thống đăng ký và vận hành tự động một tập hợp các kịch bản kiểm thử (Test Suites) độc lập:
+Thông qua chỉ thị \texttt{enable\_testing()} trong \texttt{CMakeLists.txt}, hệ thống tự động khởi chạy các khối kiểm thử (Test Suites) độc lập:
 
 \begin{itemize}[label={-}]
-    \item \textbf{Khối Kiểm thử Mật mã (\texttt{test\_crypto}):} Đo lường độ phức tạp thời gian thực thi (Time Complexity) và xác thực tính đồng nhất của dữ liệu sau quá trình mã hóa và giải mã lai giữa phương thức bất đối xứng RSA-2048 và luồng khối AES-256.
-    \item \textbf{Khối Kiểm thử Xác thực (\texttt{test\_auth} \& \texttt{test\_auth\_manager}):} Kiểm định cơ chế băm mật khẩu (Password Hashing) sử dụng thuật toán PBKDF2 kết hợp giá trị nhiễu (Salting), đồng thời kiểm tra sự nhất quán trong luồng ghi cơ sở dữ liệu nội bộ SQLite3.
-    \item \textbf{Khối Kiểm thử Giao thức (\texttt{test\_protocol}):} Xác thực cơ chế Tuần tự hóa (Serialization) và Phân tích cú pháp (Parsing) của giao thức cấu trúc gói tin nhị phân. Các bài kiểm tra đặc biệt tập trung vào khả năng bắt ngoại lệ (Error Handling) khi đối mặt với các cấu trúc JSON bị biến dạng (Malformed JSON).
-    \item \textbf{Khối Kiểm thử Giới hạn Dòng (\texttt{test\_ratelimit}):} Mô phỏng các xung lưu lượng mạng (Traffic Spikes) đột biến nhằm kiểm chứng năng lực phản xạ, từ chối dịch vụ của thuật toán Token Bucket tại biên giới mạng.
+    \item Khối Kiểm thử Mật mã (\texttt{test\_crypto}): Đo lường độ phức tạp thời gian (Time Complexity) và xác thực tính toàn vẹn dữ liệu sau quá trình mã hóa/giải mã kết hợp RSA-2048 và AES-256.
+    \item Khối Kiểm thử Xác thực (\texttt{test\_auth} \& \texttt{test\_auth\_manager}): Đánh giá cơ chế băm mật khẩu (Password Hashing) PBKDF2 kết hợp giá trị nhiễu (Salting), và kiểm tra luồng ghi của cơ sở dữ liệu SQLite3.
+    \item Khối Kiểm thử Giao thức (\texttt{test\_protocol}): Xác thực quy trình Tuần tự hóa (Serialization) và Phân tích cú pháp (Parsing) của giao thức gói tin. Bài kiểm tra đánh giá khả năng xử lý ngoại lệ (Error Handling) với cấu trúc JSON không hợp lệ (Malformed JSON).
+    \item Khối Kiểm thử Giới hạn Dòng (\texttt{test\_ratelimit}): Mô phỏng xung lưu lượng mạng (Traffic Spikes) để kiểm chứng năng lực từ chối dịch vụ của thuật toán Token Bucket.
 \end{itemize}
 
-Bên cạnh các bài kiểm thử C++, dự án tích hợp hệ thống kiểm thử tự động hộp đen viết bằng ngôn ngữ Python (\texttt{integration\_test.py}). Kịch bản này tương tác trực tiếp qua luồng TCP (Raw Socket) nhằm kiểm chứng sự bền bỉ của kiến trúc đa luồng trước các trạng thái dị thường từ máy khách.
+Ngoài kiểm thử C++, dự án tích hợp hệ thống kiểm thử hộp đen bằng Python (\texttt{integration\_test.py}). Kịch bản này tương tác qua luồng TCP (Raw Socket) nhằm kiểm chứng sự ổn định của kiến trúc đa luồng trước các trạng thái dữ liệu bất thường từ máy khách.
 
-Bảng \ref{tab:test_suites} trình bày ma trận phân bổ các module kiểm thử tự động của hệ thống.
+Bảng \ref{tab:test_suites} trình bày sự phân bổ các module kiểm thử tự động của hệ thống.
 
 \begin{longtable}{
     >{\raggedright\arraybackslash}p{4.5cm}
@@ -36,12 +36,13 @@ Bảng \ref{tab:test_suites} trình bày ma trận phân bổ các module kiểm
 }
     \caption{Ma trận phân bổ các module kiểm thử tự động} \label{tab:test_suites} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Tên module kiểm thử}} & \multicolumn{1}{c}{\textbf{Ngôn ngữ lập trình}} & \multicolumn{1}{c}{\textbf{Mục tiêu kiểm định kỹ thuật}} \\
+    \multicolumn{1}{c}{Tên module kiểm thử} & \multicolumn{1}{c}{Ngôn ngữ lập trình} & \multicolumn{1}{c}{Mục tiêu kiểm định kỹ thuật} \\
     \midrule
     \endfirsthead
     
+        \caption[]{Ma trận phân bổ các module kiểm thử tự động (tiếp theo)} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Tên module kiểm thử}} & \multicolumn{1}{c}{\textbf{Ngôn ngữ lập trình}} & \multicolumn{1}{c}{\textbf{Mục tiêu kiểm định kỹ thuật}} \\
+    \multicolumn{1}{c}{Tên module kiểm thử} & \multicolumn{1}{c}{Ngôn ngữ lập trình} & \multicolumn{1}{c}{Mục tiêu kiểm định kỹ thuật} \\
     \midrule
     \endhead
     
@@ -63,36 +64,36 @@ Bảng \ref{tab:test_suites} trình bày ma trận phân bổ các module kiểm
     \texttt{test\_ratelimit} & C++ / Macro & Kiểm tra tính chính xác của cơ chế chống spam (Token Bucket Firewall). \\
     \midrule
 
-    \texttt{integration\_test.py} & Python 3 & Kiểm thử tích hợp hộp đen (E2E), mô phỏng chu kỳ sống (Lifecycle) của Client. \\
+    \texttt{integration\_test.py} & Python 3 & Kiểm thử tích hợp hộp đen (E2E), mô phỏng vòng đời (Lifecycle) của Client. \\
 \end{longtable}
 
 [PLACEHOLDER\_HINH\_ANH\_KIEN\_TRUC\_KIEM\_THU]
 
-\subsection[Đánh giá giới hạn chịu tải]{Đánh giá giới hạn chịu tải (Load Benchmark)}
+\subsection{Đánh giá Giới hạn Chịu tải (Load Benchmark)}
 
-\subsubsection[Cơ sở lý thuyết về đánh giá hiệu năng]{Cơ sở lý thuyết về đánh giá hiệu năng hệ thống mạng}
+\subsubsection{Cơ sở lý thuyết về Đánh giá Hiệu năng}
 
-Đánh giá giới hạn chịu tải (Load Benchmark) là một hạng mục kiểm định cốt lõi đối với các kiến trúc phân tán và máy chủ truyền thông thời gian thực. Mục tiêu của quá trình này là đo lường hành vi của hệ thống dưới các mức độ áp lực dữ liệu (Data Pressure) khác nhau, từ đó phát hiện các điểm thắt cổ chai (Bottleneck) về I/O, khả năng tính toán của CPU hoặc giới hạn bộ nhớ.
+Đánh giá giới hạn chịu tải (Load Benchmark) là phương thức kiểm định quan trọng đối với kiến trúc phân tán và máy chủ truyền thông thời gian thực. Mục tiêu là đo lường trạng thái hệ thống dưới các mức độ áp lực dữ liệu (Data Pressure) khác nhau, nhằm xác định các điểm thắt nút (Bottleneck) về I/O, năng lực tính toán CPU hoặc giới hạn bộ nhớ.
 
-Ba chỉ số định lượng (Metrics) quan trọng thường được sử dụng trong đánh giá hệ thống mạng bao gồm:
+Ba chỉ số định lượng (Metrics) được sử dụng bao gồm:
 \begin{itemize}[label={-}]
-    \item \textbf{Thông lượng (Throughput):} Đo lường số lượng gói tin hoặc luồng thông điệp mà hệ thống có thể xử lý thành công trong một đơn vị thời gian (thường là msg/s).
-    \item \textbf{Độ trễ trung bình (Average Latency):} Đo lường thời gian trung bình hệ thống cần để hoàn thành chu trình từ khi tiếp nhận yêu cầu đến khi trả về kết quả (Round-Trip Time).
-    \item \textbf{Độ trễ đuôi phân phối (Tail Latency - P99, P99.9):} Biểu thị thời gian phản hồi của 1\% hoặc 0.1\% lượng yêu cầu chậm nhất trong hệ thống. Đây là chỉ số khắt khe nhất nhằm đánh giá độ ổn định của kiến trúc đa luồng, đảm bảo luồng thực thi không bị phong tỏa (Blocked) đột biến.
+    \item Thông lượng (Throughput): Số lượng thông điệp hệ thống xử lý hoàn tất trong một đơn vị thời gian (msg/s).
+    \item Độ trễ trung bình (Average Latency): Khoảng thời gian trung bình từ khi tiếp nhận yêu cầu đến khi hệ thống trả kết quả (Round-Trip Time).
+    \item Độ trễ đuôi phân phối (Tail Latency - P99, P99.9): Thời gian phản hồi lớn nhất của 1\% hoặc 0.1\% lượng yêu cầu chậm nhất, dùng để đánh giá mức độ ổn định của kiến trúc đa luồng.
 \end{itemize}
 
-\subsubsection{Kịch bản đo lường thực tế hệ thống}
+\subsubsection{Kịch bản Đo lường Thực tế}
 
-Phép thử căng thẳng (Stress Test) dành cho mô hình bộ định tuyến sự kiện \texttt{epoll} được triển khai tự động thông qua mã nguồn \texttt{benchmark\_load.cpp}. Kịch bản này ứng dụng kỹ thuật Đa luồng (Multi-threading) để cấp phát đồng thời hàng loạt luồng ngầm độc lập, mỗi luồng vận hành như một máy khách (Client) kết nối trực tiếp thông qua Raw Socket đến cổng TCP \texttt{9000} của máy chủ.
+Kiểm thử căng thẳng (Stress Test) cho bộ định tuyến sự kiện \texttt{epoll} được thực hiện tự động qua mã nguồn \texttt{benchmark\_load.cpp}. Kịch bản này sử dụng kỹ thuật Đa luồng (Multi-threading) để cấp phát các luồng độc lập, mô phỏng các máy khách (Client) kết nối song song qua Raw Socket đến cổng TCP \texttt{9000} của máy chủ.
 
-Trong chu kỳ mô phỏng, mỗi máy khách sẽ gửi tuần tự gói tin \texttt{MSG\_CHAT\_SEND} dạng JSON định kỳ sau mỗi khoảng nghỉ 10 mili-giây. Kịch bản đánh giá được chia thành ba cấp độ (Scenarios) tăng dần:
+Mỗi máy khách định kỳ gửi gói tin \texttt{MSG\_CHAT\_SEND} định dạng JSON sau một khoảng thời gian 10 mili-giây. Kịch bản đánh giá được phân thành ba mức độ (Scenarios):
 \begin{itemize}[label={-}]
-    \item \textbf{Baseline (Tiêu chuẩn):} Mô phỏng 10 máy khách hoạt động liên tục trong 30 giây.
-    \item \textbf{Load Test (Chịu tải):} Tăng quy mô lên 50 máy khách hoạt động liên tục trong 60 giây.
-    \item \textbf{Stress Test (Căng thẳng):} Tạo áp lực dội bom dữ liệu với 100 máy khách trong 60 giây.
+    \item Tiêu chuẩn (Baseline): Mô phỏng 10 máy khách hoạt động liên tục trong 30 giây.
+    \item Chịu tải (Load Test): Mô phỏng 50 máy khách hoạt động liên tục trong 60 giây.
+    \item Căng thẳng (Stress Test): Mô phỏng tải mức độ cao với 100 máy khách trong 60 giây.
 \end{itemize}
 
-Bảng \ref{tab:benchmark_performance} thống kê chi tiết các chỉ số hiệu suất đo lường được ở từng kịch bản.
+Bảng \ref{tab:benchmark_performance} thống kê các chỉ số hiệu suất tại từng kịch bản.
 
 \begin{longtable}{
     >{\raggedright\arraybackslash}p{3cm}
@@ -103,12 +104,13 @@ Bảng \ref{tab:benchmark_performance} thống kê chi tiết các chỉ số hi
 }
     \caption[Đo lường Thông lượng và Độ trễ của Server]{Đo lường Thông lượng và Độ trễ của Server ở các mức độ CCU} \label{tab:benchmark_performance} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Kịch bản}} & \multicolumn{1}{c}{\textbf{Khách giả lập}} & \multicolumn{1}{c}{\textbf{Thông lượng}} & \multicolumn{1}{c}{\textbf{Độ trễ TB}} & \multicolumn{1}{c}{\textbf{Độ trễ P99}} \\
+    \multicolumn{1}{c}{Kịch bản} & \multicolumn{1}{c}{Khách giả lập} & \multicolumn{1}{c}{Thông lượng} & \multicolumn{1}{c}{Độ trễ TB} & \multicolumn{1}{c}{Độ trễ P99} \\
     \midrule
     \endfirsthead
     
+        \caption[]{Đo lường Thông lượng và Độ trễ của Server ở các mức độ CCU (tiếp theo)} \\
     \toprule
-    \multicolumn{1}{c}{\textbf{Kịch bản}} & \multicolumn{1}{c}{\textbf{Khách giả lập}} & \multicolumn{1}{c}{\textbf{Thông lượng}} & \multicolumn{1}{c}{\textbf{Độ trễ TB}} & \multicolumn{1}{c}{\textbf{Độ trễ P99}} \\
+    \multicolumn{1}{c}{Kịch bản} & \multicolumn{1}{c}{Khách giả lập} & \multicolumn{1}{c}{Thông lượng} & \multicolumn{1}{c}{Độ trễ TB} & \multicolumn{1}{c}{Độ trễ P99} \\
     \midrule
     \endhead
     
@@ -127,10 +129,10 @@ Bảng \ref{tab:benchmark_performance} thống kê chi tiết các chỉ số hi
     Stress Test & 100 CCU & $\sim$ 9,200 msg/s & 5.4 ms & 15.3 ms \\
 \end{longtable}
 
-\subsubsection{Kết luận đánh giá hiệu năng}
+\subsubsection{Kết luận Đánh giá Hiệu năng}
 
-Dưới áp lực tính toán phức hợp bao gồm việc tiếp nhận chuỗi kết nối I/O, thực thi giải mã luồng khối AES, phân tích và lọc dữ liệu (XSS Filtering) trước khi định tuyến phân phối lên đến \textbf{9,200 gói tin mỗi giây}, hệ thống vẫn duy trì chu kỳ sống trơn tru mà không ghi nhận bất kỳ hiện tượng tràn bộ nhớ hay treo cứng dịch vụ (Crash). 
+Trong điều kiện xử lý các tác vụ phức hợp bao gồm quản lý kết nối I/O, giải mã AES, phân tích và lọc dữ liệu (XSS Filtering) trước khi định tuyến phân phối, hệ thống duy trì được thông lượng 9,200 gói tin mỗi giây. Tại mức tải này, hệ thống hoạt động ổn định, không xuất hiện hiện tượng tràn bộ nhớ hay gián đoạn dịch vụ.
 
-Chỉ số độ trễ đuôi phân phối đối với 99\% lượng thông điệp (P99 Latency) vẫn duy trì ở ngưỡng cực đại $\sim$15.3 mili-giây, hoàn toàn đáp ứng được quy chuẩn kỹ thuật của một ứng dụng nhắn tin thời gian thực. Kết quả này xác thực tính đúng đắn của việc kết hợp kiến trúc cấp phát luồng dạng Thread-Pool cùng cơ chế điều phối phi đồng bộ \texttt{epoll\_wait} ở tầng nhân hệ điều hành Linux.
+Chỉ số độ trễ đuôi phân phối (P99 Latency) duy trì ở mức tối đa $\sim$15.3 mili-giây, đáp ứng tiêu chuẩn kỹ thuật của một nền tảng nhắn tin thời gian thực. Kết quả này phản ánh tính hiệu quả khi áp dụng kiến trúc Thread-Pool kết hợp cơ chế điều phối phi đồng bộ \texttt{epoll\_wait} trên hệ điều hành nhân Linux.
 
 [PLACEHOLDER\_HINH\_ANH\_BIEU\_DO\_HIEU\_NANG]

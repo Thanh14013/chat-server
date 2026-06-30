@@ -1,24 +1,24 @@
 \subsection{Yêu cầu phi chức năng}
 
-Bên cạnh các tính năng nghiệp vụ cốt lõi, hệ thống đặc biệt chú trọng vào các yêu cầu phi chức năng nhằm đảm bảo năng lực vận hành, độ tin cậy và an toàn thông tin toàn diện trong môi trường thực tế:
+Các yêu cầu phi chức năng nhằm đảm bảo khả năng vận hành, độ tin cậy và an toàn thông tin:
 
 \begin{enumerate}
-    \item Hiệu năng và Khả năng mở rộng (Performance \& Scalability):
+    \item Hiệu năng và khả năng mở rộng (Performance \& Scalability):
     \begin{itemize}[label={-}]
-        \item Khả năng xử lý đồng thời: Kiến trúc máy chủ phải được thiết kế dựa trên cơ chế I/O đa kênh (I/O Multiplexing) thông qua API epoll kết hợp với mô hình Thread Pool. Thiết kế này đảm bảo luồng điều phối chính không bao giờ bị nghẽn (non-blocking), giải quyết hiệu quả bài toán C10K với khả năng duy trì hàng chục nghìn kết nối mà vẫn giữ độ trễ ở mức tối thiểu.
-        \item Tối ưu hóa băng thông truyền tải: Áp dụng giao thức mạng nhị phân tùy chỉnh (Custom Binary Protocol) thay thế cho văn bản thuần túy nhằm tối thiểu hóa kích thước gói tin, tiết kiệm băng thông và giảm thiểu hao phí CPU trong quá trình phân tích cú pháp (parsing).
+        \item Xử lý đồng thời: Sử dụng kiến trúc I/O đa kênh (I/O Multiplexing) với epoll và Thread Pool nhằm duy trì luồng điều phối phi đồng bộ (Non-blocking). Giải quyết bài toán C10K với độ trễ thấp.
+        \item Tối ưu băng thông: Áp dụng giao thức nhị phân (Custom Binary Protocol) để tối thiểu hóa kích thước gói tin và hao phí phân tích cú pháp (Parsing).
     \end{itemize}
 
-    \item Bảo mật và Toàn vẹn dữ liệu (Security \& Integrity):
+    \item Bảo mật và toàn vẹn dữ liệu (Security \& Integrity):
     \begin{itemize}[label={-}]
-        \item Mã hóa kênh truyền: Toàn bộ lưu lượng mạng lưới phải được mã hóa tải trọng theo tiêu chuẩn công nghiệp (AES-256-GCM), với khóa phiên (Session Key) được thỏa thuận và phân phối an toàn thông qua cơ chế mã hóa khóa công khai (RSA-2048).
-        \item Xác thực tính nguyên vẹn: Sử dụng mã kiểm lỗi (CRC32) và mã xác thực thông điệp (HMAC) trên từng gói tin để ngăn chặn mọi hành vi đánh tráo, sửa đổi trái phép dữ liệu trên đường truyền.
-        \item An toàn lưu trữ dữ liệu: Mật khẩu người dùng bắt buộc phải được băm một chiều an toàn trước khi lưu. Hệ thống cơ sở dữ liệu nội bộ (SQLite) phải áp dụng cơ chế ghi chép trước nhật ký (Write-Ahead Logging) để duy trì tính nhất quán, không làm hỏng file dữ liệu ngay cả khi hệ thống gặp sự cố đột ngột.
+        \item Mã hóa kênh truyền: Mã hóa tải trọng bằng AES-256-GCM, trao đổi khóa phiên (Session Key) qua RSA-2048.
+        \item Toàn vẹn thông điệp: Áp dụng kiểm lỗi CRC32 và mã xác thực HMAC cho từng gói tin.
+        \item An toàn lưu trữ: Băm mật khẩu một chiều trước khi lưu trữ. Sử dụng Write-Ahead Logging (WAL) cho cơ sở dữ liệu SQLite để duy trì tính nhất quán.
     \end{itemize}
 
-    \item Tính tin cậy và Khả năng chịu lỗi (Reliability \& Fault Tolerance):
+    \item Tính tin cậy và khả năng chịu lỗi (Reliability \& Fault Tolerance):
     \begin{itemize}[label={-}]
-        \item Quản lý tài nguyên chặt chẽ: Tự động dọn dẹp và thu hồi toàn bộ tài nguyên (socket, phiên đăng nhập, vùng nhớ cấp phát) của các kết nối chết, ngắt kết nối đột ngột hoặc vi phạm thời gian chờ (Timeout). Quy trình này giúp triệt tiêu hoàn toàn rủi ro cạn kiệt bộ mô tả tệp (File Descriptor Exhaustion) và rò rỉ bộ nhớ (Memory Leak).
-        \item Khả năng phục hồi luồng dữ liệu mạng: Xây dựng bộ đệm mạng (Network Buffer) độc lập cho từng kết nối với năng lực tự động xử lý các rủi ro đặc thù của luồng truyền TCP, bao gồm hiện tượng phân mảnh gói tin (TCP Fragmentation) và dính gói (TCP Sticky Packets), đảm bảo quá trình đọc/ghi dữ liệu luôn trọn vẹn và không gây sụp đổ tiến trình.
+        \item Quản lý tài nguyên: Tự động thu hồi tài nguyên (socket, phiên đăng nhập, vùng nhớ) của kết nối vi phạm thời gian chờ (Timeout) hoặc ngắt đột ngột, ngăn chặn cạn kiệt mô tả tệp (File Descriptor Exhaustion) và rò rỉ bộ nhớ (Memory Leak).
+        \item Xử lý luồng mạng: Triển khai bộ đệm (Network Buffer) độc lập cho từng kết nối nhằm xử lý hiện tượng phân mảnh (TCP Fragmentation) và dính gói (TCP Sticky Packets).
     \end{itemize}
 \end{enumerate}

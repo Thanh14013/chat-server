@@ -4,50 +4,50 @@
 \contentsline {chapter}{\numberline {1}GIỚI THIỆU ĐỀ TÀI}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Khảo sát hiện trạng}{1}{section.1.1}%
 \contentsline {subsection}{\numberline {1.1.1}Đặt vấn đề}{1}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}Mục tiêu và phạm vi của đề tài}{2}{subsection.1.1.2}%
-\contentsline {section}{\numberline {1.2}Phân tích yêu cầu hệ thống}{3}{section.1.2}%
-\contentsline {subsection}{\numberline {1.2.1}Yêu cầu chức năng}{3}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {1.2.2}Yêu cầu phi chức năng}{4}{subsection.1.2.2}%
-\contentsline {chapter}{\numberline {2}PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}{6}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Kiến trúc tổng thể và Phân tích yêu cầu}{6}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Phân tích yêu cầu hệ thống}{6}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Kiến trúc tổng thể}{8}{subsection.2.1.2}%
-\contentsline {section}{\numberline {2.2}Giao thức Mạng và Mô hình I/O}{13}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Mô hình Client-Server và I/O Multiplexing}{13}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Thiết kế Định dạng Gói tin}{14}{subsection.2.2.2}%
-\contentsline {section}{\numberline {2.3}Thiết kế Cơ sở dữ liệu và Cơ chế Xác thực}{16}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Cấu trúc Lưu trữ Dữ liệu}{16}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Luồng Xác thực và Quản lý Phiên}{18}{subsection.2.3.2}%
-\contentsline {section}{\numberline {2.4}Giao thức Mật mã và Tính bảo mật}{19}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Luồng Trao đổi khóa}{20}{subsection.2.4.1}%
-\contentsline {section}{\numberline {2.5}Hệ thống Chức năng Cốt lõi}{21}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Luồng dữ liệu Trò chuyện và Quản lý phòng}{21}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Trung chuyển Tệp tin ẩn danh}{23}{subsection.2.5.2}%
-\contentsline {section}{\numberline {2.6}Hệ thống Quản trị và Chống lạm dụng}{25}{section.2.6}%
-\contentsline {subsection}{\numberline {2.6.1}Hàng rào Chống Spam và DDoS}{25}{subsection.2.6.1}%
-\contentsline {subsection}{\numberline {2.6.2}Phân quyền RBAC và Quản trị}{27}{subsection.2.6.2}%
-\contentsline {chapter}{\numberline {3}TRIỂN KHAI VÀ ĐÁNH GIÁ HỆ THỐNG}{30}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Môi trường và Công nghệ Triển khai}{30}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Cấu hình Môi trường Hệ thống}{30}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Kịch bản biên dịch và vận hành}{32}{subsection.3.1.2}%
-\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về quy trình biên dịch}{32}{subsubsection.3.1.2.1}%
-\contentsline {subsubsection}{\numberline {2.}Kịch bản biên dịch trong thực tế hệ thống}{32}{subsubsection.3.1.2.2}%
-\contentsline {subsubsection}{\numberline {3.}Chu trình vận hành và tham số dòng lệnh}{34}{subsubsection.3.1.2.3}%
-\contentsline {section}{\numberline {3.2}Kịch bản Kiểm thử và Đánh giá Hiệu năng}{35}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Tổng quan hệ thống Kiểm thử tự động}{35}{subsection.3.2.1}%
-\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về phương pháp luận kiểm thử}{35}{subsubsection.3.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.}Cấu trúc Test Framework trong thực tế mã nguồn}{36}{subsubsection.3.2.1.2}%
-\contentsline {subsection}{\numberline {3.2.2}Đánh giá giới hạn chịu tải}{37}{subsection.3.2.2}%
-\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về đánh giá hiệu năng}{37}{subsubsection.3.2.2.1}%
-\contentsline {subsubsection}{\numberline {2.}Kịch bản đo lường thực tế hệ thống}{38}{subsubsection.3.2.2.2}%
-\contentsline {subsubsection}{\numberline {3.}Kết luận đánh giá hiệu năng}{39}{subsubsection.3.2.2.3}%
-\contentsline {section}{\numberline {3.3}Đánh giá Khả năng phòng thủ Hệ thống}{39}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Phòng thủ trước tấn công Từ chối dịch vụ}{39}{subsection.3.3.1}%
-\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công Từ chối dịch vụ}{39}{subsubsection.3.3.1.1}%
-\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ thực tế tại biên giới mạng}{40}{subsubsection.3.3.1.2}%
-\contentsline {subsection}{\numberline {3.3.2}Phòng thủ trước tấn công Tiêm nhiễm và Vượt quyền}{41}{subsection.3.3.2}%
-\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công XSS và Lỗ hổng kiểm soát}{41}{subsubsection.3.3.2.1}%
-\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ và cách ly rủi ro thực tế}{42}{subsubsection.3.3.2.2}%
-\contentsline {chapter}{\numberline {4}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{44}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Kết quả đạt được}{44}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Hướng phát triển tương lai}{45}{section.4.2}%
+\contentsline {subsection}{\numberline {1.1.2}Mục tiêu và phạm vi của đề tài}{1}{subsection.1.1.2}%
+\contentsline {section}{\numberline {1.2}Phân tích yêu cầu hệ thống}{2}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Yêu cầu chức năng}{2}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Yêu cầu phi chức năng}{3}{subsection.1.2.2}%
+\contentsline {chapter}{\numberline {2}PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Kiến trúc tổng thể và Phân tích yêu cầu}{4}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Phân tích yêu cầu hệ thống}{4}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Kiến trúc tổng thể}{5}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Giao thức Mạng và Mô hình I/O}{7}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Mô hình Client-Server và I/O Multiplexing}{7}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Thiết kế Định dạng Gói tin}{7}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Thiết kế Cơ sở dữ liệu và Cơ chế Xác thực}{9}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Cấu trúc Lưu trữ Dữ liệu}{9}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Luồng Xác thực và Quản lý Phiên}{10}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Giao thức Mật mã và Tính bảo mật}{11}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Luồng Trao đổi khóa}{11}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Hệ thống Chức năng Cốt lõi}{11}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Quản lý Phòng và Định tuyến Thông điệp}{11}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Trung chuyển Tệp tin Ẩn danh}{13}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Hệ thống Quản trị và Chống lạm dụng}{15}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Phòng chống Tấn công Từ chối Dịch vụ (DoS/DDoS)}{15}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Kiểm soát Truy cập và Quản trị (RBAC)}{17}{subsection.2.6.2}%
+\contentsline {chapter}{\numberline {3}TRIỂN KHAI VÀ ĐÁNH GIÁ HỆ THỐNG}{19}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Môi trường và Công nghệ Triển khai}{19}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Cấu hình Môi trường Hệ thống}{19}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Kịch bản Biên dịch và Vận hành}{20}{subsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về quy trình biên dịch}{20}{subsubsection.3.1.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Kiến trúc biên dịch thực tế}{21}{subsubsection.3.1.2.2}%
+\contentsline {subsubsection}{\numberline {3.}Chu trình vận hành và tham số dòng lệnh}{22}{subsubsection.3.1.2.3}%
+\contentsline {section}{\numberline {3.2}Kịch bản Kiểm thử và Đánh giá Hiệu năng}{23}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Tổng quan Hệ thống Kiểm thử Tự động}{23}{subsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về Phương pháp luận Kiểm thử}{23}{subsubsection.3.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.}Cấu trúc Khung Kiểm thử}{23}{subsubsection.3.2.1.2}%
+\contentsline {subsection}{\numberline {3.2.2}Đánh giá Giới hạn Chịu tải (Load Benchmark)}{25}{subsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về Đánh giá Hiệu năng}{25}{subsubsection.3.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Kịch bản Đo lường Thực tế}{25}{subsubsection.3.2.2.2}%
+\contentsline {subsubsection}{\numberline {3.}Kết luận Đánh giá Hiệu năng}{26}{subsubsection.3.2.2.3}%
+\contentsline {section}{\numberline {3.3}Đánh giá Khả năng Phòng thủ Hệ thống}{26}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Phòng thủ trước tấn công Từ chối dịch vụ}{26}{subsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công Từ chối dịch vụ}{26}{subsubsection.3.3.1.1}%
+\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ thực tế tại biên giới mạng}{27}{subsubsection.3.3.1.2}%
+\contentsline {subsection}{\numberline {3.3.2}Phòng thủ trước tấn công Tiêm nhiễm và Vượt quyền}{28}{subsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {1.}Cơ sở lý thuyết về tấn công XSS và Lỗ hổng kiểm soát}{28}{subsubsection.3.3.2.1}%
+\contentsline {subsubsection}{\numberline {2.}Cơ chế phòng thủ và cách ly rủi ro}{28}{subsubsection.3.3.2.2}%
+\contentsline {chapter}{\numberline {4}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{30}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Kết quả đạt được}{30}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Hướng phát triển tương lai}{31}{section.4.2}%

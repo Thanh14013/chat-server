@@ -11,6 +11,7 @@
 \usepackage[hidelinks]{hyperref} % Tạo liên kết ẩn viền đỏ
 \usepackage{indentfirst} % Thụt lề đoạn đầu tiên
 \usepackage{enumitem} % Tùy chỉnh danh sách
+\setlist{nolistsep, topsep=0pt, partopsep=0pt} % Xóa khoảng trắng danh sách
 \usepackage{setspace} % Giãn dòng
 \onehalfspacing % Giãn dòng 1.5
 \setlength{\parskip}{6pt} % Khoảng cách giữa các đoạn
@@ -26,7 +27,7 @@
     top=2.0cm,
     bottom=2.0cm
 }
-\flushbottom
+\raggedbottom
 
 % --- THIẾT LẬP HEADER VÀ FOOTER ---
 \usepackage{fancyhdr}
@@ -57,11 +58,13 @@
   {\normalfont\normalsize\bfseries}
   {\thesection}
   {1em}{}
+\titlespacing*{\section}{0pt}{12pt}{0pt}
   
 \titleformat{\subsection}
   {\normalfont\normalsize\bfseries}
   {\thesubsection}
   {1em}{}
+\titlespacing*{\subsection}{0pt}{12pt}{0pt}
 
 % Mục cấp 3: 1., 2...
 \renewcommand{\thesubsubsection}{\arabic{subsubsection}.}
@@ -69,6 +72,7 @@
   {\normalfont\normalsize\bfseries}
   {\thesubsubsection}
   {1em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{0pt}
 
 % Mục cấp 4: a., b...
 \renewcommand{\theparagraph}{\alph{paragraph}.}

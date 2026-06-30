@@ -1,30 +1,30 @@
 \section{Hệ thống Chức năng Cốt lõi}
 
-\subsection[Luồng dữ liệu Trò chuyện và Quản lý phòng]{Luồng dữ liệu Trò chuyện và Quản lý phòng (RoomManager)}
+\subsection{Quản lý Phòng và Định tuyến Thông điệp}
 
 \begin{enumerate}
-    \item \textbf{Cơ sở lý thuyết về Định tuyến Thông điệp và Mẫu thiết kế Xuất bản - Đăng ký (Publish-Subscribe)}
+    \item Cơ sở lý thuyết về Định tuyến Thông điệp và Mẫu thiết kế Xuất bản - Đăng ký (Publish-Subscribe)
     
-    Trong kiến trúc phần mềm phân tán đa người dùng (Multi-user Distributed Systems), việc quản lý và phân phối thông điệp thời gian thực đặt ra thách thức lớn về sự tranh chấp tài nguyên và hiệu năng định tuyến. Mẫu thiết kế Xuất bản - Đăng ký (Publish-Subscribe Pattern) được ứng dụng rộng rãi như một mô hình lý thuyết tiêu chuẩn để giải quyết bài toán này. Trong đó, mỗi "Phòng trò chuyện" (Chat Room) đóng vai trò là một Chủ đề (Topic/Channel). Người gửi (Publisher) đẩy thông điệp vào kênh, và hệ thống sẽ tự động sao chép, phân phối tới tất cả các thành viên đang theo dõi (Subscribers) kênh đó.
+    Trong hệ thống phân tán đa người dùng (Multi-user Distributed Systems), việc quản lý và phân phối thông điệp đòi hỏi giải pháp xử lý tranh chấp tài nguyên và tối ưu định tuyến. Mẫu thiết kế Xuất bản - Đăng ký (Publish-Subscribe Pattern) được áp dụng để giải quyết bài toán này. Mỗi phòng trò chuyện (Chat Room) hoạt động tương đương một Chủ đề (Topic/Channel). Người gửi (Publisher) đẩy thông điệp vào kênh, hệ thống sẽ sao chép và phân phối thông điệp đến tất cả các thành viên đăng ký (Subscribers).
     
-    Đồng thời, để đảm bảo tính Nhất quán dữ liệu (Data Consistency) khi hàng ngàn luồng truy cập đồng thời vào cấu trúc quản lý kênh, hệ thống áp dụng cơ chế Khóa Đọc-Ghi (Reader-Writer Lock). Cơ chế này cho phép đa luồng đọc (Broadcast) song song mà không bị nghẽn, nhưng độc quyền hóa luồng ghi (Join/Leave/Create) để chống hiện tượng tương tranh bộ nhớ (Race Condition). Bên cạnh đó, việc thanh lọc chuỗi (String Sanitization) là bắt buộc ở cửa ngõ đầu vào nhằm ngăn chặn các lỗ hổng tiêm nhiễm mã độc (XSS, Injection).
+    Để duy trì tính nhất quán dữ liệu (Data Consistency) trong môi trường truy cập đồng thời, hệ thống sử dụng cơ chế Khóa Đọc-Ghi (Reader-Writer Lock). Cơ chế này cho phép các luồng đọc (Broadcast) hoạt động song song theo định dạng phi chặn (Non-blocking), đồng thời cấp quyền độc quyền cho luồng ghi (Join/Leave/Create) để ngăn ngừa hiện tượng tương tranh (Race Condition). Ngoài ra, quá trình thanh lọc chuỗi (String Sanitization) được thực thi tại điểm tiếp nhận dữ liệu nhằm hạn chế các lỗ hổng tiêm nhiễm (XSS, Injection).
 
-    \item \textbf{Triển khai Định tuyến và Quản lý phòng trong mã nguồn}
-    
+    \item Triển khai Định tuyến và Quản lý phòng trong mã nguồn \\
+% REMOVED BLANK LINE
     Hệ thống hiện thực hóa mô hình Pub/Sub thông qua lớp lõi \texttt{RoomManager}. Luồng dữ liệu trò chuyện \texttt{MSG\_CHAT\_SEND} được xử lý theo ba tầng kiến trúc:
     
-    \begin{itemize}
-        \item \textbf{Tầng 1: Thanh lọc Dữ liệu (Sanitization):} Ngay khi tiếp nhận Payload, chuỗi văn bản \texttt{message} bị ép phải đi qua module \texttt{MessageFilter}. Bằng các biểu thức chính quy (Regex), mọi ký tự có nguy cơ thực thi mã độc như thẻ \texttt{<script>}, nháy đơn (\texttt{'}), nháy kép (\texttt{"}) đều bị mã hóa thành văn bản thuần. Đây là chốt chặn bảo mật phi trạng thái (Stateless).
+    \begin{itemize}[label={-}]
+        \item Tầng 1: Thanh lọc Dữ liệu (Sanitization): Khi tiếp nhận Payload, chuỗi \texttt{message} được xử lý qua module \texttt{MessageFilter}. Các biểu thức chính quy (Regex) được sử dụng để mã hóa những ký tự đặc biệt (như thẻ \texttt{<script>}, \texttt{'}, \texttt{"}) thành văn bản thuần. Cơ chế này hoạt động phi trạng thái (Stateless).
         
-        \item \textbf{Tầng 2: Định tuyến và Khuếch đại (Routing \& Broadcast):} Hệ thống phân tách luồng xử lý:
-        \begin{itemize}
-            \item \textit{Direct Message (Cá nhân):} Tra cứu \texttt{ClientSession} của người nhận qua số hiệu bộ mô tả tệp (\texttt{fd}) và chuyển tiếp nguyên bản gói tin JSON.
-            \item \textit{Room Message (Phòng nhóm):} Hàm \texttt{RoomManager::broadcastToRoom()} được kích hoạt. Hàm này cấp phát một khóa đọc \texttt{std::shared\_lock<std::shared\_mutex>} để truy xuất danh sách \texttt{members} (Subscribers) của \texttt{Room}. Vòng lặp sẽ sao chép và phân phối thông điệp tới từng \texttt{fd} thông qua \texttt{ClientSession::sendPacket()}, đồng thời loại trừ \texttt{excludeFd} (Người gửi).
+        \item Tầng 2: Định tuyến và Khuếch đại (Routing \& Broadcast): Hệ thống phân nhánh xử lý theo loại thông điệp:
+        \begin{itemize}[label={$\circ$}]
+            \item Direct Message (Cá nhân): Tra cứu \texttt{ClientSession} của người nhận qua định danh bộ mô tả tệp (\texttt{fd}) và chuyển tiếp gói tin JSON.
+            \item Room Message (Phòng nhóm): Hàm \texttt{RoomManager::broadcastToRoom()} sử dụng khóa đọc \texttt{std::shared\_lock} để truy xuất danh sách thành viên (\texttt{members}) của \texttt{Room}. Hệ thống phân phối thông điệp đến các \texttt{fd} qua hàm \texttt{ClientSession::sendPacket()}, ngoại trừ \texttt{excludeFd} (người gửi).
         \end{itemize}
         
-        \item \textbf{Tầng 3: Lưu trữ Lịch sử và Đồng bộ (Persistence):} Mỗi \texttt{Room} được liên kết động 1-1 với một đối tượng \texttt{ChatHistory}. Hàm \texttt{RoomManager::appendHistory()} kết xuất tin nhắn xuống SQLite theo nguyên lý Ghi trước Nhật ký (WAL). Khi một Client mới tham gia phòng (\texttt{joinRoom()}), hàm \texttt{sendHistoryToClient()} lập tức truy xuất $N$ tin nhắn gần nhất và đẩy xuống Client, đảm bảo tính liên tục của ngữ cảnh giao tiếp.
+        \item Tầng 3: Lưu trữ Lịch sử và Đồng bộ (Persistence): Mỗi \texttt{Room} được liên kết 1-1 với đối tượng \texttt{ChatHistory}. Hàm \texttt{RoomManager::appendHistory()} lưu tin nhắn vào cơ sở dữ liệu SQLite thông qua cơ chế Write-Ahead Logging (WAL). Khi máy khách tham gia phòng (\texttt{joinRoom()}), \texttt{sendHistoryToClient()} truy xuất $N$ tin nhắn gần nhất và truyền đi để đồng bộ ngữ cảnh.
         
-        \item \textbf{Cơ chế Quản trị Vòng đời (Lifecycle Management):} Bảng \ref{tab:room_locks} minh họa chiến lược quản trị đồng thời (Concurrency Strategy) được áp dụng trên biến \texttt{m\_mutex} của \texttt{RoomManager}. Đặc biệt, hệ thống tích hợp thuật toán Thu gom rác tự động (Garbage Collection): nếu hàm \texttt{leaveRoom()} phát hiện \texttt{getMemberCount() == 0}, nó sẽ tự động giải phóng đối tượng \texttt{Room} và \texttt{ChatHistory} khỏi RAM nhằm tối ưu hóa tài nguyên.
+        \item Cơ chế Quản trị Vòng đời (Lifecycle Management): Bảng \ref{tab:room_locks} mô tả chiến lược cấp phát khóa (Concurrency Strategy) trên biến \texttt{m\_mutex} của \texttt{RoomManager}. Khối Thu gom rác (Garbage Collection) được tích hợp trong hàm \texttt{leaveRoom()}, tự động giải phóng các đối tượng \texttt{Room} và \texttt{ChatHistory} khi \texttt{getMemberCount() == 0}.
     \end{itemize}
 \end{enumerate}
 
@@ -39,6 +39,7 @@
     \midrule
     \endfirsthead
     
+        \caption[]{Chiến lược cấp phát khóa (Locking) trong RoomManager (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Tên Hàm (Method)}} & \multicolumn{1}{c}{\textbf{Loại Khóa (Lock Type)}} & \multicolumn{1}{c}{\textbf{Mục đích Kỹ thuật}} \\
     \midrule
@@ -50,13 +51,13 @@
     \bottomrule
     \endlastfoot
 
-    \texttt{broadcastToRoom()} \newline \texttt{getUsersInRoom()} \newline \texttt{getRoomList()} & \texttt{std::shared\_lock} \newline (Khóa Đọc) & Cho phép luồng phân phối tin nhắn và truy xuất danh sách hoạt động đa nhiệm song song không giới hạn, không gây nghẽn cổ chai (Non-blocking). \\
+    \texttt{broadcastToRoom()} \newline \texttt{getUsersInRoom()} \newline \texttt{getRoomList()} & \texttt{std::shared\_lock} \newline (Khóa Đọc) & Hỗ trợ phân phối tin nhắn và truy xuất danh sách hoạt động song song, đảm bảo cơ chế phi chặn (Non-blocking). \\
     \midrule
     
-    \texttt{createRoom()} \newline \texttt{deleteRoom()} & \texttt{std::unique\_lock} \newline (Khóa Ghi) & Độc quyền thay đổi cấu trúc bảng băm \texttt{m\_rooms} và \texttt{m\_histories}. Đảm bảo tính Toàn vẹn cấu trúc (Structural Integrity). \\
+    \texttt{createRoom()} \newline \texttt{deleteRoom()} & \texttt{std::unique\_lock} \newline (Khóa Ghi) & Cấp quyền ghi độc quyền để thay đổi bảng \texttt{m\_rooms} và \texttt{m\_histories}, duy trì tính toàn vẹn cấu trúc (Structural Integrity). \\
     \midrule
 
-    \texttt{joinRoom()} \newline \texttt{leaveRoom()} \newline \texttt{removeUser()} & \texttt{std::unique\_lock} \newline (Khóa Ghi) & Ngăn ngừa tương tranh cục bộ khi cập nhật danh sách \texttt{members} của phòng và con trỏ ngược \texttt{m\_fdToRoom}. \\
+    \texttt{joinRoom()} \newline \texttt{leaveRoom()} \newline \texttt{removeUser()} & \texttt{std::unique\_lock} \newline (Khóa Ghi) & Tránh tương tranh khi cập nhật danh sách \texttt{members} của phòng và con trỏ \texttt{m\_fdToRoom}. \\
 \end{longtable}
 
 % PLACEHOLDER: Hình ảnh Sơ đồ Luồng dữ liệu Quản lý Phòng
@@ -66,31 +67,31 @@
     \label{fig:room_manager}
 \end{figure}
 
-\subsection[Trung chuyển Tệp tin ẩn danh]{Trung chuyển Tệp tin ẩn danh (Server-Relayed File Transfer)}
+\subsection{Trung chuyển Tệp tin Ẩn danh}
 
 \begin{enumerate}
-    \item \textbf{Cơ sở lý thuyết về Kiến trúc Trung chuyển Ẩn danh}
+    \item Cơ sở lý thuyết về Kiến trúc Trung chuyển Ẩn danh \\
+% REMOVED BLANK LINE
+    Trong giao thức chia sẻ tệp tin P2P (Peer-to-Peer), các thiết bị đầu cuối thiết lập kết nối trực tiếp gây lộ địa chỉ IP. Đặc điểm này phát sinh rủi ro về quyền riêng tư và tăng khả năng bị tấn công từ chối dịch vụ (DDoS) hoặc truy vết danh tính (Doxing). 
     
-    Trong các giao thức chia sẻ tệp tin thông thường như P2P (Peer-to-Peer), hai thiết bị đầu cuối phải thiết lập kết nối trực tiếp, dẫn đến việc lộ lọt địa chỉ IP công cộng. Điều này tạo ra rủi ro nghiêm trọng về quyền riêng tư và mở ra bề mặt tấn công cho các chiến dịch từ chối dịch vụ (DDoS) hoặc truy vết danh tính (Doxing). 
-    
-    Để khắc phục, hệ thống áp dụng mô hình Trung chuyển qua Máy chủ (Server-Relayed Architecture) kết hợp Phễu Proxy (Proxy Funneling). Máy chủ đóng vai trò là "Người đứng giữa hợp pháp", tiếp nhận các đoạn dữ liệu (Chunks) từ người gửi và định tuyến lại cho người nhận. Mô hình này đảm bảo ẩn danh hoàn toàn (Anonymity) do cả hai bên chỉ biết đến IP của Server. Đồng thời, thay vì lưu tệp tin xuống ổ cứng vật lý để chuyển tiếp (Store-and-Forward), hệ thống sử dụng Kỹ thuật Đệm bộ nhớ tạm thời (In-Memory Buffering/Zero-Disk I/O) giúp triệt tiêu hoàn toàn độ trễ đọc/ghi đĩa và tránh nguy cơ tràn dung lượng máy chủ do rác dữ liệu.
+    Hệ thống vận dụng mô hình Trung chuyển qua Máy chủ (Server-Relayed Architecture) kết hợp Phễu Proxy (Proxy Funneling). Máy chủ đóng vai trò trung gian nhận đoạn dữ liệu (Chunks) từ người gửi và định tuyến đến người nhận. Cơ chế này hỗ trợ ẩn danh tính (Anonymity) thông qua việc giấu IP đầu cuối. Hệ thống ứng dụng Kỹ thuật Đệm bộ nhớ tạm thời (In-Memory Buffering/Zero-Disk I/O) thay cho việc lưu trữ vật lý (Store-and-Forward), qua đó giảm thiểu độ trễ I/O đĩa và hạn chế rủi ro tràn dung lượng máy chủ.
 
-    \item \textbf{Triển khai Luồng Truyền tệp trong mã nguồn}
+    \item Triển khai Luồng Truyền tệp trong mã nguồn \\
+% REMOVED BLANK LINE
+    Lớp tĩnh \texttt{FileTransfer} điều phối quá trình xử lý tệp tin. Vòng đời phiên truyền tệp hoạt động dựa trên mô hình Máy trạng thái hữu hạn (Finite State Machine - FSM) gồm 4 pha:
     
-    Tầng xử lý tệp tin được điều phối bởi lớp tĩnh \texttt{FileTransfer}. Vòng đời của một phiên truyền tệp được vận hành như một Máy trạng thái hữu hạn (Finite State Machine - FSM) với 4 pha cốt lõi:
-    
-    \begin{itemize}
-        \item \textbf{Pha 1: Yêu cầu và Xác thực (PENDING):} Khi người gửi phát gói \texttt{MSG\_FILE\_REQUEST}, hệ thống sinh ra một \texttt{tid} (Transfer ID) bằng bộ định danh CSPRNG. Hàm \texttt{isAllowedExtension()} thực hiện kiểm duyệt an ninh gắt gao (Whitelist) chỉ cho phép \texttt{.txt}, \texttt{.png}, \texttt{.jpg}, \texttt{.pdf}. Dung lượng bị giới hạn chặt ở mức 3MB. Nếu hợp lệ, hệ thống khởi tạo đối tượng \texttt{FileTransferSession} lưu trên bảng băm RAM.
+    \begin{itemize}[label={-}]
+        \item Pha 1: Yêu cầu và Xác thực (PENDING): Khi nhận gói tin \texttt{MSG\_FILE\_REQUEST} từ người gửi, hệ thống cấp mã \texttt{tid} (Transfer ID) qua bộ định danh CSPRNG. Hàm \texttt{isAllowedExtension()} đối chiếu định dạng (chỉ cho phép: \texttt{.txt}, \texttt{.png}, \texttt{.jpg}, \texttt{.pdf}) và giới hạn dung lượng ở 3MB. Nếu hợp lệ, \texttt{FileTransferSession} được khởi tạo trên bộ nhớ.
         
-        \item \textbf{Pha 2: Chấp thuận (ACCEPTED):} Người nhận được máy chủ thông báo và có quyền từ chối hoặc chấp nhận. Nếu từ chối qua gói \texttt{MSG\_FILE\_REJECT}, Session lập tức bị hủy bỏ. Nếu chấp nhận qua gói \texttt{MSG\_FILE\_ACCEPT}, trạng thái chuyển sang \texttt{ACCEPTED}, mở khóa cho luồng dữ liệu tiếp theo.
+        \item Pha 2: Chấp thuận (ACCEPTED): Người nhận tiến hành xác nhận. Lệnh từ chối (\texttt{MSG\_FILE\_REJECT}) sẽ tự hủy bỏ Session. Việc chấp thuận (\texttt{MSG\_FILE\_ACCEPT}) chuyển hệ thống sang trạng thái \texttt{ACCEPTED} để mở luồng truyền tải.
         
-        \item \textbf{Pha 3: Luồng Chuyển tiếp (IN\_PROGRESS):} Người gửi băm nhỏ tệp thành các phần (Chunks) và gửi liên tục qua gói \texttt{MSG\_FILE\_DATA}. Hàm \texttt{FileTransfer::handleData()} kiểm tra quyền sở hữu \texttt{senderFd} (Security Check) để chống giả mạo, sau đó ngay lập tức chuyển tiếp (Relay) payload này tới \texttt{receiverFd}. Dữ liệu chỉ nằm trên RAM trong vài mili-giây trước khi được đẩy xuống socket đích.
+        \item Pha 3: Luồng Chuyển tiếp (IN\_PROGRESS): Người gửi phân tách tệp thành các đoạn nhỏ (Chunks) và liên tục gửi dữ liệu qua gói \texttt{MSG\_FILE\_DATA}. Ngay sau đó, hàm \texttt{FileTransfer::handleData()} tiến hành đối chiếu \texttt{senderFd} để xác thực và chuyển tiếp (Relay) payload này tới đích \texttt{receiverFd}.
         
-        \item \textbf{Pha 4: Hoàn tất và Dọn dẹp rác (COMPLETE / Garbage Collection):} Khi hoàn tất, gói \texttt{MSG\_FILE\_COMPLETE} kích hoạt việc ghi nhận Kiểm toán (\texttt{AUDIT\_D}) và xóa Session. Đặc biệt, để xử lý các phiên bị treo do mất kết nối (Zombies), bộ thu gom rác \texttt{cleanupExpired()} được Event Loop gọi định kỳ để tiêu hủy mọi Session vượt quá ngưỡng \texttt{TIMEOUT\_SEC}.
+        \item Pha 4: Hoàn tất và Dọn dẹp rác (COMPLETE / Garbage Collection): Tiến trình nhận gói \texttt{MSG\_FILE\_COMPLETE} để kích hoạt chức năng ghi Nhật ký Kiểm toán (\texttt{AUDIT\_D}) và giải phóng Session. Để xử lý các phiên bị treo, hàm \texttt{cleanupExpired()} được gọi định kỳ nhằm hủy bỏ các giao dịch đã vượt quá thời gian \texttt{TIMEOUT\_SEC}.
     \end{itemize}
 \end{enumerate}
 
-Bảng \ref{tab:file_states} tổng hợp các Trạng thái hợp lệ (Valid States) trong vòng đời của \texttt{FileTransferSession}.
+Bảng \ref{tab:file_states} tổng hợp các Trạng thái trong vòng đời của \texttt{FileTransferSession}.
 
 \begin{longtable}{
     >{\raggedright\arraybackslash}p{3cm}
@@ -103,6 +104,7 @@ Bảng \ref{tab:file_states} tổng hợp các Trạng thái hợp lệ (Valid S
     \midrule
     \endfirsthead
     
+        \caption[]{Các trạng thái của Phiên truyền tệp (FileTransferSession) (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Trạng thái (State)}} & \multicolumn{1}{c}{\textbf{Gói tin Kích hoạt}} & \multicolumn{1}{c}{\textbf{Mô tả Nghiệp vụ}} \\
     \midrule
@@ -114,16 +116,16 @@ Bảng \ref{tab:file_states} tổng hợp các Trạng thái hợp lệ (Valid S
     \bottomrule
     \endlastfoot
 
-    \texttt{PENDING} & \texttt{MSG\_FILE\_REQUEST} & Chờ người nhận xác nhận. Khóa chức năng truyền luồng dữ liệu. \\
+    \texttt{PENDING} & \texttt{MSG\_FILE\_REQUEST} & Trạng thái chờ xác nhận từ người nhận. Luồng dữ liệu truyền tải bị khóa. \\
     \midrule
     
-    \texttt{ACCEPTED} & \texttt{MSG\_FILE\_ACCEPT} & Người nhận đồng ý. Mở khóa cho phép tiếp nhận gói Data đầu tiên. \\
+    \texttt{ACCEPTED} & \texttt{MSG\_FILE\_ACCEPT} & Người nhận chấp thuận. Khởi chạy tiến trình tiếp nhận gói Data đầu tiên. \\
     \midrule
 
-    \texttt{IN\_PROGRESS} & \texttt{MSG\_FILE\_DATA} & Đang trong quá trình trung chuyển các đoạn dữ liệu (Chunks). \\
+    \texttt{IN\_PROGRESS} & \texttt{MSG\_FILE\_DATA} & Quá trình trung chuyển các đoạn dữ liệu (Chunks) đang diễn ra. \\
     \midrule
     
-    \texttt{(Destroyed)} & \texttt{MSG\_FILE\_COMPLETE} \newline \texttt{MSG\_FILE\_REJECT} & Session bị xóa khỏi bộ nhớ \texttt{m\_transfers}. Hoàn tất vòng đời. \\
+    \texttt{(Destroyed)} & \texttt{MSG\_FILE\_COMPLETE} \newline \texttt{MSG\_FILE\_REJECT} & Session bị xóa khỏi bảng lưu trữ. Hoàn tất chu kỳ vòng đời. \\
 \end{longtable}
 
 % PLACEHOLDER: Hình ảnh Sơ đồ Truyền tệp

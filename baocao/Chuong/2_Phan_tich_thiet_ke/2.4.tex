@@ -1,30 +1,23 @@
 \section{Giao thức Mật mã và Tính bảo mật}
 
-Để đảm bảo nguyên tắc bảo mật thông điệp (Confidentiality), toàn bộ luồng giao tiếp giữa Client và Server đều được đặt dưới lớp bảo vệ của phương pháp Trao đổi khóa lai (Hybrid Cryptography). Phương pháp này giải quyết được điểm yếu của mã hóa bất đối xứng (chậm) và mã hóa đối xứng (khó phân phối khóa).
+Hệ thống sử dụng phương pháp Trao đổi khóa lai (Hybrid Cryptography) nhằm duy trì tính bảo mật thông điệp (Confidentiality), tối ưu hóa hiệu năng tính toán của mã hóa bất đối xứng và giải quyết bài toán phân phối khóa của mã hóa đối xứng.
 
 \subsection[Luồng Trao đổi khóa]{Luồng Trao đổi khóa (Key Exchange Workflow)}
 
 \begin{enumerate}
-    \item \textbf{Cơ sở lý thuyết về Mật mã lai (Hybrid Cryptography)}
-    
-    Để giải quyết trọn vẹn bài toán bảo mật kênh truyền, lý thuyết mật mã hiện đại đề xuất sự kết hợp giữa Mật mã Bất đối xứng (Asymmetric Cryptography) và Mật mã Đối xứng (Symmetric Cryptography) nhằm tối ưu hóa cả hai khía cạnh: An toàn phân phối khóa và Hiệu năng mã hóa. 
-    
-    Mật mã Bất đối xứng (điển hình là thuật toán RSA) sử dụng một cặp khóa Công khai/Bí mật (Public/Private Key) để đảm bảo khóa giao tiếp có thể được truyền tải an toàn trên một kênh không tin cậy (Insecure Channel) mà không sợ rò rỉ. Tuy nhiên, RSA đòi hỏi tài nguyên tính toán cực kỳ lớn, không phù hợp để mã hóa dữ liệu theo thời gian thực. Ngược lại, Mật mã Đối xứng (điển hình là AES) sở hữu tốc độ mã hóa vượt trội, đáp ứng tốt cho lưu lượng mạng cao, nhưng lại gặp khó khăn ở khâu phân phối khóa an toàn ban đầu. 
-    
-    Hệ thống kết hợp cả hai mô hình này bằng cách dùng RSA-2048 để thiết lập một đường hầm an toàn ban đầu (Key Exchange), qua đó trao đổi một Khóa phiên Đối xứng (Session Key). Toàn bộ luồng dữ liệu sau đó sẽ được mã hóa bằng Khóa phiên này theo chế độ AES-GCM. Đây là chế độ Mã hóa có Xác thực (Authenticated Encryption with Associated Data - AEAD), không chỉ cung cấp tính Bảo mật (Confidentiality) mà còn tạo ra các Thẻ xác thực (Authentication Tags) nhằm bảo vệ tính Toàn vẹn (Integrity), ngăn chặn tuyệt đối các cuộc tấn công thay đổi nội dung gói tin (Man-in-the-Middle Attack).
+    \item Cơ sở lý thuyết \\
+% REMOVED BLANK LINE
+    Phương pháp Mật mã lai kết hợp thuật toán RSA-2048 để thiết lập kênh truyền và phân phối khóa phiên (Session Key). Dữ liệu nghiệp vụ được mã hóa bằng thuật toán đối xứng AES-GCM (Mã hóa có xác thực - AEAD). Quá trình này đảm bảo tính bảo mật (Confidentiality) và tính toàn vẹn (Integrity) thông qua Thẻ xác thực (Authentication Tags), nhằm phòng chống tấn công xen giữa (Man-in-the-Middle).
 
-    \item \textbf{Quy trình Bắt tay Mật mã trong mã nguồn (KeyExchange)}
+    \item Triển khai hệ thống \\
+% REMOVED BLANK LINE
+    Quy trình trao đổi khóa được thực thi bởi \texttt{CryptoEngine} và \texttt{KeyExchange} trước khi xử lý nghiệp vụ, bao gồm 4 bước:
     
-    Trong hệ thống thực tế, quy trình trao đổi khóa được triển khai độc lập ngay trước khi bất kỳ giao tiếp nghiệp vụ nào diễn ra, được quản lý chặt chẽ bởi hai module \texttt{CryptoEngine} và \texttt{KeyExchange}. Quá trình gồm ba bước:
-    
-    \begin{itemize}
-        \item \textbf{Bước 1: Chào hỏi và Cấp phát Khóa Công khai:} Ngay khi một kết nối TCP được thiết lập (\texttt{HandshakeState::WAITING\_HELLO}), \texttt{CryptoEngine} trích xuất Khóa Công khai RSA-2048 đã được khởi tạo sẵn (\texttt{getPublicKeyPEM()}). Máy chủ đóng gói chuỗi PEM này cùng với một \texttt{server\_nonce} ngẫu nhiên (sinh bằng CSPRNG) vào gói tin \texttt{MSG\_CRYPTO\_KEY\_OFFER} và gửi xuống máy khách.
-        
-        \item \textbf{Bước 2: Sinh Khóa Phiên (Session Key):} Máy khách nhận Khóa Công khai, tự động sinh ngẫu nhiên một khóa AES 256-bit (32 bytes) và một \texttt{client\_nonce} (16 bytes). Khối dữ liệu 48 bytes này được mã hóa bằng Khóa Công khai RSA của máy chủ và gửi ngược lại thông qua gói tin \texttt{MSG\_CRYPTO\_KEY\_ACCEPT}.
-        
-        \item \textbf{Bước 3: Thiết lập Đường hầm Bảo mật:} Hàm \texttt{KeyExchange::handleKeyAccept()} tiến hành giải mã khối dữ liệu bằng Khóa Bí mật RSA. Hệ thống bóc tách 32 bytes khóa AES và lưu trữ cục bộ vào bảng băm \texttt{session\_keys\_} trong bộ nhớ của \texttt{CryptoEngine}, ánh xạ trực tiếp theo \texttt{fd} của kết nối. Các bản rõ của khóa trên RAM lập tức bị xóa bỏ an toàn bằng lệnh \texttt{OPENSSL\_cleanse()} nhằm tránh rò rỉ bộ nhớ.
-        
-        \item \textbf{Cơ chế phòng thủ chủ động:} Nếu quá trình giải mã thất bại, sai kích thước blob, hoặc vượt quá thời gian cho phép (\texttt{HANDSHAKE\_TIMEOUT\_SEC}), \texttt{KeyExchange} lập tức đánh dấu \texttt{HandshakeState::FAILED} và cắt đứt kết nối. Đồng thời, hệ thống báo cáo địa chỉ IP vi phạm cho \texttt{IntrusionDetector} để ghi nhận các hành vi tấn công Dò quét cổng (Port Scan) hoặc Phá vỡ mã hóa (Crypto-cracking), từ đó áp dụng lệnh cấm IP (\texttt{IP\_BLOCK\_SECONDS}) nếu phát hiện tần suất vi phạm bất thường.
+    \begin{itemize}[label={-}]
+        \item Khởi tạo khóa công khai: Sau khi kết nối TCP được thiết lập, \texttt{CryptoEngine} đóng gói khóa công khai RSA-2048 và \texttt{server\_nonce} ngẫu nhiên vào gói tin \texttt{MSG\_CRYPTO\_KEY\_OFFER} để gửi tới máy khách.
+        \item Sinh khóa phiên: Máy khách khởi tạo khóa AES-256 (32 bytes) và \texttt{client\_nonce} (16 bytes), mã hóa bằng khóa công khai RSA. Phản hồi được gửi lại qua gói \texttt{MSG\_CRYPTO\_KEY\_ACCEPT}.
+        \item Thiết lập đường hầm bảo mật: \texttt{KeyExchange} giải mã gói tin bằng khóa bí mật RSA, ánh xạ khóa AES vào bảng \texttt{session\_keys\_} theo định danh mô tả tệp (\texttt{fd}). Dữ liệu khóa bản rõ trên RAM được xóa bằng hàm \texttt{OPENSSL\_cleanse()} nhằm tránh rò rỉ.
+        \item Cơ chế phòng vệ: \texttt{KeyExchange} đóng kết nối khi phát hiện lỗi giải mã hoặc vượt quá thời gian chờ (\texttt{HANDSHAKE\_TIMEOUT\_SEC}). \texttt{IntrusionDetector} ghi nhận các dấu hiệu bất thường (Port Scan, lỗi xác thực) và thực hiện khóa IP (Ban IP).
     \end{itemize}
 \end{enumerate}
 

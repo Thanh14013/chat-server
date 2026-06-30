@@ -1,22 +1,22 @@
 \selectlanguage *{vietnamese}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{Đặc tả yêu cầu chức năng hệ thống}}{6}{table.2.1}%
-\contentsline {table}{\numberline {2.2}{Đặc tả yêu cầu phi chức năng hệ thống}}{7}{table.2.2}%
-\contentsline {table}{\numberline {2.3}{Phân rã các thành phần kiến trúc hệ thống}}{9}{table.2.3}%
-\contentsline {table}{\numberline {2.4}{Cấu trúc Gói tin Nhị phân}}{15}{table.2.4}%
-\contentsline {table}{\numberline {2.5}{Đặc tả các Bảng thực thể trong Cơ sở dữ liệu}}{17}{table.2.5}%
-\contentsline {table}{\numberline {2.6}{Chiến lược cấp phát khóa trong RoomManager}}{23}{table.2.6}%
-\contentsline {table}{\numberline {2.7}{Các trạng thái của Phiên truyền tệp}}{25}{table.2.7}%
-\contentsline {table}{\numberline {2.8}{Hệ thống Điểm phạt Hành vi}}{26}{table.2.8}%
-\contentsline {table}{\numberline {2.9}{Ma trận Phân quyền của Hệ thống}}{29}{table.2.9}%
+\contentsline {table}{\numberline {2.1}{Đặc tả yêu cầu chức năng hệ thống}}{4}{table.2.1}%
+\contentsline {table}{\numberline {2.2}{Đặc tả yêu cầu phi chức năng hệ thống}}{5}{table.2.2}%
+\contentsline {table}{\numberline {2.3}{Phân rã các thành phần kiến trúc hệ thống}}{6}{table.2.3}%
+\contentsline {table}{\numberline {2.4}{Cấu trúc Gói tin Nhị phân}}{8}{table.2.4}%
+\contentsline {table}{\numberline {2.5}{Đặc tả các Bảng thực thể trong Cơ sở dữ liệu}}{9}{table.2.5}%
+\contentsline {table}{\numberline {2.6}{Chiến lược cấp phát khóa trong RoomManager}}{13}{table.2.6}%
+\contentsline {table}{\numberline {2.7}{Các trạng thái của Phiên truyền tệp}}{14}{table.2.7}%
+\contentsline {table}{\numberline {2.8}{Hệ thống Điểm phạt Hành vi}}{16}{table.2.8}%
+\contentsline {table}{\numberline {2.9}{Ma trận Phân quyền của Hệ thống}}{18}{table.2.9}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{Bảng Ma trận Phụ thuộc Thư viện}}{31}{table.3.1}%
-\contentsline {table}{\numberline {3.2}{Các tập lệnh và tham số cấu hình trong chu trình biên dịch}}{33}{table.3.2}%
-\contentsline {table}{\numberline {3.3}{Các tham số dòng lệnh vận hành Máy chủ}}{34}{table.3.3}%
-\contentsline {table}{\numberline {3.4}{Các tham số dòng lệnh kết nối Máy khách}}{35}{table.3.4}%
-\contentsline {table}{\numberline {3.5}{Ma trận phân bổ các module kiểm thử tự động}}{37}{table.3.5}%
-\contentsline {table}{\numberline {3.6}{Đo lường Thông lượng và Độ trễ của Server}}{39}{table.3.6}%
-\contentsline {table}{\numberline {3.7}{Cấu hình giới hạn tốc độ của hệ thống}}{41}{table.3.7}%
-\contentsline {table}{\numberline {3.8}{Ma trận điểm số rủi ro của hệ thống phòng thủ}}{43}{table.3.8}%
+\contentsline {table}{\numberline {3.1}{Bảng Ma trận Phụ thuộc Thư viện}}{20}{table.3.1}%
+\contentsline {table}{\numberline {3.2}{Các tập lệnh và tham số cấu hình trong quy trình biên dịch}}{21}{table.3.2}%
+\contentsline {table}{\numberline {3.3}{Các tham số dòng lệnh vận hành Máy chủ}}{22}{table.3.3}%
+\contentsline {table}{\numberline {3.4}{Các tham số dòng lệnh Máy khách}}{23}{table.3.4}%
+\contentsline {table}{\numberline {3.5}{Ma trận phân bổ các module kiểm thử tự động}}{24}{table.3.5}%
+\contentsline {table}{\numberline {3.6}{Đo lường Thông lượng và Độ trễ của Server}}{26}{table.3.6}%
+\contentsline {table}{\numberline {3.7}{Cấu hình giới hạn tốc độ của hệ thống}}{28}{table.3.7}%
+\contentsline {table}{\numberline {3.8}{Ma trận điểm số rủi ro của hệ thống phòng thủ}}{29}{table.3.8}%
 \addvspace {10\p@ }

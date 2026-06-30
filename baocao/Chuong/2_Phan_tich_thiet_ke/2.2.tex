@@ -3,23 +3,20 @@
 \subsection[Mô hình Client-Server và I/O Multiplexing]{Mô hình Client-Server và I/O Multiplexing (\texttt{epoll})}
 
 \begin{enumerate}
-    \item Cơ sở lý thuyết về I/O Multiplexing và Bài toán C10K
+    \item Cơ sở lý thuyết \\
+% REMOVED BLANK LINE
+    Mô hình Thread-per-connection phát sinh chi phí chuyển ngữ cảnh (Context Switching) lớn đối với bài toán C10K. Do đó, kỹ thuật I/O Multiplexing với API \texttt{epoll} (Linux) được áp dụng để một luồng có thể giám sát nhiều mô tả tệp (File Descriptor - FD). Thông qua cấu trúc cây đỏ đen (Red-Black Tree) và danh sách liên kết (Linked List), \texttt{epoll} đạt độ phức tạp $\mathcal{O}(1)$ trong quá trình xử lý sự kiện.
 
-    Kiến trúc Client-Server (C/S) là nền tảng của các ứng dụng truyền thông mạng. Khi giải quyết bài toán C10K (xử lý đồng thời 10.000 kết nối), mô hình lập trình mạng truyền thống như cấp phát luồng theo kết nối (Thread-per-connection) sẽ làm cạn kiệt tài nguyên hệ thống. Chi phí chuyển ngữ cảnh (Context Switching) lượng lớn luồng thực thi gây ra thắt cổ chai (Bottleneck) hiệu năng tại nhân hệ điều hành (Kernel).
-
-    Để khắc phục, kỹ thuật đa kênh vào/ra (I/O Multiplexing) được áp dụng, cho phép một luồng (Thread) duy nhất giám sát trạng thái của nhiều mô tả tệp (File Descriptor - FD). Trên hệ điều hành Linux, \texttt{epoll} là API tối ưu thay thế cho các cơ chế \texttt{select} hoặc \texttt{poll} truyền thống. Khác với phương pháp duyệt tuyến tính có độ phức tạp thuật toán $\mathcal{O}(N)$, \texttt{epoll} sử dụng cấu trúc dữ liệu cây đỏ đen (Red-Black Tree) để quản lý tập FD và danh sách liên kết (Linked List) để lưu trữ các sự kiện sẵn sàng. Cơ chế hướng sự kiện (Event-driven) này tối ưu hóa độ phức tạp xử lý sự kiện xuống mức $\mathcal{O}(1)$, đảm bảo hiệu năng máy chủ duy trì ổn định dưới tải trọng cao và độc lập với số lượng kết nối đang mở.
-
-    \item Triển khai thực tiễn trong mã nguồn hệ thống
-
-    Dựa trên cơ sở lý thuyết, thành phần \texttt{TcpServer} được thiết kế theo kiến trúc I/O bất đồng bộ (Non-blocking I/O) kết hợp cơ chế \texttt{epoll} nhằm điều phối đa kết nối TCP. Quá trình thực thi được phân rã thành các giai đoạn cốt lõi sau:
-
+    \item Triển khai hệ thống \\
+% REMOVED BLANK LINE
+    Thành phần \texttt{TcpServer} sử dụng I/O phi đồng bộ (Non-blocking I/O) và \texttt{epoll} để điều phối kết nối TCP theo quy trình sau:
     \begin{itemize}[label={-}]
-        \item Khởi tạo điểm cuối (Endpoint): Sử dụng các System Call cơ sở (\texttt{socket}, \texttt{bind}, \texttt{listen}) để khởi tạo Socket lắng nghe (\texttt{m\_listenFd}) ở trạng thái thụ động. Thuộc tính Non-blocking được thiết lập thông qua hàm \texttt{fcntl}. Điểm cuối này chuyên trách tiếp nhận các yêu cầu thiết lập kết nối (gói SYN) từ Client.
-        \item Khởi tạo I/O Multiplexer: Lớp \texttt{TcpServer} tạo một thể hiện (instance) của \texttt{epoll} qua hàm \texttt{epoll\_create1(0)}. Bộ mô tả tệp \texttt{m\_listenFd} lập tức được đăng ký vào tập giám sát \texttt{m\_epollFd} thông qua hàm \texttt{epoll\_ctl} với cờ \texttt{EPOLLIN} nhằm theo dõi các kết nối mới.
-        \item Vòng lặp sự kiện (Event Loop): Hàm \texttt{epollLoop()} thực thi vòng lặp vô hạn, định kỳ gọi \texttt{epoll\_wait} để truy xuất danh sách các sự kiện I/O đã sẵn sàng từ Kernel. Dựa trên nguồn phát sinh sự kiện, luồng xử lý được định tuyến như sau:
+        \item Khởi tạo điểm cuối: Chuyển trạng thái Socket lắng nghe sang phi đồng bộ thông qua \texttt{fcntl}.
+        \item Khởi tạo I/O Multiplexer: Tạo đối tượng \texttt{epoll} (\texttt{epoll\_create1}) và đăng ký Socket lắng nghe với cờ \texttt{EPOLLIN} (\texttt{epoll\_ctl}).
+        \item Vòng lặp sự kiện: Thực thi \texttt{epoll\_wait} để thu thập sự kiện I/O.
         \begin{itemize}[label={$\circ$}]
-            \item Sự kiện trên Socket lắng nghe: Gọi hàm \texttt{accept} để thiết lập kết nối TCP, trích xuất bộ mô tả tệp mới (\texttt{clientFd}) và thiết lập trạng thái Non-blocking. Cấu trúc \texttt{clientFd} được đăng ký vào \texttt{epoll} kèm tập cờ \texttt{EPOLLIN | EPOLLRDHUP}. Hệ thống đồng thời khởi tạo đối tượng \texttt{ClientSession} và kích hoạt các phân hệ bảo mật (\texttt{RateLimiter}, \texttt{IntrusionDetector}) để xác thực địa chỉ IP.
-            \item Sự kiện trên Socket dữ liệu: Cờ \texttt{EPOLLIN} chỉ định bộ đệm nhận (Receive Buffer) của Kernel đã có dữ liệu. \texttt{TcpServer} tiến hành đọc luồng byte thô qua hàm \texttt{recv} và chuyển giao vùng đệm cho đối tượng \texttt{ClientSession} tương ứng để thực thi tiền xử lý và tái tổ hợp gói tin.
+            \item Sự kiện kết nối: Gọi \texttt{accept}, chuyển \texttt{clientFd} sang trạng thái phi đồng bộ, đăng ký vào \texttt{epoll} (cờ \texttt{EPOLLIN | EPOLLRDHUP}) và khởi tạo \texttt{ClientSession}.
+            \item Sự kiện dữ liệu: \texttt{TcpServer} tiếp nhận byte thô (\texttt{recv}) và giao cho \texttt{ClientSession} xử lý.
         \end{itemize}
     \end{itemize}
 \end{enumerate}
@@ -27,13 +24,13 @@
 \subsection[Thiết kế Định dạng Gói tin]{Thiết kế Định dạng Gói tin (Packet Format)}
 
 \begin{enumerate}
-    \item Cơ sở lý thuyết về thiết kế giao thức mạng
+    \item Cơ sở lý thuyết \\
+% REMOVED BLANK LINE
+    TCP là giao thức hướng luồng (Stream-oriented), gây ra hiện tượng dính gói (Sticky Packet) và phân mảnh (Half Packet). Tầng ứng dụng sử dụng giao thức nhị phân (Binary Protocol) để xác định ranh giới gói tin, tối ưu băng thông và giảm chi phí phân tích cú pháp (Parsing Overhead).
 
-Trong truyền thông mạng, giao thức TCP truyền tải dữ liệu dưới dạng luồng byte liên tục (Byte Stream) không có ranh giới định dạng. Đặc tính này dẫn đến hiện tượng dính gói (Sticky Packet) và phân mảnh gói tin (Half Packet) tại phía nhận. Để bóc tách thông điệp chính xác, tầng Ứng dụng (Application Layer) cần thiết lập cơ chế phân định ranh giới thông điệp. Việc áp dụng giao thức nhị phân (Binary Protocol) thay cho các giao thức dạng văn bản (Text-based Protocol) truyền thống (như HTTP) giúp giảm thiểu băng thông truyền tải và tối ưu hóa chi phí phân tích cú pháp (Parsing Overhead).
-
-    \item Cấu trúc gói tin thực tế của hệ thống
-
-Dựa trên cơ sở lý thuyết, hệ thống triển khai một giao thức nhị phân tùy chỉnh (Custom Binary Protocol). Cấu trúc của một đơn vị dữ liệu (Packet) được thiết kế bao gồm hai phân đoạn độc lập: phần tiêu đề (Header) và phần dữ liệu mang theo (Payload). Đặc tả chi tiết các trường dữ liệu được trình bày tại Bảng 2.4.
+    \item Cấu trúc gói tin \\
+% REMOVED BLANK LINE
+    Hệ thống thiết kế giao thức nhị phân gồm Header (17 Bytes) và Payload, được đặc tả chi tiết tại Bảng \ref{tab:packet_format}.
 \end{enumerate}
 
 
@@ -50,6 +47,7 @@ Dựa trên cơ sở lý thuyết, hệ thống triển khai một giao thức n
         \midrule
         \endfirsthead
         
+        \caption[]{Cấu trúc Gói tin Nhị phân (tiếp theo)} \\
         \toprule
         \textbf{Phân đoạn} & \textbf{Trường dữ liệu} & \textbf{Kích thước} & \textbf{Mô tả chi tiết} \\
         \midrule
@@ -61,23 +59,23 @@ Dựa trên cơ sở lý thuyết, hệ thống triển khai một giao thức n
         \bottomrule
         \endlastfoot
 
-        Header & \texttt{magic} (Dấu hiệu nhận biết) & 2 Bytes & Chuỗi byte đặc trưng nhận diện tính hợp lệ của gói tin. \\
-        & \texttt{version} (Phiên bản) & 1 Byte & Xác định phiên bản giao thức đang sử dụng. \\
-        & \texttt{msg\_type} (Loại tin nhắn) & 1 Byte & Định nghĩa nghiệp vụ của gói tin (ví dụ: đăng nhập, trò chuyện, truyền tệp). \\
-        & \texttt{flags} (Cờ điều khiển) & 1 Byte & Chỉ định trạng thái gói tin (mã hóa, nén, phân mảnh). \\
-        & \texttt{sequence\_num} (Số thứ tự) & 4 Bytes & Định danh thứ tự gói tin, hỗ trợ ráp mảnh (Reassembly). \\
-        & \texttt{payload\_length} (Kích thước Payload) & 4 Bytes & Lưu trữ độ dài chính xác của phần Payload, giải quyết triệt để lỗi Sticky-packet. \\
-        & \texttt{checksum} (Mã kiểm tra) & 4 Bytes & Xác thực tính toàn vẹn (Integrity) của dữ liệu. \\
+        Header & \texttt{magic} (Nhận diện) & 2 Bytes & Chuỗi byte nhận diện tính hợp lệ. \\
+        & \texttt{version} (Phiên bản) & 1 Byte & Định danh phiên bản giao thức. \\
+        & \texttt{msg\_type} (Loại tin) & 1 Byte & Định nghĩa nghiệp vụ (đăng nhập, trò chuyện...). \\
+        & \texttt{flags} (Cờ điều khiển) & 1 Byte & Trạng thái gói tin (mã hóa, nén). \\
+        & \texttt{sequence\_num} (Thứ tự) & 4 Bytes & Hỗ trợ ráp mảnh. \\
+        & \texttt{payload\_length} (Kích thước) & 4 Bytes & Giải quyết hiện tượng Sticky Packet. \\
+        & \texttt{checksum} (Mã kiểm tra) & 4 Bytes & Xác thực toàn vẹn dữ liệu (Integrity). \\
         \midrule
         
-        Payload & Dữ liệu JSON đã mã hóa & Tùy biến (Động) & Đóng gói tham số nghiệp vụ linh hoạt và được mã hóa nguyên khối (AES-256). \\
+        Payload & Dữ liệu JSON & Tùy biến & Đóng gói tham số nghiệp vụ (Mã hóa AES-256). \\
     \end{longtable}
     
 
-Quá trình luân chuyển và phân giải gói tin (Packet Parsing) giữa Client và Server được thực thi theo chu trình tuần tự sau:
-    \begin{itemize}[label={-}]
-        \item Đóng gói và mã hóa (Tại Client): Tuần tự hóa (Serialize) đối tượng JSON thành luồng byte và thực thi thuật toán mã hóa dữ liệu. Hệ thống tính toán kích thước và gắn (Append) 17 bytes tiêu đề (Header) nhị phân vào trước phần dữ liệu mang theo (Payload) để tạo thành gói tin hoàn chỉnh.
-        \item Trích xuất và xác thực Header (Phía Server): Thành phần \texttt{ClientSession} đọc chính xác 17 Bytes đầu tiên từ luồng TCP để phân giải các tham số định tuyến (\texttt{msg\_type}, \texttt{payload\_length}) và xác thực tính hợp lệ (\texttt{magic}, \texttt{checksum}).
-        \item Cấp phát bộ nhớ và nạp Payload: Dựa trên kích thước \texttt{payload\_length}, hệ thống cấp phát vùng nhớ động có kích thước tương ứng. Quá trình đọc dữ liệu từ bộ đệm mạng được duy trì vòng lặp cho đến khi truy xuất trọn vẹn phần Payload, đảm bảo xử lý tình trạng phân mảnh gói tin (Half-packet).
-        \item Giải mã và định tuyến nghiệp vụ: \texttt{CryptoEngine} giải mã luồng dữ liệu để khôi phục cấu trúc JSON nguyên bản. Dựa trên giá trị \texttt{msg\_type} hệ thống định tuyến (Routing) gói tin tới các bộ xử lý nghiệp vụ (Handlers) tương ứng.
-    \end{itemize}
+Chu trình phân giải gói tin (Packet Parsing) gồm các bước:
+\begin{itemize}[label={-}]
+    \item Đóng gói: Tuần tự hóa JSON, mã hóa và gắn Header (17 Bytes) trước Payload.
+    \item Phân tích Header: \texttt{ClientSession} đọc 17 bytes đầu tiên để trích xuất các tham số điều khiển (\texttt{msg\_type}, \texttt{payload\_length}, \texttt{magic}, \texttt{checksum}).
+    \item Đọc Payload: Cấp phát bộ nhớ dựa trên \texttt{payload\_length} để nhận luồng Payload và xử lý hiện tượng phân mảnh.
+    \item Giải mã và định tuyến: \texttt{CryptoEngine} giải mã khối dữ liệu, sau đó hệ thống định tuyến theo \texttt{msg\_type} đến bộ xử lý tương ứng.
+\end{itemize}
