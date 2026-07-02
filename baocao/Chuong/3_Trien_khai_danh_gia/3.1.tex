@@ -5,20 +5,20 @@
 \begin{enumerate}
     \item Cơ sở lý thuyết về Tương thích Nền tảng (Platform Compatibility) và I/O Phi đồng bộ
     
-    Trong các phần mềm mạng, cơ chế Vào/Ra (I/O) là yếu tố kỹ thuật quyết định khả năng chịu tải. Các hệ điều hành nhân Linux/Unix hỗ trợ API \texttt{epoll} với độ phức tạp $O(1)$, tối ưu cho việc theo dõi đồng thời lượng lớn kết nối (Socket) so với hàm \texttt{select()} $O(N)$. Ngược lại, nền tảng Windows sử dụng kiến trúc \texttt{IOCP} (I/O Completion Ports). Do sự khác biệt về API này, các máy chủ hiệu năng cao thường được triển khai độc quyền trên Linux để tối ưu hóa tốc độ xử lý.
+    Trong kiến trúc phần mềm mạng, cơ chế Vào/Ra (I/O) là yếu tố quan trọng đối với năng lực xử lý đồng thời. Hệ điều hành nhân Linux/Unix cung cấp API \texttt{epoll} với độ phức tạp $O(1)$, cải thiện hiệu suất trong việc quản lý số lượng lớn kết nối (Socket) so với hàm \texttt{select()} có độ phức tạp $O(N)$. Nền tảng Windows sử dụng kiến trúc \texttt{IOCP} (I/O Completion Ports). Do sự khác biệt về API giữa các hệ điều hành, phân hệ máy chủ (Server) được thiết kế cho môi trường Linux nhằm tối ưu hóa tốc độ xử lý.
     
-    Trong khâu đóng gói (Build Process), việc sử dụng Hệ thống Siêu biên dịch (Meta-Build Systems) như CMake giúp chuẩn hóa quá trình triển khai. CMake cung cấp một lớp trừu tượng (Abstraction Layer) để tự động sinh ra kịch bản biên dịch bản địa thay vì phải sử dụng cấu trúc \texttt{Makefile} độc lập cho từng nền tảng.
+    Quy trình đóng gói (Build Process) sử dụng Hệ thống Siêu biên dịch (Meta-Build System) CMake nhằm chuẩn hóa quy trình triển khai. CMake cung cấp lớp trừu tượng (Abstraction Layer) cho phép tự động khởi tạo kịch bản biên dịch bản địa, thay thế cho việc duy trì các tệp \texttt{Makefile} độc lập trên từng nền tảng.
 
     \item Kiến trúc Biên dịch trong tệp \texttt{CMakeLists.txt}
     
-    Dự án được tổ chức theo cấu trúc Kho lưu trữ tập trung (Monorepo), bao gồm cả \texttt{vcs\_server} và \texttt{vcs\_client}. Cấu hình biên dịch được phân luồng qua các biến của CMake:
+    Dự án được tổ chức theo cấu trúc Kho lưu trữ tập trung (Monorepo), chứa toàn bộ mã nguồn của \texttt{vcs\_server} và \texttt{vcs\_client}. Tiến trình biên dịch được cấu hình thông qua các tham số của CMake:
     
     \begin{itemize}[label={-}]
-        \item Máy chủ (Server-Side): Giới hạn biên dịch trên môi trường POSIX (Linux). Khối kiểm tra \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))} đảm bảo tính tương thích và sự hoạt động ổn định của module \texttt{epoll}.
+        \item Phân hệ Máy chủ (Server-Side): Triển khai trên môi trường POSIX (Linux). Cấu trúc kiểm tra \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))} được sử dụng để thiết lập tính tương thích và đảm bảo khả năng hoạt động của module \texttt{epoll}.
         
-        \item Máy khách (Client-Side): Hỗ trợ đa nền tảng. Khi biến \texttt{WIN32} tồn tại, CMake tự động liên kết tĩnh (Static Linking) với các thư viện mạng cốt lõi của môi trường Windows như \texttt{wsock32}, \texttt{ws2\_32} và \texttt{crypt32}.
+        \item Phân hệ Máy khách (Client-Side): Hỗ trợ kiến trúc đa nền tảng. Khi biến \texttt{WIN32} được kích hoạt, CMake thực thi liên kết tĩnh (Static Linking) với các thư viện mạng cốt lõi của Windows như \texttt{wsock32}, \texttt{ws2\_32} và \texttt{crypt32}.
         
-        \item Quản lý Phụ thuộc (Dependency Injection): Dự án định cấu hình biên dịch bằng chuẩn \texttt{C++17} (\texttt{CMAKE\_CXX\_STANDARD 17}) và các cờ tối ưu hóa \texttt{-Wall -Wextra -O2}. Quá trình biên dịch liên kết với 4 thư viện chính: OpenSSL (\texttt{libssl-dev}), SQLite3 (\texttt{libsqlite3-dev}), POSIX Threads (Threads) và \texttt{nlohmann/json}.
+        \item Quản lý Phụ thuộc (Dependency Management): Dự án định cấu hình biên dịch dựa trên chuẩn \texttt{C++17} (\texttt{CMAKE\_CXX\_STANDARD 17}) kết hợp cùng các cờ tối ưu hóa \texttt{-Wall -Wextra -O2}. Quá trình liên kết nhị phân phụ thuộc vào 4 thư viện lõi: OpenSSL (\texttt{libssl-dev}), SQLite3 (\texttt{libsqlite3-dev}), POSIX Threads (Threads) và \texttt{nlohmann/json}.
     \end{itemize}
 \end{enumerate}
 
@@ -35,7 +35,6 @@ Bảng \ref{tab:dependencies} trình bày ma trận các thành phần phụ thu
     \midrule
     \endfirsthead
     
-        \caption[]{Bảng Ma trận Phụ thuộc Thư viện (Dependency Matrix) (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Tên Thư viện}} & \multicolumn{1}{c}{\textbf{Loại Liên kết}} & \multicolumn{1}{c}{\textbf{Mục đích Kỹ thuật}} \\
     \midrule
@@ -48,36 +47,32 @@ Bảng \ref{tab:dependencies} trình bày ma trận các thành phần phụ thu
     \endlastfoot
 
     \texttt{OpenSSL::SSL} \newline \texttt{OpenSSL::Crypto} & Động (Dynamic) & Cung cấp phương thức mã hóa lai (RSA, AES-GCM) và hàm sinh số ngẫu nhiên CSPRNG. \\
-    \midrule
-    
-    \texttt{SQLite3} & Động (Dynamic) & Hệ quản trị cơ sở dữ liệu cục bộ phục vụ module \texttt{AuthManager} và \texttt{ChatHistory}. \\
-    \midrule
 
-    \texttt{Threads::Threads} & Hệ thống (System) & Gọi API POSIX Threads để thực thi đa luồng cho Worker Threads và vòng lặp sự kiện. \\
-    \midrule
-    
+    \texttt{SQLite3} & Động (Dynamic) & Hệ quản trị cơ sở dữ liệu cục bộ phục vụ phân hệ \texttt{AuthManager} và \texttt{ChatHistory}. \\
+
+    \texttt{Threads::Threads} & Hệ thống (System) & Gọi API POSIX Threads nhằm thực thi đa luồng cho các Worker Threads và vòng lặp sự kiện. \\
+
     \texttt{nlohmann/json} & Header-only & Hỗ trợ tuần tự hóa (Serialize) và giải tuần tự hóa (Deserialize) chuỗi JSON. \\
-    \midrule
 
-    \texttt{wsock32}, \texttt{ws2\_32} & Tĩnh (Static) \newline (Chỉ Windows) & API mạng lõi thay thế cho Socket POSIX ở trình khách trên hệ điều hành Windows. \\
+    \texttt{wsock32}, \texttt{ws2\_32} & Tĩnh (Static) \newline (Chỉ Windows) & API mạng lõi thay thế cho Socket POSIX ở trình khách trên nền tảng hệ điều hành Windows. \\
 \end{longtable}
 
 \subsection{Kịch bản Biên dịch và Vận hành}
 
 \subsubsection{Cơ sở lý thuyết về quy trình biên dịch}
 
-Trong kỹ thuật phần mềm hiện đại, quy trình xây dựng (Build Process) hỗ trợ chuẩn hóa mã nguồn trên đa nền tảng. CMake đóng vai trò là một Hệ thống Siêu biên dịch (Meta-build System), có khả năng chuyển đổi cấu hình khai báo (Declarative Configuration) thành các tập lệnh thực thi (Native Build Scripts) tương thích với môi trường biên dịch mục tiêu.
+Trong kỹ thuật phần mềm hiện đại, quy trình xây dựng (Build Process) hỗ trợ chuẩn hóa mã nguồn trên đa nền tảng. CMake là một Hệ thống Siêu biên dịch (Meta-build System), có chức năng chuyển đổi cấu hình khai báo (Declarative Configuration) thành các tập lệnh thực thi (Native Build Scripts) tương thích với môi trường biên dịch mục tiêu.
 
-Dự án áp dụng cấu trúc Biên dịch ngoại tuyến (Out-of-Source Build). Bằng cách đặt toàn bộ tệp đối tượng trung gian (\texttt{.o}, \texttt{.so}) vào thư mục \texttt{build/}, cấu trúc mã nguồn nguyên bản không bị tác động, đồng thời hỗ trợ làm sạch không gian dự án hiệu quả. Kỹ thuật Biên dịch song song (Parallel Compilation) qua bộ đa xử lý đối xứng (SMP) của CPU cũng được sử dụng để tối ưu thời gian đóng gói nhị phân.
+Dự án áp dụng cấu trúc Biên dịch ngoại tuyến (Out-of-Source Build). Các tệp đối tượng trung gian (\texttt{.o}, \texttt{.so}) được lưu trữ tại thư mục \texttt{build/}, giúp giữ nguyên cấu trúc mã nguồn gốc. Kỹ thuật Biên dịch song song (Parallel Compilation) thông qua bộ đa xử lý đối xứng (SMP) của CPU được sử dụng nhằm giảm thời gian đóng gói nhị phân.
 
 \subsubsection{Kiến trúc biên dịch thực tế}
 
-Tiến trình đóng gói được cấu hình qua tệp \texttt{CMakeLists.txt} và tệp kịch bản tự động \texttt{build\_all.sh}. Hệ thống yêu cầu trình biên dịch chuẩn \texttt{C++17} kết hợp bộ cờ \texttt{-Wall -Wextra -O2} nhằm kiểm soát nghiêm ngặt các cảnh báo và gia tăng hiệu suất thực thi.
+Tiến trình đóng gói được cấu hình qua tệp \texttt{CMakeLists.txt} và tệp kịch bản \texttt{build\_all.sh}. Hệ thống yêu cầu trình biên dịch chuẩn \texttt{C++17} kết hợp với các tham số \texttt{-Wall -Wextra -O2} nhằm kiểm soát các cảnh báo và tối ưu hóa hiệu năng thực thi.
 
-Quá trình biên dịch chia thành hai phân luồng tách biệt:
+Quá trình biên dịch phân tách thành hai luồng độc lập:
 \begin{itemize}[label={-}]
-    \item Phân luồng Máy chủ (Server-side): Yêu cầu trực tiếp môi trường POSIX (Linux) qua khối kiểm tra \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))}. Mã nhị phân được liên kết nội tại với POSIX Threads, OpenSSL và \texttt{SQLITE3}.
-    \item Phân luồng Máy khách (Client-side): Hỗ trợ Biên dịch chéo (Cross-platform Compilation). Đối với kiến trúc Windows, tệp \texttt{mingw-toolchain.cmake} thực hiện chức năng cấu hình MinGW để liên kết tĩnh các thư viện mạng đặc thù (\texttt{wsock32}, \texttt{ws2\_32}, \texttt{crypt32}).
+    \item Phân luồng Máy chủ (Server-side): Yêu cầu hệ điều hành POSIX (Linux) thông qua khối kiểm tra \texttt{if(NOT (WIN32 OR CMAKE\_CROSSCOMPILING))}. Mã nhị phân được liên kết với POSIX Threads, OpenSSL và \texttt{SQLITE3}.
+    \item Phân luồng Máy khách (Client-side): Hỗ trợ Biên dịch chéo (Cross-platform Compilation). Đối với kiến trúc Windows, tệp \texttt{mingw-toolchain.cmake} thực hiện chức năng cấu hình MinGW nhằm liên kết tĩnh các thư viện mạng đặc thù (\texttt{wsock32}, \texttt{ws2\_32}, \texttt{crypt32}).
 \end{itemize}
 
 Bảng \ref{tab:build_commands} chi tiết hóa các tập lệnh cấu hình trong quy trình triển khai.
@@ -93,7 +88,6 @@ Bảng \ref{tab:build_commands} chi tiết hóa các tập lệnh cấu hình tr
     \midrule
     \endfirsthead
     
-        \caption[]{Các tập lệnh và tham số cấu hình trong quy trình biên dịch (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Giai đoạn}} & \multicolumn{1}{c}{\textbf{Tập lệnh (Command)}} & \multicolumn{1}{c}{\textbf{Mục đích kỹ thuật}} \\
     \midrule
@@ -106,26 +100,22 @@ Bảng \ref{tab:build_commands} chi tiết hóa các tập lệnh cấu hình tr
     \endlastfoot
 
     1. Khởi tạo Không gian & \texttt{mkdir -p build/linux \&\& cd build/linux} & Thiết lập môi trường cho phương thức Biên dịch ngoại tuyến (Out-of-source Build). \\
-    \midrule
-    
+
     2. Thiết lập CMake & \texttt{cmake ../..} & Khởi chạy trình phân tích, định tuyến thư viện và cấu trúc tệp \texttt{Makefile}. \\
-    \midrule
 
     3. Biên dịch Đa luồng & \texttt{make -j\$(nproc)} & Kích hoạt tác vụ biên dịch song song dựa trên số lượng nhân CPU. \\
-    \midrule
-    
+
     4. Biên dịch Chéo (Win) & \texttt{cmake -DCMAKE\_TOOLCHAIN...} \newline \texttt{make -j\$(nproc) vcs\_client} & Khởi chạy kịch bản biên dịch ứng dụng Client độc lập cho hệ điều hành Windows. \\
 \end{longtable}
 
-[PLACEHOLDER\_HINH\_ANH\_KIEN\_TRUC\_BIEN\_DICH]
 
 \subsubsection{Chu trình vận hành và tham số dòng lệnh}
 
-Các mã nhị phân khi thực thi được tích hợp hệ thống diễn giải tham số dòng lệnh (Command-line Arguments). Đặc điểm này cấp cho quản trị viên quyền thay đổi cấu hình kỹ thuật tại thời điểm chạy (Runtime) mà không cần biên dịch lại mã nguồn.
+Các tập tin nhị phân hỗ trợ hệ thống phân tích tham số dòng lệnh (Command-line Arguments). Chức năng này cho phép cấu hình hệ thống tại thời điểm chạy (Runtime) mà không cần biên dịch lại mã nguồn.
 
 1. Phân hệ Máy chủ (Server Execution)
 
-Tiến trình \texttt{vcs\_server} đảm nhận vai trò phân bổ Thread Pool, cấp phát cơ sở dữ liệu và lắng nghe truy cập mạng. Luồng \texttt{main()} tự động khởi tạo thư mục \texttt{logs/} (phân quyền \texttt{0755}) và nạp cơ sở dữ liệu \texttt{vcs\_chat.db}. Bảng \ref{tab:server_args} mô tả chức năng của các tham số cấu hình.
+Tiến trình \texttt{vcs\_server} thực hiện phân bổ Thread Pool, cấp phát cơ sở dữ liệu và mở cổng mạng chờ kết nối. Hàm khởi tạo \texttt{main()} thiết lập thư mục \texttt{logs/} (phân quyền \texttt{0755}) và nạp cơ sở dữ liệu \texttt{vcs\_chat.db}. Bảng \ref{tab:server_args} mô tả chức năng của các tham số cấu hình máy chủ.
 
 \begin{longtable}{
     >{\centering\arraybackslash}p{4cm}
@@ -138,7 +128,6 @@ Tiến trình \texttt{vcs\_server} đảm nhận vai trò phân bổ Thread Pool
     \midrule
     \endfirsthead
     
-        \caption[]{Các tham số dòng lệnh vận hành Máy chủ (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
     \midrule
@@ -150,18 +139,16 @@ Tiến trình \texttt{vcs\_server} đảm nhận vai trò phân bổ Thread Pool
     \bottomrule
     \endlastfoot
 
-    \texttt{--config <path>} & Chuỗi & Đọc tệp cấu hình JSON chứa quy mô hệ thống (Mặc định: \texttt{server\_config.json}). \\
-    \midrule
-    
-    \texttt{--port <port\_number>} & Số nguyên & Ghi đè cổng dịch vụ mạng khai báo trong tệp cấu hình JSON. \\
-    \midrule
+    \texttt{--config <path>} & Chuỗi & Chỉ định tệp cấu hình JSON chứa thông số vận hành (Mặc định: \texttt{server\_config.json}). \\
 
-    \texttt{--verify-audit-log} & Cờ (Bool) & Chạy phương thức \texttt{AuditLogger::verifyChain()} nhằm kiểm tra tính toàn vẹn của chuỗi Audit Log. \\
+    \texttt{--port <port\_number>} & Số nguyên & Ghi đè tham số cổng dịch vụ mạng khai báo trong cấu hình hệ thống. \\
+
+    \texttt{--verify-audit-log} & Cờ (Bool) & Kích hoạt phương thức \texttt{AuditLogger::verifyChain()} nhằm xác thực tính toàn vẹn của chuỗi Audit Log. \\
 \end{longtable}
 
 2. Phân hệ Máy khách (Client Execution)
 
-Ứng dụng \texttt{vcs\_client} kết nối Socket an toàn thông qua cấu trúc \texttt{ConnectionManager}. Đối với hệ điều hành Windows, \texttt{WSAStartup} được gọi ở giai đoạn đầu để khởi động thư viện mạng \texttt{winsock2}. Bảng \ref{tab:client_args} liệt kê các tham số dòng lệnh tương ứng.
+Ứng dụng \texttt{vcs\_client} khởi tạo liên kết Socket thông qua cấu trúc \texttt{ConnectionManager}. Đối với nền tảng Windows, API \texttt{WSAStartup} được gọi ở giai đoạn đầu nhằm khởi động thư viện mạng \texttt{winsock2}. Bảng \ref{tab:client_args} liệt kê các tham số dòng lệnh liên quan.
 
 \begin{longtable}{
     >{\centering\arraybackslash}p{4cm}
@@ -174,7 +161,6 @@ Tiến trình \texttt{vcs\_server} đảm nhận vai trò phân bổ Thread Pool
     \midrule
     \endfirsthead
     
-        \caption[]{Các tham số dòng lệnh Máy khách (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Tham số}} & \multicolumn{1}{c}{\textbf{Kiểu dữ liệu}} & \multicolumn{1}{c}{\textbf{Mô tả chức năng kỹ thuật}} \\
     \midrule
@@ -186,10 +172,8 @@ Tiến trình \texttt{vcs\_server} đảm nhận vai trò phân bổ Thread Pool
     \bottomrule
     \endlastfoot
 
-    \texttt{--host <ip\_address>} & Chuỗi & Chỉ định địa chỉ IP máy chủ (Mặc định: \texttt{127.0.0.1}). \\
-    \midrule
-    
+    \texttt{--host <ip\_address>} & Chuỗi & Định tuyến đến địa chỉ IP máy chủ (Mặc định: \texttt{127.0.0.1}). \\
+
     \texttt{--port <port\_number>} & Số nguyên & Chỉ định cổng mạng của máy chủ đích (Mặc định: \texttt{9000}). \\
 \end{longtable}
 
-[PLACEHOLDER\_HINH\_ANH\_CHU\_TRINH\_VAN\_HANH]

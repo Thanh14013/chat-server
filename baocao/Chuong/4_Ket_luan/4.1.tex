@@ -1,27 +1,27 @@
 \section{Kết quả đạt được}
 
-Đồ án đã hoàn thành mục tiêu xây dựng hệ thống phần mềm trò chuyện trực tuyến theo kiến trúc Client-Server. Hệ thống được phát triển bằng ngôn ngữ \texttt{C++17}, vận dụng các cơ sở lý thuyết về Mật mã học và An toàn thông tin vào thực tiễn. 
+Dự án đã triển khai hệ thống phần mềm giao tiếp trực tuyến dựa trên kiến trúc Client-Server. Hệ thống được phát triển bằng ngôn ngữ \texttt{C++17}, áp dụng các tiêu chuẩn kỹ thuật về Mật mã học và An toàn thông tin.
 
-Các kết quả chính bao gồm:
+Các kết quả nghiệm thu bao gồm:
 
 \begin{enumerate}[label=\arabic*.]
-    \item Về Kiến trúc mạng và Hiệu năng:
+    \item Về Kiến trúc mạng và Năng lực xử lý:
     \begin{itemize}[label={-}]
-        \item Xây dựng máy chủ trên nền tảng Linux, ứng dụng cơ chế I/O phi đồng bộ qua API \texttt{epoll} kết hợp mô hình Thread-Pool. Kết quả đo lường (Stress Test) ghi nhận máy chủ duy trì thông lượng trên 9,000 gói tin/giây với độ trễ phản hồi ở phân vị 99\% dưới 16ms.
-        \item Phát triển ứng dụng máy khách hoạt động đa nền tảng (Linux, Windows). Giao thức truyền tải được thiết kế kết hợp Header nhị phân và Payload JSON nhằm chuẩn hóa quy trình đóng gói và phân giải dữ liệu.
+        \item Triển khai phân hệ máy chủ (Server) trên hệ điều hành Linux, tích hợp cơ chế I/O phi đồng bộ thông qua API \texttt{epoll} kết hợp kiến trúc Thread-Pool. Quá trình đánh giá hiệu năng (Stress Test) ghi nhận thông lượng xử lý đạt mức >9,000 gói tin/giây, đồng thời duy trì độ trễ biên (P99 Latency) dưới 16 mili-giây.
+        \item Phân hệ máy khách (Client) hỗ trợ đa nền tảng (Linux, Windows). Giao thức giao tiếp được chuẩn hóa thông qua cấu trúc Header nhị phân kết hợp tải trọng (Payload) định dạng JSON, phục vụ quá trình tuần tự hóa và giải tuần tự hóa dữ liệu.
     \end{itemize}
 
     \item Về An toàn thông tin:
     \begin{itemize}[label={-}]
-        \item Tính Bảo mật (Confidentiality): Tích hợp cơ chế trao đổi khóa lai giữa phương pháp bất đối xứng \texttt{RSA-2048} và đối xứng \texttt{AES-256-GCM}, mã hóa nội dung thông điệp tại tầng ứng dụng (E2EE).
-        \item Tính Toàn vẹn (Integrity): Sử dụng hàm băm \texttt{SHA-256} để xác thực mảnh tệp tin và ứng dụng cơ chế chuỗi khối (Blockchain-lite) vào hệ thống \texttt{AuditLogger} nhằm đảm bảo tính toàn vẹn của nhật ký kiểm toán.
-        \item Tính Sẵn sàng (Availability): Triển khai hệ thống phòng thủ bao gồm \texttt{IntrusionDetector} và \texttt{RateLimiter} (Token Bucket) nhằm phân tích vi phạm và cách ly các nguồn phát tán lưu lượng bất thường.
+        \item Tính Bảo mật (Confidentiality): Triển khai chu trình trao đổi khóa lai (Hybrid Key Exchange) sử dụng thuật toán bất đối xứng \texttt{RSA-2048} để thỏa thuận khóa phiên, kết hợp mã hóa luồng dữ liệu thông qua thuật toán đối xứng \texttt{AES-256-GCM} tại tầng Ứng dụng.
+        \item Tính Toàn vẹn (Integrity): Ứng dụng hàm băm \texttt{SHA-256} nhằm kiểm định tính toàn vẹn của tệp tin trong quá trình truyền tải. Bên cạnh đó, hệ thống tích hợp cấu trúc chuỗi băm (Hash-chaining) tương tự chuỗi khối (Blockchain-lite) vào phân hệ \texttt{AuditLogger} nhằm xác thực dữ liệu kiểm toán hệ thống.
+        \item Tính Sẵn sàng (Availability): Vận hành cơ chế kiểm soát truy cập thông qua phân hệ \texttt{RateLimiter} (thuật toán Token Bucket) và \texttt{IntrusionDetector}, hỗ trợ phân loại vi phạm và chặn các địa chỉ IP phát sinh lưu lượng bất thường.
     \end{itemize}
 
     \item Về Tính năng nghiệp vụ:
     \begin{itemize}[label={-}]
-        \item Định tuyến thông điệp thời gian thực qua các phòng (Rooms) độc lập, hỗ trợ cơ chế bảo vệ bằng mật khẩu (băm qua PBKDF2).
-        \item Xây dựng luồng truyền tải tệp tin qua trạm trung chuyển (Server-Relayed Transfer), kết hợp bộ lọc làm sạch dữ liệu (Sanitize) và tự động thu hồi tài nguyên (Garbage Collection).
-        \item Tích hợp hệ thống kiểm soát truy cập dựa trên vai trò (RBAC) để thực thi các chính sách quản trị như cấm phát ngôn (\texttt{/mute}) và khóa tài khoản (\texttt{/ban}).
+        \item Phân phối luồng dữ liệu thời gian thực theo cấu trúc phòng (Rooms) độc lập. Môi trường này hỗ trợ cơ chế xác thực riêng bằng mật khẩu dựa trên thuật toán băm PBKDF2.
+        \item Xây dựng quy trình truyền tải tệp tin qua kiến trúc trạm trung chuyển (Server-Relayed Transfer). Quá trình này kết hợp cơ chế làm sạch dữ liệu (Sanitize) và cơ chế thu gom rác (Garbage Collection) nhằm giải phóng tài nguyên tự động.
+        \item Tích hợp mô hình Kiểm soát truy cập phân quyền (Role-Based Access Control - RBAC) nhằm quản lý các lệnh quản trị, bao gồm: kiểm soát phát ngôn (\texttt{/mute}), ngắt kết nối (\texttt{/kick}) và cấm truy cập (\texttt{/ban}).
     \end{itemize}
 \end{enumerate}

@@ -137,6 +137,10 @@ bool Database::createTables()
         sqlite3_free(errMsg);
         return false;
     }
+
+    // Safely add last_room column if it doesn't exist (ignores error if already exists)
+    sqlite3_exec(m_db, "ALTER TABLE Users ADD COLUMN last_room TEXT DEFAULT '';", nullptr, nullptr, nullptr);
+
     LOG_INFO("Database tables ready.");
     return true;
 }

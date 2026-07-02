@@ -1,39 +1,63 @@
 @startuml
-skinparam monochrome true
-skinparam shadowing false
 skinparam componentStyle rectangle
 skinparam defaultTextAlignment center
+skinparam linetype ortho
 
 package "Kiến trúc tổng thể hệ thống (System Architecture)" {
 
-  component "Tầng Nghiệp vụ\n(Business Logic Layer)" as BusinessLayer {
-    [AuthManager]
-    [RoomManager]
-    [Room]
-    [FileTransfer]
-    [AdminCommands]
+  component "Thiết bị đầu cuối\n(Client)" as Client
 
-    [RoomManager] *-- [Room]
+  package "Tầng Nghiệp vụ\n(Business Logic Layer)" as BusinessLayer #E8F5E9 {
+    component "AuthManager" as AuthManager
+    component "RoomManager\n& Room" as RoomManager
+    component "FileTransfer" as FileTransfer
+    component "AdminCommands" as AdminCommands
   }
 
-  component "Tầng Bảo mật và Lọc\n(Security & Filter Layer)" as SecurityLayer {
-    [KeyExchange]
-    [CryptoEngine]
-    [RateLimiter]
-    [IntrusionDetector]
-    [MessageFilter]
-    [AuditLogger]
+  package "Tầng Bảo mật và Lọc\n(Security & Filter Layer)" as SecurityLayer #FFF3E0 {
+    component "KeyExchange &\nCryptoEngine" as CryptoEngine
+    component "MessageFilter" as MessageFilter
+    component "IntrusionDetector &\nRateLimiter" as RateLimiter
+    component "AuditLogger" as AuditLogger
   }
 
-  component "Tầng Mạng và Cốt lõi\n(Network & Core Layer)" as NetworkLayer {
-    [TcpServer]
-    [EventLoop]
-    [ThreadPool]
-    [ClientSession]
+  package "Tầng Mạng và Cốt lõi\n(Network & Core Layer)" as NetworkLayer #E3F2FD {
+    component "TcpServer" as TcpServer
+    component "EventLoop" as EventLoop
+    component "ThreadPool" as ThreadPool
+    component "ClientSession" as ClientSession
   }
 
-  NetworkLayer -up-> SecurityLayer : "Luồng dữ liệu thô\n(Byte Stream)"
-  SecurityLayer -up-> BusinessLayer : "Dữ liệu chuẩn hóa &\nđã qua kiểm duyệt"
+  package "Tầng Lưu trữ và Tiện ích\n(Utils & Storage Layer)" as UtilsLayer #F3E5F5 {
+    component "Database\n(SQLite)" as Database
+    component "Logger" as SystemLogger
+  }
+
+  ' Mạng & Cốt lõi
+  Client -down-> TcpServer : "Kết nối TCP"
+  TcpServer -down-> EventLoop : "Đăng ký FD"
+  EventLoop -down-> ThreadPool : "Phân phối I/O"
+  ThreadPool -down-> ClientSession : "Cập nhật trạng thái"
+  
+  ' Phân nhánh từ ClientSession lên Tầng Bảo mật
+  ClientSession -up-> CryptoEngine : "Giải mã/Mã hóa"
+  ClientSession -up-> RateLimiter : "Kiểm tra băng thông"
+  
+  ' Phân nhánh từ ClientSession lên Tầng Nghiệp vụ
+  ClientSession -up-> AuthManager : "Xác thực Token"
+  ClientSession -up-> RoomManager : "Điều hướng Room"
+  ClientSession -up-> FileTransfer : "Gửi File"
+  ClientSession -up-> AdminCommands : "Lệnh quản trị"
+  ClientSession -up-> MessageFilter : "Kiểm duyệt Regex"
+
+  ' Tương tác nội bộ các tầng
+  RateLimiter -left-> AuditLogger : "Ghi log vi phạm"
+  AdminCommands -down-> AuditLogger : "Lưu vết thao tác"
+  
+  ' Tương tác với Database & Logger
+  AuthManager -down-> Database : "Truy vấn Auth"
+  RoomManager -down-> Database : "Truy vấn Room"
+  TcpServer -down-> SystemLogger : "Ghi log kết nối"
+  
 }
-
 @enduml

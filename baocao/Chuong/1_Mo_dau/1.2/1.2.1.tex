@@ -1,43 +1,43 @@
 \subsection{Yêu cầu chức năng}
 
-Hệ thống yêu cầu đáp ứng các nhóm chức năng cốt lõi sau:
+Hệ thống yêu cầu đáp ứng các nhóm chức năng cốt lõi bao gồm:
 
 \begin{enumerate}
     \item Quản lý tài khoản và xác thực (Authentication \& Authorization): 
     \begin{itemize}[label={-}]
-        \item Đăng ký (Register) và đăng nhập (Login) an toàn. Mật khẩu được băm (SHA256/bcrypt) trước khi lưu trữ.
-        \item Cấp phát thẻ định danh phiên (Session Token) bằng HMAC, hỗ trợ tự động phục hồi kết nối (Session Resumption).
+        \item Xử lý đăng ký (Register) và đăng nhập (Login). Mật khẩu được băm (Hash) bằng thuật toán chuẩn (SHA256/bcrypt) trước khi lưu trữ vào cơ sở dữ liệu.
+        \item Cấp phát thẻ định danh phiên (Session Token) thông qua mã xác thực HMAC, cung cấp khả năng tự động phục hồi kết nối (Session Resumption).
     \end{itemize}
 
     \item Quản lý phiên kết nối và trạng thái (Session Management):
     \begin{itemize}[label={-}]
-        \item Quản lý vòng đời kết nối mạng (Connect, Disconnect) và duy trì tín hiệu sống sót (Ping/Pong).
-        \item Tra cứu danh sách người dùng trực tuyến (List Users) và thông tin hồ sơ (Whois).
+        \item Quản lý vòng đời kết nối mạng (Connect, Disconnect) và duy trì tín hiệu kiểm tra trạng thái hoạt động (Ping/Pong).
+        \item Cung cấp chức năng tra cứu danh sách người dùng trực tuyến (List Users) và thông tin hồ sơ (Whois).
     \end{itemize}
 
     \item Giao tiếp và nhắn tin thời gian thực (Real-time Chatting):
     \begin{itemize}[label={-}]
-        \item Nhắn tin cá nhân (Direct Message): Trao đổi thông điệp trực tiếp (1-1).
-        \item Nhắn tin nhóm (Room Chat): Liệt kê phòng (List Rooms), tạo phòng (Create Room), tham gia (Join), rời phòng (Leave) và phát đa hướng thông điệp (Broadcast).
-        \item Truy vấn lịch sử trò chuyện từ cơ sở dữ liệu.
+        \item Nhắn tin cá nhân (Direct Message): Trao đổi thông điệp trực tiếp giữa hai máy khách (1-1).
+        \item Nhắn tin nhóm (Room Chat): Cung cấp tính năng liệt kê phòng (List Rooms), tạo phòng (Create Room), tham gia (Join), rời phòng (Leave) và phát đa hướng thông điệp (Broadcast).
+        \item Lưu trữ và truy vấn lịch sử trò chuyện thông qua hệ quản trị cơ sở dữ liệu.
     \end{itemize}
 
     \item Truyền tải tệp tin (File Transfer):
     \begin{itemize}[label={-}]
-        \item Hỗ trợ luồng điều khiển truyền tệp hai chiều: gửi yêu cầu (File Request) và xác nhận (Accept/Reject).
-        \item Truyền dữ liệu dạng phân mảnh (Chunking) để chống tắc nghẽn luồng thông điệp chính.
+        \item Quản lý luồng điều khiển truyền tệp hai chiều thông qua các thông điệp: gửi yêu cầu (File Request) và phản hồi (Accept/Reject).
+        \item Truyền tải dữ liệu dưới dạng phân mảnh (Chunking) nhằm duy trì thông lượng cho luồng thông điệp chính.
     \end{itemize}
 
     \item Quản trị hệ thống (Admin Commands):
     \begin{itemize}[label={-}]
-        \item Áp dụng cơ chế phân quyền quản trị viên (Admin Privilege).
-        \item Xử lý vi phạm: kích xuất (Kick), cấm gửi tin (Mute), cấm truy cập (Ban IP/Username), thăng cấp (Promote) và phát thông báo hệ thống (System Broadcast).
+        \item Tích hợp cơ chế phân quyền quản trị viên (Admin Privilege).
+        \item Thực thi các lệnh điều khiển và xử lý vi phạm: kích xuất (Kick), cấm gửi tin (Mute), cấm truy cập (Ban IP/Username), thăng cấp (Promote) và phát thông báo hệ thống (System Broadcast).
     \end{itemize}
 
-    \item An ninh và phòng vệ chủ động (Security):
+    \item Bảo mật hệ thống (Security):
     \begin{itemize}[label={-}]
-        \item Bắt tay mật mã (Crypto Handshake): Trao đổi khóa (Key Exchange) khi khởi tạo kết nối để thiết lập kênh truyền bảo mật.
-        \item Giới hạn lưu lượng (Rate Limiting): Phòng chống tấn công từ chối dịch vụ (DoS) và thư rác (Spam).
-        \item Hệ thống phát hiện xâm nhập (IDS): Phân loại và ghi nhận vi phạm (sai mật khẩu, quét cổng, gói tin dị dạng) để áp dụng biện pháp khóa IP (Ban).
+        \item Bắt tay mật mã (Crypto Handshake): Thực hiện trao đổi khóa (Key Exchange) trong quá trình khởi tạo kết nối nhằm thiết lập kênh truyền mã hóa.
+        \item Giới hạn lưu lượng (Rate Limiting): Hạn chế tần suất gửi thông điệp để giảm thiểu nguy cơ tấn công từ chối dịch vụ (DoS) và thư rác (Spam).
+        \item Hệ thống phát hiện xâm nhập (IDS): Nhận diện và ghi log các vi phạm (đăng nhập sai vượt giới hạn, quét cổng, gói tin dị dạng) làm cơ sở cho biện pháp khóa IP (Ban).
     \end{itemize}
 \end{enumerate}

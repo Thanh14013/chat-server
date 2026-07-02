@@ -1,24 +1,24 @@
 \subsection{Yêu cầu phi chức năng}
 
-Các yêu cầu phi chức năng nhằm đảm bảo khả năng vận hành, độ tin cậy và an toàn thông tin:
+Các yêu cầu phi chức năng tập trung vào cấu trúc hệ thống, hiệu suất xử lý và cơ chế bảo mật:
 
 \begin{enumerate}
     \item Hiệu năng và khả năng mở rộng (Performance \& Scalability):
     \begin{itemize}[label={-}]
-        \item Xử lý đồng thời: Sử dụng kiến trúc I/O đa kênh (I/O Multiplexing) với epoll và Thread Pool nhằm duy trì luồng điều phối phi đồng bộ (Non-blocking). Giải quyết bài toán C10K với độ trễ thấp.
-        \item Tối ưu băng thông: Áp dụng giao thức nhị phân (Custom Binary Protocol) để tối thiểu hóa kích thước gói tin và hao phí phân tích cú pháp (Parsing).
+        \item Xử lý đồng thời: Áp dụng kiến trúc I/O đa kênh (I/O Multiplexing) với cơ chế epoll kết hợp Thread Pool nhằm vận hành luồng điều phối phi đồng bộ (Non-blocking). Hệ thống yêu cầu đáp ứng ngưỡng kết nối C10K trong điều kiện độ trễ nằm trong khoảng cho phép.
+        \item Tối ưu hóa băng thông: Triển khai giao thức nhị phân tùy chỉnh (Custom Binary Protocol) nhằm tối giản kích thước gói tin và giảm chi phí phân tích cú pháp (Parsing).
     \end{itemize}
 
     \item Bảo mật và toàn vẹn dữ liệu (Security \& Integrity):
     \begin{itemize}[label={-}]
-        \item Mã hóa kênh truyền: Mã hóa tải trọng bằng AES-256-GCM, trao đổi khóa phiên (Session Key) qua RSA-2048.
-        \item Toàn vẹn thông điệp: Áp dụng kiểm lỗi CRC32 và mã xác thực HMAC cho từng gói tin.
-        \item An toàn lưu trữ: Băm mật khẩu một chiều trước khi lưu trữ. Sử dụng Write-Ahead Logging (WAL) cho cơ sở dữ liệu SQLite để duy trì tính nhất quán.
+        \item Mã hóa kênh truyền: Thực thi mã hóa tải trọng dữ liệu bằng thuật toán AES-256-GCM và trao đổi khóa phiên (Session Key) thông qua thuật toán RSA-2048.
+        \item Toàn vẹn thông điệp: Kiểm soát tính toàn vẹn thông qua hàm kiểm lỗi CRC32 và mã xác thực HMAC được đính kèm trong mỗi gói tin.
+        \item Lưu trữ dữ liệu: Sử dụng hàm băm một chiều cho dữ liệu định danh. Triển khai cơ chế Write-Ahead Logging (WAL) của cơ sở dữ liệu SQLite nhằm bảo đảm tính nhất quán của dữ liệu lưu trữ.
     \end{itemize}
 
     \item Tính tin cậy và khả năng chịu lỗi (Reliability \& Fault Tolerance):
     \begin{itemize}[label={-}]
-        \item Quản lý tài nguyên: Tự động thu hồi tài nguyên (socket, phiên đăng nhập, vùng nhớ) của kết nối vi phạm thời gian chờ (Timeout) hoặc ngắt đột ngột, ngăn chặn cạn kiệt mô tả tệp (File Descriptor Exhaustion) và rò rỉ bộ nhớ (Memory Leak).
-        \item Xử lý luồng mạng: Triển khai bộ đệm (Network Buffer) độc lập cho từng kết nối nhằm xử lý hiện tượng phân mảnh (TCP Fragmentation) và dính gói (TCP Sticky Packets).
+        \item Quản lý tài nguyên: Hệ thống áp dụng cơ chế tự động thu hồi tài nguyên (bao gồm socket, phiên đăng nhập, và vùng nhớ được cấp phát) đối với các kết nối vượt quá thời gian chờ (Timeout) hoặc bị ngắt kết nối đột ngột. Quá trình này nhằm tránh tình trạng cạn kiệt bộ mô tả tệp (File Descriptor Exhaustion) và rò rỉ bộ nhớ (Memory Leak).
+        \item Xử lý luồng mạng: Phân mảnh và tái tổ hợp gói tin mạng thông qua việc cấp phát bộ đệm (Network Buffer) độc lập trên từng phiên kết nối, nhằm giải quyết đặc tính phân mảnh (TCP Fragmentation) và gộp gói (TCP Sticky Packets) của giao thức TCP.
     \end{itemize}
 \end{enumerate}

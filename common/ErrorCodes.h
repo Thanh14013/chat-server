@@ -17,5 +17,6 @@ enum class ErrorCode : uint8_t {
     ERR_INVALID_TOKEN          = 0x0C,
     ERR_REPLAY_DETECTED        = 0x0D,
     ERR_SERVER_FULL            = 0x0E,
+    ERR_MESSAGE_BLOCKED        = 0x0F,
     ERR_INTERNAL               = 0xFF
 };

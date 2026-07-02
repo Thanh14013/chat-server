@@ -41,6 +41,9 @@ namespace vcs::security
 
         void removeSessionByFd(int fd);
 
+        void updateLastRoom(const std::string& nickname, const std::string& room);
+        std::string getLastRoom(const std::string& nickname) const;
+
         struct RoomData {
             std::string name;
             std::string creator;

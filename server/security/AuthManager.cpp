@@ -459,4 +459,30 @@ namespace vcs::security
         sqlite3_finalize(stmt);
         return banned;
     }
+
+    void AuthManager::updateLastRoom(const std::string& nickname, const std::string& room) {
+        const char *sql = "UPDATE Users SET last_room = ? WHERE nickname = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, room.c_str(), -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(stmt, 2, nickname.c_str(), -1, SQLITE_TRANSIENT);
+            sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+        }
+    }
+
+    std::string AuthManager::getLastRoom(const std::string& nickname) const {
+        std::string room = "";
+        const char *sql = "SELECT last_room FROM Users WHERE nickname = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, nickname.c_str(), -1, SQLITE_TRANSIENT);
+            if (sqlite3_step(stmt) == SQLITE_ROW) {
+                const char* val = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+                if (val) room = val;
+            }
+            sqlite3_finalize(stmt);
+        }
+        return room;
+    }
 }

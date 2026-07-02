@@ -1,17 +1,17 @@
 \section{Hướng phát triển tương lai}
 
-Để hệ thống đáp ứng các yêu cầu mở rộng và tối ưu hóa tính năng trong thực tiễn, một số định hướng phát triển tiếp theo được đề xuất như sau:
+Nhằm đáp ứng các yêu cầu mở rộng kiến trúc và nâng cấp tính năng nghiệp vụ trong tương lai, một số định hướng phát triển được đề xuất bao gồm:
 
 \begin{enumerate}[label=\arabic*.]
-    \item Nâng cấp Giao thức Bảo mật chuyển tiếp hoàn hảo (Perfect Forward Secrecy - PFS):
-    Hệ thống hiện tại sử dụng thuật toán RSA để mã hóa khóa phiên AES, chưa hỗ trợ PFS. Việc nâng cấp lên thuật toán trao đổi khóa Elliptic Curve Diffie-Hellman (ECDHE) sẽ đảm bảo mỗi phiên giao tiếp sử dụng một khóa độc lập. Cơ chế này ngăn chặn nguy cơ dữ liệu quá khứ bị giải mã ngay cả khi khóa bí mật dài hạn của máy chủ bị lộ.
+    \item Nâng cấp tiêu chuẩn Bảo mật chuyển tiếp hoàn hảo (Perfect Forward Secrecy - PFS):
+    Hệ thống hiện hành sử dụng thuật toán RSA trong quá trình phân phối khóa phiên AES, do đó chưa đáp ứng tiêu chuẩn PFS. Việc thay thế bằng giao thức trao đổi khóa Elliptic Curve Diffie-Hellman (ECDHE) sẽ thiết lập các khóa độc lập cho từng phiên giao tiếp. Kiến trúc này ngăn chặn rủi ro giải mã dữ liệu quá khứ trong trường hợp khóa bí mật dài hạn của máy chủ bị lộ.
 
-    \item Tích hợp Mã hóa đầu cuối (End-to-End Encryption - E2EE):
-    Bên cạnh mã hóa tầng giao vận Client-Server, việc áp dụng Giao thức Signal (Signal Protocol) sẽ hỗ trợ mã hóa E2EE cho các phiên trò chuyện. Máy chủ sẽ hoạt động với vai trò trung chuyển (Blind Relay) đối với các luồng dữ liệu mã hóa, tăng cường mức độ bảo mật cho thông điệp người dùng.
+    \item Triển khai phương thức Mã hóa đầu cuối (End-to-End Encryption - E2EE):
+    Bên cạnh luồng mật mã hóa Client-Server, việc áp dụng các tiêu chuẩn như Giao thức Signal (Signal Protocol) sẽ hỗ trợ tính năng mã hóa E2EE cho từng phiên giao tiếp. Ở mô hình này, máy chủ chỉ đóng vai trò trạm chuyển tiếp (Relay) đối với các gói tin đã được mã hóa, qua đó ngăn chặn khả năng truy cập hoặc thay đổi nội dung thông điệp tại máy chủ.
 
-    \item Triển khai Kiến trúc Phân tán (Distributed Architecture):
-    Để xử lý lưu lượng mạng vượt ngưỡng giới hạn của một máy chủ vật lý, kiến trúc nguyên khối (Monolithic) có thể được chuyển đổi sang mô hình cụm phân tán (Cluster/Microservices). Sự kết hợp với Redis Pub/Sub hoặc Apache Kafka làm hệ thống trung chuyển thông điệp (Message Broker) giữa các Node sẽ hỗ trợ phân tán tải và nâng cao khả năng mở rộng (Scalability) của hệ thống.
+    \item Chuyển đổi sang Kiến trúc Phân tán (Distributed Architecture):
+    Nhằm đáp ứng khối lượng truy cập lớn vượt quá khả năng xử lý của một máy chủ độc lập, kiến trúc nguyên khối (Monolithic) có thể được tái cấu trúc theo mô hình phân tán (Cluster/Microservices). Việc tích hợp các hệ thống như Redis Pub/Sub hoặc Apache Kafka với vai trò Bộ điều phối thông điệp (Message Broker) giữa các máy chủ (Node) sẽ hỗ trợ cơ chế cân bằng tải và cải thiện khả năng mở rộng ngang (Horizontal Scalability) của hệ thống.
 
-    \item Phát triển Giao diện người dùng (GUI) và Giao thức Đa phương tiện:
-    Chuyển đổi Client từ giao diện dòng lệnh (CLI) sang giao diện đồ họa thông qua bộ công cụ \texttt{Qt} (C++) hoặc \texttt{Electron/Tauri}. Dự án cũng có thể tích hợp tiêu chuẩn \texttt{WebRTC} nhằm cung cấp tính năng gọi thoại và gọi video theo mô hình mạng ngang hàng (P2P), giảm tải băng thông cho máy chủ trung tâm.
+    \item Xây dựng Giao diện người dùng (GUI) và Hỗ trợ truyền thông Đa phương tiện:
+    Phát triển phân hệ máy khách từ giao diện dòng lệnh (CLI) lên giao diện đồ họa (GUI) thông qua các công nghệ như \texttt{Qt} (C++) hoặc \texttt{Electron/Tauri}. Đồng thời, dự án có thể tích hợp tiêu chuẩn \texttt{WebRTC} nhằm triển khai tính năng truyền tải âm thanh và hình ảnh (Voice/Video Call) theo kiến trúc mạng ngang hàng (P2P), từ đó giảm thiểu tải băng thông tại máy chủ trung tâm.
 \end{enumerate}

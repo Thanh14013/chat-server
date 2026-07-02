@@ -1,33 +1,33 @@
 \section{Hệ thống Quản trị và Chống lạm dụng}
 
-\subsection{Phòng chống Tấn công Từ chối Dịch vụ (DoS/DDoS)}
+\subsection{Kiểm soát Rủi ro Tấn công Từ chối Dịch vụ (DoS/DDoS)}
 
 \begin{enumerate}
-    \item Cơ sở lý thuyết về Phòng chống Tấn công Từ chối Dịch vụ (DoS/DDoS)
+    \item Cơ sở lý thuyết về Kiểm soát Tấn công Từ chối Dịch vụ (DoS/DDoS)
     
-    Các máy chủ TCP khi mở cổng giao tiếp công khai thường phải đối mặt với nguy cơ quá tải do lượng lớn yêu cầu (Flooding). Đặc biệt, tấn công Từ chối Dịch vụ Phân tán (DDoS) ở Tầng 7 (Application Layer) sử dụng các thông điệp hợp lệ nhằm làm suy kiệt tài nguyên xử lý (CPU) và bộ nhớ (RAM).
+    Các máy chủ TCP khi mở cổng giao tiếp công khai luôn tiềm ẩn rủi ro quá tải do lượng lớn yêu cầu mạng (Flooding). Cụ thể, các hình thức tấn công Từ chối Dịch vụ Phân tán (DDoS) tại Tầng 7 (Application Layer) thường khai thác các thông điệp hợp lệ nhằm làm cạn kiệt tài nguyên xử lý (CPU) và bộ nhớ (RAM).
     
-    Dựa trên nguyên tắc Bảo mật Chiều sâu (Defense in Depth), hệ thống tích hợp cơ chế phòng thủ mềm với thuật toán Giỏ thẻ bài (Token Bucket). Mô hình này cấp phát một số lượng thẻ (Tokens) nhất định cho mỗi kết nối, trong đó mỗi thao tác tiêu thụ một thẻ. Giỏ được nạp lại theo tốc độ cố định (Refill Rate). Kết hợp với Hệ thống Phát hiện Xâm nhập (IDS), hành vi của máy khách được phân tích và chấm điểm rủi ro (Threat Scoring) để thiết lập cơ chế cấm vĩnh viễn (Permanent Ban) đối với các tác nhân vi phạm.
+    Dựa trên nguyên lý Bảo mật Chiều sâu (Defense in Depth), hệ thống tích hợp cơ chế kiểm soát truy cập thông qua thuật toán Giỏ thẻ bài (Token Bucket). Mô hình này cấp phát một số lượng thẻ (Tokens) nhất định trên mỗi kết nối, trong đó mỗi tác vụ tiêu thụ một lượng thẻ tương ứng. Khối lượng thẻ được tái nạp theo tốc độ cố định (Refill Rate). Kết hợp cùng Hệ thống Phát hiện Xâm nhập (IDS), hành vi của máy khách được phân tích và đánh giá qua Điểm rủi ro (Threat Scoring) nhằm thiết lập cơ chế từ chối dịch vụ vô thời hạn (Permanent Ban) đối với các tác nhân vi phạm.
 
     \item Triển khai Hệ thống RateLimiter và IntrusionDetector
     
-    Hệ thống phòng thủ được cấu thành từ hai thành phần độc lập: \texttt{RateLimiter} và \texttt{IntrusionDetector}:
+    Hệ thống kiểm soát được cấu thành từ hai phân hệ độc lập: RateLimiter và IntrusionDetector:
     
     \begin{itemize}[label={-}]
-        \item Tầng 1: Bộ giới hạn tốc độ (RateLimiter - Token Bucket): Hàm \texttt{TokenBucket::consume()} liên tục trừ điểm Token dựa trên độ trễ (\texttt{elapsed * refill\_rate}). Các ngưỡng giới hạn được áp dụng theo loại tác vụ (\texttt{MSG\_CHAT}, \texttt{CONNECT}, \texttt{AUTH}). Nếu máy khách tiêu thụ hết Token và số lần vi phạm vượt mức cho phép (\texttt{violations >= 4}), truy vấn sẽ bị từ chối (\texttt{RATE\_LIMITED}) nhằm giảm tải CPU.
+        \item Tầng 1 - Bộ giới hạn tốc độ (RateLimiter - Token Bucket): Hàm \texttt{TokenBucket::}\allowbreak\texttt{consume()} liên tục trừ điểm Token dựa trên tham số thời gian trễ (\texttt{elapsed * refill\_rate}). Các ngưỡng giới hạn được áp dụng phụ thuộc vào loại tác vụ (\texttt{MSG\_CHAT}, \texttt{CONNECT}, \texttt{AUTH}). Trong trường hợp máy khách tiêu thụ hết Token và số lần vi phạm vượt mức cho phép (\texttt{violations >= 4}), các yêu cầu tiếp theo sẽ bị từ chối (\texttt{RATE\_LIMITED}) nhằm giảm tải CPU.
         
-        \item Tầng 2: Hệ thống chấm điểm Rủi ro (IntrusionDetector): Các vi phạm từ \texttt{RateLimiter} và các module khác được báo cáo qua hàm \texttt{reportViolation()}. Mỗi lỗi được quy đổi thành điểm số rủi ro (\texttt{Threat Score}) tùy theo mức độ vi phạm.
+        \item Tầng 2 - Hệ thống chấm điểm Rủi ro (IntrusionDetector): Các vi phạm ghi nhận từ \texttt{RateLimiter} và các phân hệ khác được chuyển giao qua hàm \texttt{reportViolation()}. Mỗi mã lỗi được quy đổi thành điểm số rủi ro (\texttt{Threat Score}) tương ứng với mức độ nghiêm trọng.
         
-        \item Tầng 3: Biện pháp Xử lý (Progressive Penalty): Hàm \texttt{checkThresholds()} phân tích tổng điểm và thực thi biện pháp:
+        \item Tầng 3 - Biện pháp Xử lý (Progressive Penalty): Hàm \texttt{checkThresholds()} tiến hành phân tích tổng điểm và thực thi biện pháp kiểm soát:
         \begin{itemize}[label={$\circ$}]
-            \item Mức 100 điểm (\texttt{THREAT\_THRESHOLD}): Khóa IP 1 giờ (\texttt{m\_tempBans}).
-            \item Mức 200 điểm (\texttt{ATTACK\_THRESHOLD}): Khóa IP 24 giờ.
-            \item Mức 500 điểm (\texttt{PERM\_BAN\_THRESHOLD}): Ghi log (\texttt{AuditLogger}), xuất danh sách (\texttt{exportBanList()}) và đưa IP vào \texttt{m\_permBans} để từ chối dịch vụ vĩnh viễn ở cấp độ mạng.
+            \item Ngưỡng 100 điểm (\texttt{THREAT\_THRESHOLD}): Đưa IP vào danh sách hạn chế 1 giờ (\texttt{m\_tempBans}).
+            \item Ngưỡng 200 điểm (\texttt{ATTACK\_THRESHOLD}): Đưa IP vào danh sách hạn chế 24 giờ.
+            \item Ngưỡng 500 điểm (\texttt{PERM\_BAN\_THRESHOLD}): Lưu vết sự kiện (\texttt{AuditLogger}), xuất danh sách (\texttt{exportBanList()}) và bổ sung IP vào \texttt{m\_permBans} nhằm từ chối dịch vụ vô thời hạn ở cấp độ mạng.
         \end{itemize}
     \end{itemize}
 \end{enumerate}
 
-Bảng \ref{tab:threat_scores} tổng hợp hệ thống chấm điểm rủi ro (Threat Scoring) được định nghĩa trong \texttt{IntrusionDetector::scoreForViolation()}.
+Bảng \ref{tab:threat_scores} tổng hợp hệ thống chấm điểm rủi ro (Threat Scoring) được định nghĩa trong hàm \texttt{IntrusionDetector::scoreForViolation()}.
 
 \begin{longtable}{
     >{\raggedright\arraybackslash}p{4cm}
@@ -40,7 +40,6 @@ Bảng \ref{tab:threat_scores} tổng hợp hệ thống chấm điểm rủi ro
     \midrule
     \endfirsthead
     
-        \caption[]{Hệ thống Điểm phạt Hành vi (Threat Scoring System) (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Loại vi phạm (Violation Type)}} & \multicolumn{1}{c}{\textbf{Điểm phạt}} & \multicolumn{1}{c}{\textbf{Mô tả Nghiệp vụ}} \\
     \midrule
@@ -52,27 +51,22 @@ Bảng \ref{tab:threat_scores} tổng hợp hệ thống chấm điểm rủi ro
     \bottomrule
     \endlastfoot
 
-    \texttt{RATE\_LIMIT\_EXCEEDED} & 5 & Gửi yêu cầu vượt quá tần suất cho phép của Token Bucket. \\
-    \midrule
-    
-    \texttt{FAILED\_AUTH} \newline \texttt{INVALID\_PACKET} & 10 & Xác thực thất bại hoặc cấu trúc gói tin JSON không hợp lệ. \\
-    \midrule
+    \texttt{RATE\_LIMIT\_EXCEEDED} & 5 & Tần suất yêu cầu vượt quá giới hạn của thuật toán Token Bucket. \\
 
-    \texttt{HMAC\_FAILURE} & 20 & Chữ ký điện tử không khớp, phát hiện nghi vấn giả mạo Token. \\
-    \midrule
-    
-    \texttt{INJECTION\_ATTEMPT} & 30 & Dò tìm thấy mã XSS/SQLi qua module \texttt{MessageFilter}. \\
-    \midrule
+    \texttt{FAILED\_AUTH} \newline \texttt{INVALID\_PACKET} & 10 & Xác thực định danh không hợp lệ hoặc cấu trúc gói tin JSON sai định dạng. \\
 
-    \texttt{REPLAY\_ATTACK} & 50 & Phát hiện sử dụng lại mã định danh \texttt{jti} đã bị thu hồi. \\
-    \midrule
+    \texttt{HMAC\_FAILURE} & 20 & Chữ ký điện tử không khớp, phát sinh nghi vấn giả mạo Token. \\
 
-    \texttt{PORT\_SCAN} & 100 & Timeout trong quá trình bắt tay khóa lai, có dấu hiệu quét cổng mạng. \\
+    \texttt{INJECTION\_ATTEMPT} & 30 & Phát hiện mẫu chuỗi độc hại (XSS/SQLi) thông qua phân hệ \texttt{MessageFilter}. \\
+
+    \texttt{REPLAY\_ATTACK} & 50 & Ghi nhận hành vi tái sử dụng mã định danh \texttt{jti} đã bị thu hồi. \\
+
+    \texttt{PORT\_SCAN} & 100 & Ghi nhận lỗi quá thời gian bắt tay khóa lai, xuất hiện dấu hiệu quét cổng mạng. \\
 \end{longtable}
 
-% PLACEHOLDER: Hình ảnh Sơ đồ Luồng xử lý Rate Limiter
 \begin{figure}[htbp]
     \centering
+    \includegraphics[width=0.8\textwidth]{Hinhve/hinh_2.7.png}
     \caption[Lược đồ Khối Hệ thống Tường lửa mềm]{Lược đồ Khối (Block Diagram) Hệ thống Tường lửa mềm (RateLimiter \& IDS)}
     \label{fig:rate_limiter}
 \end{figure}
@@ -82,26 +76,26 @@ Bảng \ref{tab:threat_scores} tổng hợp hệ thống chấm điểm rủi ro
 \begin{enumerate}
     \item Cơ sở lý thuyết về Kiểm soát Truy cập dựa trên Vai trò (RBAC)
     
-    Mô hình Kiểm soát Truy cập dựa trên Vai trò (Role-Based Access Control - RBAC) được áp dụng để quản trị đặc quyền. Thay vì cấp phát quyền trực tiếp, người dùng được phân bổ vào các Vai trò (Roles) có sẵn. Hệ thống áp dụng Nguyên tắc Đặc quyền tối thiểu (Principle of Least Privilege), khởi tạo tài khoản mới ở mức quyền thấp nhất. Các thao tác thay đổi trạng thái quản trị được ghi nhận vào Nhật ký Kiểm toán (Audit Trails) để đảm bảo Tính Trách nhiệm giải trình (Accountability).
+    Mô hình Kiểm soát Truy cập dựa trên Vai trò (Role-Based Access Control - RBAC) được triển khai nhằm quản trị đặc quyền hệ thống. Theo mô hình này, người dùng được phân bổ vào các Vai trò (Roles) khả dụng thay vì được cấp phát quyền trực tiếp. Hệ thống tuân thủ Nguyên tắc Đặc quyền tối thiểu (Principle of Least Privilege), cấu hình tài khoản mới ở mức quyền hạn cơ bản nhất. Các tác vụ can thiệp vào trạng thái quản trị đều được lưu vết vào Nhật ký Kiểm toán (Audit Trails) nhằm duy trì Tính Trách nhiệm giải trình (Accountability).
 
     \item Triển khai Phân quyền trong mã nguồn (AdminCommands)
     
-    Hệ thống định nghĩa 3 cấp bậc quyền hạn (\texttt{USER}, \texttt{ADMIN}, \texttt{OWNER}), được quản lý bởi lớp \texttt{AdminCommands}. Việc kiểm tra đặc quyền được thực hiện tập trung qua hàm \texttt{hasAdminRight(adminFd, ownerOnly)} nhằm hạn chế rủi ro leo thang đặc quyền.
+    Hệ thống kiến trúc 3 cấp bậc quyền hạn (\texttt{USER}, \texttt{ADMIN}, \texttt{OWNER}), được điều phối bởi lớp \texttt{AdminCommands}. Tiến trình kiểm tra đặc quyền được vận hành tập trung qua hàm \texttt{hasAdminRight(adminFd, ownerOnly)} nhằm giới hạn rủi ro leo thang đặc quyền.
     
     \begin{itemize}[label={-}]
-        \item \texttt{USER} (Mặc định): Cung cấp quyền giao tiếp cơ bản (Nhắn tin, Truyền tệp), chịu sự giám sát của \texttt{RateLimiter} và \texttt{IntrusionDetector}.
+        \item \texttt{USER} (Mặc định): Được cấp phát quyền giao tiếp cơ bản (Nhắn tin, Truyền tệp), chịu sự giám sát toàn diện của \texttt{RateLimiter} và \texttt{IntrusionDetector}.
         
-        \item \texttt{ADMIN} (Quản trị viên): Cấp đặc quyền vận hành để thực thi các lệnh cưỡng chế:
+        \item \texttt{ADMIN} (Quản trị viên): Được cấp phát đặc quyền vận hành, cho phép thực thi các lệnh điều khiển:
         \begin{itemize}[label={$\circ$}]
-            \item \texttt{/mute} \& \texttt{/unmute}: Khóa/mở tính năng gửi tin nhắn của một phiên.
-            \item \texttt{/kick} \& \texttt{/unkick}: Loại người dùng khỏi phòng qua \texttt{kickFromRoom()}.
-            \item \texttt{/ban} \& \texttt{/unban}: Tương tác với \texttt{IntrusionDetector::permBan()} để khóa vĩnh viễn IP và Nickname.
-            \item \texttt{/broadcast}: Phân phối thông báo hệ thống đến mọi phòng.
+            \item \texttt{/mute} \& \texttt{/unmute}: Giới hạn hoặc khôi phục tính năng gửi tin nhắn của một phiên.
+            \item \texttt{/kick} \& \texttt{/unkick}: Hủy tư cách thành viên phòng thông qua \texttt{kickFromRoom()}.
+            \item \texttt{/ban} \& \texttt{/unban}: Tương tác với \texttt{IntrusionDetector::permBan()} nhằm khóa vô thời hạn địa chỉ IP và định danh.
+            \item \texttt{/broadcast}: Phân phối thông điệp hệ thống tới toàn bộ phòng trò chuyện.
         \end{itemize}
         
-        \item \texttt{OWNER} (Chủ sở hữu): Cấp quyền cao nhất (\texttt{ownerOnly = true}), bao gồm khả năng thực thi lệnh \texttt{/promote} (nâng cấp \texttt{USER} thành \texttt{ADMIN}) và \texttt{/demote} (giáng cấp \texttt{ADMIN} thành \texttt{USER}).
+        \item \texttt{OWNER} (Chủ sở hữu): Được cấp quyền quản trị tối cao (\texttt{ownerOnly = true}), bao gồm năng lực thực thi lệnh \texttt{/promote} (nâng cấp \texttt{USER} thành \texttt{ADMIN}) và \texttt{/demote} (giáng cấp \texttt{ADMIN} thành \texttt{USER}).
         
-        \item Kiểm toán Đặc quyền (Audit Logging): Mọi lệnh quản trị thực thi thành công đều kích hoạt macro \texttt{AUDIT\_D()} để lưu trữ log qua \texttt{AuditLogger}. Đối với lệnh \texttt{/kick}, hệ thống ghi nhận \texttt{AuditEventType::ADMIN}, danh tính hai bên và lý do (\texttt{reason}) nhằm đáp ứng yêu cầu thanh tra.
+        \item Kiểm toán Đặc quyền (Audit Logging): Toàn bộ lệnh quản trị được thực thi thành công sẽ kích hoạt macro \texttt{AUDIT\_D()} nhằm lưu trữ bản ghi qua \texttt{AuditLogger}. Đối với lệnh \texttt{/kick}, hệ thống lưu vết \texttt{AuditEventType::ADMIN}, bao gồm định danh các bên liên quan và tham số lý do (\texttt{reason}) nhằm đáp ứng quy chuẩn thanh tra bảo mật.
     \end{itemize}
 \end{enumerate}
 
@@ -119,7 +113,6 @@ Bảng \ref{tab:rbac_matrix} tổng hợp Ma trận Phân quyền (Access Contro
     \midrule
     \endfirsthead
     
-        \caption[]{Ma trận Phân quyền (RBAC Matrix) của Hệ thống (tiếp theo)} \\
     \toprule
     \multicolumn{1}{c}{\textbf{Tác vụ (Command)}} & \multicolumn{1}{c}{\textbf{USER}} & \multicolumn{1}{c}{\textbf{ADMIN}} & \multicolumn{1}{c}{\textbf{OWNER}} \\
     \midrule
@@ -132,10 +125,10 @@ Bảng \ref{tab:rbac_matrix} tổng hợp Ma trận Phân quyền (Access Contro
     \endlastfoot
 
     Nhắn tin / Chuyển tệp / Đổi tên & Có & Có & Có \\
-    \midrule
+
     \texttt{/mute} / \texttt{/kick} / \texttt{/broadcast} & Không & Có & Có \\
-    \midrule
+
     \texttt{/ban} / \texttt{/unban} & Không & Có & Có \\
-    \midrule
+
     \texttt{/promote} / \texttt{/demote} & Không & Không & Có \\
 \end{longtable}

@@ -184,7 +184,7 @@ void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
     auto it = m_transfers.find(tid);
     if (it == m_transfers.end()) return;
     if (it->second.sender_fd != senderFd) return;
-    if (it->second.status != TransferStatus::ACCEPTED) return;
+    if (it->second.status != TransferStatus::ACCEPTED && it->second.status != TransferStatus::IN_PROGRESS) return;
 
     it->second.status = TransferStatus::IN_PROGRESS;
 

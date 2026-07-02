@@ -10,7 +10,10 @@
 #include "../utils/Database.h"
 #include "../features/AdminCommands.h"
 #include "../features/FileTransfer.h"
+#include "../features/MessageFilter.h"
 #include "../security/RateLimiter.h"
+#include "../rooms/RoomManager.h"
+#include "../rooms/ChatHistory.h"
 #include "../security/IntrusionDetector.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -112,6 +115,7 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
 
     AdminCommands::instance().initialize(this);
     FileTransfer::instance().initialize(this);
+    RoomManager::instance().initialize(this, cfg.default_room);
     IntrusionDetector::instance().loadBanList();
     IntrusionDetector::instance().addWhitelist("127.0.0.1");
 
@@ -437,8 +441,18 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     }
 
     const auto& cfg = Config::instance().get();
+    std::string lastRoom = m_authManager->getLastRoom(parsed.nickname);
+    std::string roomToJoin = cfg.default_room;
+    
+    if (!lastRoom.empty()) {
+        std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
+        if (m_rooms.count(lastRoom)) {
+            roomToJoin = lastRoom;
+        }
+    }
+
     sess->setNickname(parsed.nickname);
-    sess->setRoom(cfg.default_room);
+    sess->setRoom(roomToJoin);
     sess->setAuthenticated(true);
 
     auto role = m_authManager->getUserRole(parsed.nickname);
@@ -453,15 +467,16 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        m_rooms[cfg.default_room].members.insert(fd);
+        m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin));
 
-    std::string notify = parsed.nickname + " joined #" + cfg.default_room;
-    broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(notify), fd);
+    std::string notify = parsed.nickname + " joined #" + roomToJoin;
+    broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
+    RoomManager::instance().sendHistoryToClient(fd, roomToJoin, 50);
 
-    LOG_INFO("Client authenticated: " + parsed.nickname + " from " + sess->ip());
+    LOG_INFO("Client authenticated: " + parsed.nickname + " from " + sess->ip() + " (Room: " + roomToJoin + ")");
 }
 
 void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
@@ -484,8 +499,18 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     }
 
     const auto& cfg = Config::instance().get();
+    std::string lastRoom = m_authManager->getLastRoom(nickname);
+    std::string roomToJoin = cfg.default_room;
+    
+    if (!lastRoom.empty()) {
+        std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
+        if (m_rooms.count(lastRoom)) {
+            roomToJoin = lastRoom;
+        }
+    }
+
     sess->setNickname(nickname);
-    sess->setRoom(cfg.default_room);
+    sess->setRoom(roomToJoin);
     sess->setAuthenticated(true);
 
     auto role = m_authManager->getUserRole(nickname);
@@ -500,15 +525,16 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
 
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
-        m_rooms[cfg.default_room].members.insert(fd);
+        m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, cfg.default_room));
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin));
 
-    std::string notify = nickname + " reconnected to #" + cfg.default_room;
-    broadcastToRoom(cfg.default_room, Builder::makeSystemNotify(notify), fd);
+    std::string notify = nickname + " reconnected to #" + roomToJoin;
+    broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
+    RoomManager::instance().sendHistoryToClient(fd, roomToJoin, 50);
 
-    LOG_INFO("Client reconnected: " + nickname + " from " + sess->ip());
+    LOG_INFO("Client reconnected: " + nickname + " from " + sess->ip() + " (Room: " + roomToJoin + ")");
 }
 
 void TcpServer::handleChatSend(int fd, const Packet& pkt){
@@ -528,6 +554,13 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 
     auto parsed = Parser::parseChatSend(pkt);
     if (parsed.message.empty()) return;
+
+    auto filterRes = MessageFilter::instance().filter(parsed.message, fd, sess->nickname());
+    if (filterRes.result != FilterResult::PASS) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Message blocked by security filter"));
+        return;
+    }
+
     if ((int)parsed.message.size() > Constants::MAX_MESSAGE_LEN) {
         sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_TOO_LONG, "Message too long"));
         return;
@@ -536,7 +569,15 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
     sess->incrementMsgCount();
     std::string room = sess->currentRoom();
     auto broadcast = Builder::makeChatBroadcast(sess->nickname(),  room, parsed.message);
-    broadcastToRoom(room, broadcast, -1);
+    broadcastToRoom(room, broadcast, fd);
+
+    HistoryEntry entry;
+    entry.timestamp = std::time(nullptr);
+    entry.sender = sess->nickname();
+    entry.room = room;
+    entry.message = parsed.message;
+    entry.msg_type = HistoryMsgType::CHAT;
+    RoomManager::instance().appendHistory(room, entry);
 }
 
 void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
@@ -550,6 +591,12 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
 
     auto parsed = Parser::parseChatPrivate(pkt);
     if (parsed.to.empty() || parsed.message.empty()) return;
+
+    auto filterRes = MessageFilter::instance().filter(parsed.message, fd, sender->nickname());
+    if (filterRes.result != FilterResult::PASS) {
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Message blocked by security filter"));
+        return;
+    }
 
     int targetFd = getFdByNickname(parsed.to);
     if (targetFd != -1) {
@@ -637,10 +684,12 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
     }
 
     sess->setRoom(newRoom);
+    m_authManager->updateLastRoom(sess->nickname(), newRoom);
 
     broadcastToRoom(oldRoom, Builder::makeSystemNotify(sess->nickname() + " left #" + oldRoom), fd);
     broadcastToRoom(newRoom, Builder::makeSystemNotify(sess->nickname() + " joined #" + newRoom), fd);
-    sess->sendPacket(Builder::makeSystemNotify("You joined #" + newRoom));   
+    sess->sendPacket(Builder::makeSystemNotify("You joined #" + newRoom));
+    RoomManager::instance().sendHistoryToClient(fd, newRoom, 50);
 }
 
 void TcpServer::handleRoomDelete(int fd, const Packet& pkt) {
