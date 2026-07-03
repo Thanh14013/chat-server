@@ -1,2 +1,4 @@
 *build
 windows_deps
+*.sh
+baocao
