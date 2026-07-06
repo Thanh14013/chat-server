@@ -87,9 +87,8 @@ std::vector<HistoryEntry> ChatHistory::loadFromDb(int n) {
 
 std::vector<HistoryEntry> ChatHistory::getRecent(int n) {
     std::lock_guard<std::mutex> lk(m_mutex);
-    if (!m_buffer.empty()) {
-        int cnt = std::min(n, (int)m_buffer.size());
-        return std::vector<HistoryEntry>(m_buffer.end() - cnt, m_buffer.end());
+    if ((int)m_buffer.size() >= n) {
+        return std::vector<HistoryEntry>(m_buffer.end() - n, m_buffer.end());
     }
     return loadFromDb(n);
 }

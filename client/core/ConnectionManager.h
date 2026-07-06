@@ -38,6 +38,8 @@ private:
     CommandHandler m_cmdHandler;
     CommandParser m_cmdParser;
 
+    std::string m_nickname;
+
     std::atomic<bool> m_running;
     
     enum class AuthState {

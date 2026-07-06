@@ -246,7 +246,5 @@ void RoomManager::sendHistoryToClient(int fd, const std::string& room, int n) {
     if (!sess) return;
 
     Packet histPkt = h->serializeForClient(entries);
-    sess->sendPacket(Builder::makeSystemNotify("--- Chat history for #" + room + " ---"));
     sess->sendPacket(histPkt);
-    sess->sendPacket(Builder::makeSystemNotify("--- End of history ---"));
 }

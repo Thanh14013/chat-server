@@ -7,6 +7,7 @@ namespace Constants{
     constexpr int      THREAD_POOL_SIZE      = 32;
     constexpr int      MAX_NICKNAME_LEN      = 32;
     constexpr int      MAX_MESSAGE_LEN       = 4096;
+    constexpr uint32_t MAX_PAYLOAD_LEN       = 1048576; // 1 MB for history/files
     constexpr int      MAX_ROOM_NAME_LEN     = 64;
     constexpr int      MAX_ROOMS             = 32;
     constexpr int      SESSION_TIMEOUT_SEC   = 3600;

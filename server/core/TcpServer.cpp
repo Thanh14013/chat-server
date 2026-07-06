@@ -398,6 +398,11 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
 
     if (!isNicknameValid(parsed.nickname)) {
         sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_NICKNAME_INVALID, "Invalid nickname"));
+        return;
+    }
+
+    if (parsed.password.empty()) {
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_AUTH_FAILED, "Password cannot be empty"));
         onClientDisconnected(fd);
         return;
     }
@@ -430,13 +435,11 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
             IntrusionDetector::instance().reportViolation(sess->ip(), ViolationType::FAILED_AUTH);
         }
         sess->sendPacket(Builder::makeConnectReject(err, "Authentication failed"));
-        onClientDisconnected(fd);
         return;
     }
 
     if (IntrusionDetector::instance().isBannedNick(parsed.nickname)) {
         sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_PERMISSION_DENIED, "Your nickname is permanently banned."));
-        onClientDisconnected(fd);
         return;
     }
 
@@ -470,7 +473,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin));
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname()));
 
     std::string notify = parsed.nickname + " joined #" + roomToJoin;
     broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
@@ -486,7 +489,6 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
 
     if (token.empty()) {
         sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_AUTH_FAILED, "Missing token"));
-        onClientDisconnected(fd);
         return;
     }
 
@@ -494,7 +496,6 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     ErrorCode err = m_authManager->reconnectWithToken(token, fd, nickname);
     if (err != ErrorCode::ERR_OK) {
         sess->sendPacket(Builder::makeConnectReject(err, "Invalid or expired token"));
-        onClientDisconnected(fd);
         return;
     }
 
@@ -528,7 +529,7 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
         m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin));
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname()));
 
     std::string notify = nickname + " reconnected to #" + roomToJoin;
     broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
@@ -568,8 +569,11 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 
     sess->incrementMsgCount();
     std::string room = sess->currentRoom();
+    
+    LOG_INFO("CHAT | Room: " + room + " | User: " + sess->nickname() + " | Msg: " + parsed.message);
+    
     auto broadcast = Builder::makeChatBroadcast(sess->nickname(),  room, parsed.message);
-    broadcastToRoom(room, broadcast, fd);
+    broadcastToRoom(room, broadcast, -1); // Broadcast to everyone, including sender
 
     HistoryEntry entry;
     entry.timestamp = std::time(nullptr);

@@ -3,8 +3,15 @@
 #include "../../common/MessageTypes.h"
 #include <iostream>
 #include <filesystem>
+#include <iomanip>
+#include <ctime>
 #include <nlohmann/json.hpp>
-
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <termios.h>
+#include <unistd.h>
+#endif
 using json = nlohmann::json;
 
 ConnectionManager::ConnectionManager(TcpClient *client)
@@ -16,6 +23,10 @@ ConnectionManager::ConnectionManager(TcpClient *client)
                                       { this->onPacketReceived(pkt); });
         m_client->setOnHandshakeDone([this](bool success)
                                      { this->onHandshakeDone(success); });
+        m_client->setOnDisconnected([this]() {
+            std::cout << "\n[SYSTEM] Disconnected from server.\n";
+            stop();
+        });
     }
 }
 
@@ -76,7 +87,6 @@ void ConnectionManager::run()
     }
 
     if (!token.empty()) {
-        std::cout << "[SYSTEM] Found saved token, attempting reconnect...\n";
         json j;
         j["token"] = token;
         std::string payload = j.dump();
@@ -94,15 +104,50 @@ void ConnectionManager::run()
     // 3. Fallback / Login Loop
     while (m_running && m_authState != AuthState::AUTHENTICATED) {
         std::cout << "Enter nickname: ";
+        std::cout.flush();
         std::string nick;
         if (!std::getline(std::cin, nick)) {
             stop();
             return;
         }
 
+        std::cout << "Enter password: ";
+        std::cout.flush();
+        std::string pass;
+#ifdef _WIN32
+        char ch;
+        while ((ch = _getch()) != '\r') {
+            if (ch == '\b') {
+                if (!pass.empty()) {
+                    pass.pop_back();
+                    std::cout << "\b \b";
+                }
+            } else if (ch == 3) {
+                std::exit(1);
+            } else {
+                pass += ch;
+                std::cout << '*';
+            }
+        }
+        std::cout << std::endl;
+#else
+        termios oldt;
+        tcgetattr(STDIN_FILENO, &oldt);
+        termios newt = oldt;
+        newt.c_lflag &= ~ECHO;
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+        if (!std::getline(std::cin, pass)) {
+            tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+            stop();
+            return;
+        }
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        std::cout << std::endl;
+#endif
+
         json j;
         j["nickname"] = nick;
-        j["password"] = "";
+        j["password"] = pass;
         std::string payload = j.dump();
         std::vector<uint8_t> body(payload.begin(), payload.end());
         
@@ -119,7 +164,7 @@ void ConnectionManager::run()
 
     if (!m_running) return;
 
-    std::cout << "Type /help for a list of commands.\n";
+    std::cout << "Type /help for a list of commands." << std::endl;
 
     std::string input;
     while (m_running)
@@ -160,6 +205,7 @@ void ConnectionManager::run()
                 j["message"] = input;
                 std::string s = j.dump();
                 std::vector<uint8_t> payload(s.begin(), s.end());
+                std::cout << "\x1b[1A\x1b[2K\r" << std::flush; // Erase the line the user just typed to avoid double printing
                 m_client->sendPacket(Packet(MessageType::MSG_CHAT_SEND, payload));
             }
         }
@@ -184,6 +230,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
                 ofs.close();
             }
             std::string room = j.value("room", "general");
+            m_nickname = j.value("nickname", "");
             std::cout << "[+] Connected successfully! You are in #" << room << "\n";
         }
         std::lock_guard<std::mutex> lock(m_authMutex);
@@ -195,7 +242,10 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
     {
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded()) {
-            std::cout << "[-] Connection rejected: " << j.value("reason", "Unknown") << "\n";
+            std::string reason = j.value("reason", "Unknown");
+            if (reason.find("token") == std::string::npos) {
+                std::cout << "[-] Connection rejected: " << reason << "\n";
+            }
         }
         if (std::filesystem::exists("token.txt")) {
             std::filesystem::remove("token.txt"); // Remove invalid token
@@ -210,10 +260,39 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[" << j.value("timestamp", 0) << "] [#"
-                      << j.value("room", "") << "] "
-                      << j.value("from", "") << ": "
-                      << j.value("message", "") << std::endl;
+            try {
+                if (j.is_array()) {
+                    for (const auto& item : j) {
+                        time_t ts = item.value("ts", 0LL);
+                        std::string sender = item.value("sender", "");
+                        std::string r = item.value("room", "");
+                        if (!r.empty() && r[0] == '#') r = r.substr(1);
+                        
+                        std::cout << "\r[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
+                                  << r << "] ";
+                        if (sender == m_nickname) {
+                            std::cout << item.value("message", "") << std::endl;
+                        } else {
+                            std::cout << sender << ": " << item.value("message", "") << std::endl;
+                        }
+                    }
+                } else if (j.is_object()) {
+                    time_t ts = j.value("ts", 0LL);
+                    std::string sender = j.value("sender", "");
+                    std::string r = j.value("room", "");
+                    if (!r.empty() && r[0] == '#') r = r.substr(1);
+
+                    std::cout << "\r[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
+                              << r << "] ";
+                    if (sender == m_nickname) {
+                        std::cout << j.value("message", "") << std::endl;
+                    } else {
+                        std::cout << sender << ": " << j.value("message", "") << std::endl;
+                    }
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "[!] Error parsing chat broadcast: " << e.what() << std::endl;
+            }
         }
         break;
     }
@@ -244,6 +323,11 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         {
             std::cout << "[ERROR] " << j.value("reason", "") << std::endl;
         }
+        break;
+    }
+    case MessageType::MSG_PING:
+    {
+        m_client->sendPacket(Packet(MessageType::MSG_PONG, std::vector<uint8_t>()));
         break;
     }
     case MessageType::MSG_USER_LIST_RESPONSE:

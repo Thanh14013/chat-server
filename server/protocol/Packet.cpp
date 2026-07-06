@@ -1,6 +1,7 @@
 #include "Packet.h"
 #include "../../common/Constants.h"
 #include <cstring>
+#include <cerrno>
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -52,8 +53,11 @@ static bool recvAll(int fd, uint8_t *buf, size_t len)
 #else
         ssize_t n = recv(fd, buf + received, len - received, 0);
 #endif
-        if (n <= 0)
+        if (n < 0) {
+            if (errno == EINTR) continue;
             return false;
+        }
+        if (n == 0) return false;
         received += n;
     }
     return true;
@@ -71,7 +75,7 @@ bool readPacketFromFd(int fd, Packet &out)
         return false;
     if (hdr.version != Constants::PROTOCOL_VERSION)
         return false;
-    if (hdr.payload_length > static_cast<uint32_t>(Constants::MAX_MESSAGE_LEN + 256))
+    if (hdr.payload_length > Constants::MAX_PAYLOAD_LEN)
         return false;
 
     std::vector<uint8_t> payload(hdr.payload_length);

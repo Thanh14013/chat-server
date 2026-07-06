@@ -30,6 +30,9 @@ TcpClient::TcpClient() : m_fd(-1), m_connected(false) {}
 TcpClient::~TcpClient()
 {
     disconnect();
+    if (m_recvThread.joinable()) {
+        m_recvThread.join();
+    }
 }
 
 bool TcpClient::tryConnect(const std::string &host, uint16_t port)

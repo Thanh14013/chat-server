@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <nlohmann/json.hpp>
 #include <sys/socket.h>
+#include <poll.h>
 
 using json = nlohmann::json;
 
@@ -49,7 +50,7 @@ void ClientSession::appendAndParseBytes(const uint8_t* data, size_t len) {
             return;
         }
 
-        if (hdr.payload_length > static_cast<uint32_t>(Constants::MAX_MESSAGE_LEN + 256)) {
+        if (hdr.payload_length > Constants::MAX_PAYLOAD_LEN) {
             LOG_ERROR("Payload too large: " + std::to_string(hdr.payload_length) + ". Closing connection fd=" + std::to_string(m_fd));
             IntrusionDetector::instance().reportViolation(m_ip, ViolationType::INVALID_PACKET);
             disconnect();
@@ -111,12 +112,25 @@ bool ClientSession::sendPacket(const Packet& pkt){
     }
 
     auto bytes = packetToBytes(to_send);
-    ssize_t total=0;
+    ssize_t total = 0;
     ssize_t len = static_cast<ssize_t>(bytes.size());
-    while (total < len){
-        ssize_t n = ::send(m_fd,bytes.data() + total, len - total, MSG_NOSIGNAL);
-        if (n <=0) return false;
-        total+=n;
+    while (total < len) {
+        ssize_t n = ::send(m_fd, bytes.data() + total, len - total, MSG_NOSIGNAL);
+        if (n < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                struct pollfd pfd;
+                pfd.fd = m_fd;
+                pfd.events = POLLOUT;
+                ::poll(&pfd, 1, 1000); // wait up to 1 second
+                continue;
+            }
+            if (errno == EINTR) {
+                continue;
+            }
+            return false;
+        }
+        if (n == 0) return false;
+        total += n;
     }
     return true;
 }

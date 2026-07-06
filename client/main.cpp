@@ -33,7 +33,17 @@ int main(int argc, char* argv[]){
         std::cerr << "WSAStartup failed." << std::endl;
         return 1;
     }
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    if (hOut != INVALID_HANDLE_VALUE) {
+        if (GetConsoleMode(hOut, &dwMode)) {
+            SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        }
+    }
 #endif
+
+    std::cin.tie(nullptr);
+    std::ios::sync_with_stdio(false);
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -42,16 +52,16 @@ int main(int argc, char* argv[]){
     }
 
     TcpClient client;
+    ConnectionManager mgr(&client);
+    g_mgr = &mgr;
+    std::signal(SIGINT, signalHandler);
+
     if (!client.connectToServer(host,port)){
         std::cerr << "Failed to connect to " << host << ":" << port << std::endl;
         return 1;
     }
 
     std::cout << "Connected to server! Starting Connection Manager..." << std::endl;
-
-    ConnectionManager mgr(&client);
-    g_mgr = &mgr;
-    std::signal(SIGINT, signalHandler);
 
     mgr.run();
 

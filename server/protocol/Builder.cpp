@@ -1,5 +1,6 @@
 #include "Builder.h"
 #include <nlohmann/json.hpp>
+#include <ctime>
 
 using json = nlohmann::json;
 
@@ -18,11 +19,12 @@ namespace Builder
         return makePacket(MessageType::MSG_SYSTEM_NOTIFY, j.dump());
     }
 
-    Packet makeConnectAccept(const std::string &token, const std::string &room)
+    Packet makeConnectAccept(const std::string &token, const std::string &room, const std::string &nickname)
     {
         json j;
         j["token"] = token;
         j["room"] = room;
+        j["nickname"] = nickname;
         return makePacket(MessageType::MSG_CONNECT_ACCEPT, j.dump());
     }
 
@@ -47,6 +49,7 @@ namespace Builder
         j["sender"] = sender;
         j["room"] = room;
         j["message"] = message;
+        j["ts"] = (long long)std::time(nullptr);
         return makePacket(MessageType::MSG_CHAT_BROADCAST, j.dump());
     }
 

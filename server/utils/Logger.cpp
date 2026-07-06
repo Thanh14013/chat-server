@@ -73,10 +73,9 @@ void Logger::log(LogLevel level, const std::string& msg) {
     if (level < m_level) return;
 
     std::ostringstream oss;
-    std::thread::id tid = std::this_thread::get_id();
+    std::thread::id tid = std::this_thread::get_id(); // Kept just in case it's used elsewhere, but we won't output it
     oss << "[" << currentTimestamp() << "]"
-        << " [" << levelToString(level) << "]"
-        << " [" << tid << "] "
+        << " [" << levelToString(level) << "] "
         << msg;
 
     std::string line = oss.str();
