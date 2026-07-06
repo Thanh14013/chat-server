@@ -35,7 +35,7 @@ namespace vcs::security
     {
         std::unique_lock<std::shared_mutex> lock(clients_mutex_);
         auto it = clients_.find(fd);
-        if (it != clients_.end())
+        if (it == clients_.end())
             return buildErrorPacket(ErrorCode::ERR_CRYPTO_HANDSHAKE_FAIL);
 
         PerClientState &cs = it->second;
