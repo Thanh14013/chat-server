@@ -1,4 +1,6 @@
-*build
+*build*
 windows_deps
 *.sh
 *baocao
+*logs
+*tests
