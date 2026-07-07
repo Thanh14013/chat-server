@@ -1,1 +1,0 @@
-{"server": {"port": 9500, "max_clients": 100, "thread_pool_size": 4}, "security": {"require_auth": true, "max_auth_attempts": 5, "rate_limit_msg_per_sec": 100, "enable_encryption": false, "enable_audit_log": true}, "rooms": {"default_room": "general", "max_rooms": 10, "history_size": 10}, "admin": {"admin_password_hash": "admin123"}}
