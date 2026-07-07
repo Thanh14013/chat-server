@@ -9,7 +9,7 @@ bool CommandParser::isCommand(const std::string& input) const {
 CommandType CommandParser::stringToCommandType(const std::string& cmdStr) const {
     if (cmdStr == "/quit") return CommandType::CMD_QUIT;
     if (cmdStr == "/list") return CommandType::CMD_LIST;
-    if (cmdStr == "/listall") return CommandType::CMD_LISTALL;
+
     if (cmdStr == "/rooms") return CommandType::CMD_ROOMS;
     if (cmdStr == "/join") return CommandType::CMD_JOIN;
     if (cmdStr == "/leave") return CommandType::CMD_LEAVE;

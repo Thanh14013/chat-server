@@ -105,12 +105,13 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
     for (const auto& r : rooms_db) {
         RoomInfo info;
         info.creator_nick = r.creator;
+        info.has_password = r.has_password;
         auto banned = m_authManager->getBannedUsersForRoomDb(r.name);
         for(const auto& b : banned) info.banned_nicks.insert(b);
         m_rooms[r.name] = info;
     }
     if (m_rooms.find(cfg.default_room) == m_rooms.end()) {
-        m_rooms[cfg.default_room] = {"system", {}, {}};
+        m_rooms[cfg.default_room] = {"system", {}, {}, false};
     }
 
     AdminCommands::instance().initialize(this);
@@ -345,7 +346,7 @@ void TcpServer::handlePacket(int fd, const Packet& raw_pkt){
         case MessageType::MSG_ADMIN_MUTE: {
             auto j = nlohmann::json::parse(payload, nullptr, false);
             if (!j.is_discarded()) {
-                int dur = j.value("duration", 300);
+                int dur = j.value("duration", -1);
                 if (dur == 0) AdminCommands::instance().unmute(fd, j.value("target",""));
                 else          AdminCommands::instance().mute(fd, j.value("target",""), dur);
             }
@@ -397,7 +398,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     if (!sess) return;
 
     if (!isNicknameValid(parsed.nickname)) {
-        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_NICKNAME_INVALID, "Invalid nickname"));
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_NICKNAME_INVALID, "Invalid nickname (3-16 alphanumeric characters)"));
         return;
     }
 
@@ -423,7 +424,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     }
 
     if (RateLimiter::instance().checkLimit("ip_" + sess->ip() + "_auth", RateLimitType::AUTH) == RateCheckResult::RATE_LIMITED) {
-        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_RATE_LIMITED, "Too many auth attempts"));
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_RATE_LIMITED, "Too many requests, please try again later"));
         onClientDisconnected(fd);
         return;
     }
@@ -434,7 +435,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         if (err == ErrorCode::ERR_AUTH_FAILED || err == ErrorCode::ERR_AUTH_TOO_MANY_ATTEMPTS) {
             IntrusionDetector::instance().reportViolation(sess->ip(), ViolationType::FAILED_AUTH);
         }
-        sess->sendPacket(Builder::makeConnectReject(err, "Authentication failed"));
+        sess->sendPacket(Builder::makeConnectReject(err, "Invalid nickname or password"));
         return;
     }
 
@@ -457,6 +458,15 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     sess->setNickname(parsed.nickname);
     sess->setRoom(roomToJoin);
     sess->setAuthenticated(true);
+    
+    time_t muteUntil = 0;
+    bool isMuted = m_authManager->getMuteStateDb(parsed.nickname, muteUntil);
+    if (isMuted && (muteUntil == 0 || muteUntil > std::time(nullptr))) {
+        sess->setMuted(true, muteUntil);
+    } else if (isMuted) {
+        m_authManager->updateMuteStateDb(parsed.nickname, false, 0);
+        sess->setMuted(false, 0);
+    }
 
     auto role = m_authManager->getUserRole(parsed.nickname);
     if (role == vcs::security::SessionToken::Role::OWNER) sess->setRole(UserRole::OWNER);
@@ -473,7 +483,8 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
         m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname()));
+    bool isAdmin = (role == vcs::security::SessionToken::Role::ADMIN || role == vcs::security::SessionToken::Role::OWNER);
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname(), isAdmin));
 
     std::string notify = parsed.nickname + " joined #" + roomToJoin;
     broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
@@ -513,6 +524,15 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
     sess->setNickname(nickname);
     sess->setRoom(roomToJoin);
     sess->setAuthenticated(true);
+    
+    time_t muteUntil = 0;
+    bool isMuted = m_authManager->getMuteStateDb(nickname, muteUntil);
+    if (isMuted && (muteUntil == 0 || muteUntil > std::time(nullptr))) {
+        sess->setMuted(true, muteUntil);
+    } else if (isMuted) {
+        m_authManager->updateMuteStateDb(nickname, false, 0);
+        sess->setMuted(false, 0);
+    }
 
     auto role = m_authManager->getUserRole(nickname);
     if (role == vcs::security::SessionToken::Role::OWNER) sess->setRole(UserRole::OWNER);
@@ -529,7 +549,8 @@ void TcpServer::handleReconnectRequest(int fd, const Packet& pkt) {
         m_rooms[roomToJoin].members.insert(fd);
     }
 
-    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname()));
+    bool isAdmin = (sess->role() == UserRole::ADMIN || sess->role() == UserRole::OWNER);
+    sess->sendPacket(Builder::makeConnectAccept(token, roomToJoin, sess->nickname(), isAdmin));
 
     std::string notify = nickname + " reconnected to #" + roomToJoin;
     broadcastToRoom(roomToJoin, Builder::makeSystemNotify(notify), fd);
@@ -543,13 +564,13 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
     if (!sess || !sess->isAuthenticated()) return;
 
     if (sess->isMuted()){
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You are muted"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You have been muted!"));
         return;
     }
 
     std::string fd_key = "fd_" + std::to_string(fd);
     if (RateLimiter::instance().checkLimit(fd_key, RateLimitType::MSG_CHAT) == RateCheckResult::RATE_LIMITED) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_RATE_LIMITED, "Slow down"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_RATE_LIMITED, "Please chat slower (Spam detected)"));
         return;
     }
 
@@ -558,12 +579,12 @@ void TcpServer::handleChatSend(int fd, const Packet& pkt){
 
     auto filterRes = MessageFilter::instance().filter(parsed.message, fd, sess->nickname());
     if (filterRes.result != FilterResult::PASS) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Message blocked by security filter"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Your message was blocked by the security filter"));
         return;
     }
 
     if ((int)parsed.message.size() > Constants::MAX_MESSAGE_LEN) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_TOO_LONG, "Message too long"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_TOO_LONG, "Message is too long"));
         return;
     }
 
@@ -589,16 +610,21 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
     if (!sender || !sender->isAuthenticated()) return;
 
     if (sender->isMuted()){
-        sender->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You are muted"));
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED,"You have been muted!"));
         return;
     }
 
     auto parsed = Parser::parseChatPrivate(pkt);
+    if (parsed.to == sender->nickname()) {
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Cannot send message to yourself"));
+        return;
+    }
+
     if (parsed.to.empty() || parsed.message.empty()) return;
 
     auto filterRes = MessageFilter::instance().filter(parsed.message, fd, sender->nickname());
     if (filterRes.result != FilterResult::PASS) {
-        sender->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Message blocked by security filter"));
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_MESSAGE_BLOCKED, "Your message was blocked by the security filter"));
         return;
     }
 
@@ -615,10 +641,11 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
             std::vector<uint8_t> payload(s.begin(), s.end());
             Packet p(MessageType::MSG_CHAT_PRIVATE, payload);
             it->second->sendPacket(p);
+            sender->sendPacket(p);
             return;
         }
     }
-    sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found"));
+    sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Target user not found"));
 }
 
 void TcpServer::handleDisconnect(int fd, const Packet&) {
@@ -648,8 +675,22 @@ void TcpServer::handleRoomListRequest(int fd) {
     auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
-    auto rooms = getRoomList();
-    json j = rooms;
+    auto allRooms = m_authManager->loadAllRoomsFromDb();
+    std::set<std::string> publicRooms;
+    for (const auto& r : allRooms) {
+        if (!r.has_password) publicRooms.insert(r.name);
+    }
+
+    json j = json::array();
+    std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
+    for (const auto& [name, roomData] : m_rooms) {
+        if (publicRooms.find(name) != publicRooms.end()) {
+            json item;
+            item["room"] = name;
+            item["users"] = roomData.members.size();
+            j.push_back(item);
+        }
+    }
     sess->sendPacket(Builder::makeRoomListResponse(j.dump()));
 }
 
@@ -661,17 +702,26 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
     std::string newRoom = parsed.room_name;
     if (newRoom.empty()) return;
 
-    const auto& cfg = Config::instance().get();
-    if (newRoom != cfg.default_room) {
-        ErrorCode err = m_authManager->verifyRoomPasswordDb(newRoom, parsed.password);
-        if (err == ErrorCode::ERR_ROOM_NOT_FOUND) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room not found"));
-            return;
+    auto allRooms = m_authManager->loadAllRoomsFromDb();
+    bool isPasswordProtected = false;
+    bool roomExists = false;
+    for (const auto& r : allRooms) {
+        if (r.name == newRoom) {
+            roomExists = true;
+            isPasswordProtected = r.has_password;
+            break;
         }
+    }
+
+    if (isPasswordProtected) {
+        auto err = m_authManager->verifyRoomPasswordDb(newRoom, parsed.password);
         if (err != ErrorCode::ERR_OK) {
-            sess->sendPacket(Builder::makeError(err, "Incorrect room password"));
+            sess->sendPacket(Builder::makeError(err, "Incorrect password or room not found"));
             return;
         }
+    } else if (!roomExists && newRoom != Config::instance().get().default_room) {
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room not found"));
+        return;
     }
 
     std::string oldRoom = sess->currentRoom();
@@ -679,7 +729,7 @@ void TcpServer::handleRoomJoin(int fd, const Packet& pkt){
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
         if (m_rooms.count(newRoom) && m_rooms[newRoom].banned_nicks.count(sess->nickname())) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "You are banned from this room"));
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "You have been kicked from this room."));
             return;
         }
         if (m_rooms.count(oldRoom)) m_rooms[oldRoom].members.erase(fd);
@@ -704,19 +754,19 @@ void TcpServer::handleRoomDelete(int fd, const Packet& pkt) {
     const auto& cfg = Config::instance().get();
 
     if (roomName == cfg.default_room) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Cannot delete default room"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Cannot delete the default room (general)"));
         return;
     }
 
     std::string creator = m_authManager->getRoomCreatorDb(roomName);
     if (creator.empty()) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room not found"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room does not exist"));
         return;
     }
 
     bool isAdmin = (sess->role() == UserRole::ADMIN || sess->role() == UserRole::OWNER);
     if (creator != sess->nickname() && !isAdmin) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Only creator or admin can delete this room"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Only the room creator or an ADMIN can delete this room"));
         return;
     }
 
@@ -751,7 +801,7 @@ void TcpServer::handleRoomDelete(int fd, const Packet& pkt) {
 void TcpServer::handleAdminRoomInfo(int fd) {
     auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated() || (sess->role() != UserRole::ADMIN && sess->role() != UserRole::OWNER)) {
-        if (sess) sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Admin only"));
+        if (sess) sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "You do not have admin privileges"));
         return;
     }
 
@@ -780,21 +830,21 @@ void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
         if (m_rooms.count(roomName)) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Room already exists"));
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Room name already exists"));
             return;
         }
         if ((int)m_rooms.size() >= Constants::MAX_ROOMS) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Max rooms reached"));
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "System has reached maximum number of rooms"));
             return;
         }
         
         ErrorCode err = m_authManager->createRoomDb(roomName, parsed.password, sess->nickname());
         if (err != ErrorCode::ERR_OK) {
-            sess->sendPacket(Builder::makeError(err, "Failed to create room"));
+            sess->sendPacket(Builder::makeError(err, "Cannot create room right now, please try again later"));
             return;
         }
         
-        m_rooms[roomName] = {sess->nickname(), {}, {}};
+        m_rooms[roomName] = {sess->nickname(), {}, {}, !parsed.password.empty()};
     }
 
     sess->sendPacket(Builder::makeSystemNotify("Room #" + roomName + " created"));
@@ -839,7 +889,7 @@ void TcpServer::handleRoomLeave(int fd){
     std::string defRoom = cfg.default_room;
 
     if (oldRoom == defRoom) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Cannot leave default room"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "You cannot leave the default room (general)"));
         return;
     }
 

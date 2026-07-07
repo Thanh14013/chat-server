@@ -6,7 +6,7 @@ enum class CommandType{
     // General
     CMD_QUIT,
     CMD_LIST,
-    CMD_LISTALL,
+
     CMD_ROOMS,
     CMD_JOIN,
     CMD_LEAVE,

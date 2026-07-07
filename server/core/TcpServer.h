@@ -37,6 +37,8 @@ class TcpServer {
         std::vector<std::string> getUsersInRoom(const std::string& room);
         std::vector<std::string> getRoomList();
 
+        vcs::security::AuthManager* getAuthManager() { return m_authManager.get(); }
+
         static TcpServer* s_instance;
 
     private:
@@ -73,6 +75,7 @@ class TcpServer {
             std::string creator_nick;
             std::set<int> members;
             std::set<std::string> banned_nicks;
+            bool has_password;
         };
 
         std::unordered_map<int, std::shared_ptr<ClientSession>> m_sessions;

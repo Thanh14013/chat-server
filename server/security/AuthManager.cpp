@@ -485,4 +485,32 @@ namespace vcs::security
         }
         return room;
     }
+
+    void AuthManager::updateMuteStateDb(const std::string& nickname, bool isMuted, time_t muteUntil) {
+        const char *sql = "UPDATE Users SET is_muted = ?, mute_until = ? WHERE nickname = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_int(stmt, 1, isMuted ? 1 : 0);
+            sqlite3_bind_int64(stmt, 2, static_cast<sqlite3_int64>(muteUntil));
+            sqlite3_bind_text(stmt, 3, nickname.c_str(), -1, SQLITE_TRANSIENT);
+            sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+        }
+    }
+
+    bool AuthManager::getMuteStateDb(const std::string& nickname, time_t& muteUntilOut) const {
+        bool isMuted = false;
+        muteUntilOut = 0;
+        const char *sql = "SELECT is_muted, mute_until FROM Users WHERE nickname = ?;";
+        sqlite3_stmt *stmt = nullptr;
+        if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, nickname.c_str(), -1, SQLITE_TRANSIENT);
+            if (sqlite3_step(stmt) == SQLITE_ROW) {
+                isMuted = sqlite3_column_int(stmt, 0) != 0;
+                muteUntilOut = static_cast<time_t>(sqlite3_column_int64(stmt, 1));
+            }
+            sqlite3_finalize(stmt);
+        }
+        return isMuted;
+    }
 }

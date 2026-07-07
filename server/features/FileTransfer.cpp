@@ -63,6 +63,11 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
     auto sender = m_server->getSession(senderFd);
     if (!sender) return;
 
+    if (sender->isMuted()){
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "You have been muted!"));
+        return;
+    }
+
     json j;
     try { j = json::parse(payloadJson); } catch (...) { return; }
 
@@ -78,20 +83,20 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
 
     if ((long long)fileSize > MAX_FILE_BYTES) {
         sender->sendPacket(Builder::makeError(ErrorCode::ERR_FILE_TOO_LARGE,
-            "File exceeds 3MB limit"));
+                                              "File size exceeds limit (Max: " + std::to_string(MAX_FILE_BYTES / (1024*1024)) + "MB)"));
         return;
     }
 
     if (!isAllowedExtension(filename)) {
         sender->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL,
-            "File type not allowed"));
+            "File type not supported"));
         return;
     }
 
     int receiverFd = m_server->getFdByNickname(toNick);
     auto receiver = m_server->getSession(receiverFd);
     if (!receiver) {
-        sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found: " + toNick));
+        sender->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found in system: " + toNick));
         return;
     }
 
@@ -123,7 +128,7 @@ void FileTransfer::handleRequest(int senderFd, const std::string& payloadJson){
     receiver->sendPacket(Packet(MessageType::MSG_FILE_REQUEST, payload));
 
     AUDIT_D(AuditEventType::FILE, sender->nickname(), toNick, "FILE_REQUEST",AuditResult::SUCCESS, sender->ip(),"file=" + filename + " size=" + std::to_string(fileSize));
-    LOG_INFO("FileTransfer request: " + sender->nickname() + " -> " + toNick + " file=" + filename + " tid=" + tid);
+    LOG_INFO("FileTransfer request: " + sender->nickname() + " -> " + toNick + " file=" + filename);
 }
 
 void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
@@ -143,10 +148,11 @@ void FileTransfer::handleAccept(int receiverFd, const std::string& payloadJson){
     auto sender = m_server->getSession(it->second.sender_fd);
     if (!sender) return;
 
+    j["filename"] = it->second.filename;
     std::string rs = j.dump();
     std::vector<uint8_t> payload(rs.begin(), rs.end());
     sender->sendPacket(Packet(MessageType::MSG_FILE_ACCEPT, payload));
-    LOG_INFO("FileTransfer accepted: tid=" + tid);
+    LOG_INFO("FileTransfer accepted: file=" + it->second.filename);
 }
 
 void FileTransfer::handleReject(int receiverFd, const std::string& payloadJson) {
@@ -169,7 +175,7 @@ void FileTransfer::handleReject(int receiverFd, const std::string& payloadJson) 
     }
 
     m_transfers.erase(it);
-    LOG_INFO("FileTransfer rejected: tid=" + tid);
+    LOG_INFO("FileTransfer rejected: file=" + it->second.filename);
 }
 
 void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
@@ -178,7 +184,7 @@ void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
     json j;
     try { j = json::parse(payloadJson); } catch (...) { return; }
     std::string tid  = j.value("transfer_id", "");
-    std::string data = j.value("data", "");
+
 
     std::lock_guard<std::mutex> lk(m_mutex);
     auto it = m_transfers.find(tid);
@@ -197,7 +203,7 @@ void FileTransfer::handleData(int senderFd, const std::string& payloadJson) {
     std::string rs = j.dump();
     std::vector<uint8_t> payload(rs.begin(), rs.end());
     receiver->sendPacket(Packet(MessageType::MSG_FILE_DATA, payload));
-    LOG_INFO("FileTransfer data relayed: tid=" + tid);
+    LOG_INFO("FileTransfer data relayed: file=" + it->second.filename);
 }
 
 void FileTransfer::handleComplete(int senderFd, const std::string& payloadJson) {
@@ -224,7 +230,7 @@ void FileTransfer::handleComplete(int senderFd, const std::string& payloadJson) 
             ok ? AuditResult::SUCCESS : AuditResult::FAILURE, "",
             "tid=" + tid + " file=" + it->second.filename);
 
-    LOG_INFO("FileTransfer complete: tid=" + tid + " ok=" + (ok ? "yes" : "no"));
+    LOG_INFO("FileTransfer complete: file=" + it->second.filename + " ok=" + (ok ? "yes" : "no"));
     m_transfers.erase(it);
 }
 

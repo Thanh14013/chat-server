@@ -140,6 +140,8 @@ bool Database::createTables()
 
     // Safely add last_room column if it doesn't exist (ignores error if already exists)
     sqlite3_exec(m_db, "ALTER TABLE Users ADD COLUMN last_room TEXT DEFAULT '';", nullptr, nullptr, nullptr);
+    sqlite3_exec(m_db, "ALTER TABLE Users ADD COLUMN is_muted INTEGER DEFAULT 0;", nullptr, nullptr, nullptr);
+    sqlite3_exec(m_db, "ALTER TABLE Users ADD COLUMN mute_until INTEGER DEFAULT 0;", nullptr, nullptr, nullptr);
 
     LOG_INFO("Database tables ready.");
     return true;

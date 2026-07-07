@@ -28,6 +28,8 @@ public:
     void setOnHandshakeDone(HandshakeDoneCallback cb) { m_onHandshakeDone = cb; }
 
     bool isReady() const;
+    void setAdmin(bool v) { m_isAdmin = v; }
+    bool isAdmin() const { return m_isAdmin; }
 
 private:
     void receiveThread();
@@ -40,6 +42,7 @@ private:
     std::atomic<bool> m_connected;
     std::thread m_recvThread;
     std::mutex m_sendMutex;
+    bool m_isAdmin = false;
 
     vcs::client::ClientCrypto m_crypto;
 

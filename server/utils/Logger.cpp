@@ -32,9 +32,10 @@ void Logger::setLogDir(const std::string& dir) {
 std::string Logger::currentTimestamp() {
     auto now = std::chrono::system_clock::now();
     auto tt  = std::chrono::system_clock::to_time_t(now);
+    tt += 7 * 3600; // Adjust to UTC+7
     auto ms  = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
     std::ostringstream oss;
-    oss << std::put_time(std::localtime(&tt), "%Y-%m-%d %H:%M:%S");
+    oss << std::put_time(std::gmtime(&tt), "%Y-%m-%d %H:%M:%S");
     oss << "." << std::setw(3) << std::setfill('0') << ms.count();
     return oss.str();
 }
@@ -42,8 +43,9 @@ std::string Logger::currentTimestamp() {
 std::string Logger::currentDateStr() {
     auto now = std::chrono::system_clock::now();
     auto tt  = std::chrono::system_clock::to_time_t(now);
+    tt += 7 * 3600; // Adjust to UTC+7
     std::ostringstream oss;
-    oss << std::put_time(std::localtime(&tt), "%Y%m%d");
+    oss << std::put_time(std::gmtime(&tt), "%Y%m%d");
     return oss.str();
 }
 

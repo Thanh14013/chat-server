@@ -23,6 +23,15 @@ public:
     void stop();
 
     void registerUpload(const std::string &filename, const std::string &filepath);
+    std::string getLastIncomingTransferId() const { return m_lastIncomingTransferId; }
+    std::string getIncomingFileName(const std::string& tid) const {
+        std::lock_guard<std::mutex> lock(m_fileMutex);
+        auto it = m_activeDownloads.find(tid);
+        if (it != m_activeDownloads.end()) {
+            return it->second.filename;
+        }
+        return "";
+    }
 
 private:
     void onPacketReceived(const Packet &pkt);
@@ -52,8 +61,9 @@ private:
     std::atomic<AuthState> m_authState{AuthState::PENDING_HANDSHAKE};
     std::condition_variable m_authCv;
     std::mutex m_authMutex;
-    std::mutex m_fileMutex;
+    mutable std::mutex m_fileMutex;
     std::map<std::string, std::string> m_pendingUploads; // filename -> filepath
+    std::map<std::string, std::string> m_incomingTransfersMap; // filename -> transfer_id
 
     struct DownloadState
     {
@@ -61,6 +71,10 @@ private:
         uint64_t expectedSize = 0;
         uint64_t receivedSize = 0;
         std::string expectedHash;
+        std::string localFilepath;
+        bool isFirstChunk = true;
     };
     std::map<std::string, DownloadState> m_activeDownloads; // transfer_id -> state
+
+    std::string m_lastIncomingTransferId;
 };

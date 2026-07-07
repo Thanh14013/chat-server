@@ -5,7 +5,7 @@
 
 namespace Builder {
     Packet makeSystemNotify(const std::string& message);
-    Packet makeConnectAccept(const std::string& token, const std::string& room, const std::string& nickname);
+    Packet makeConnectAccept(const std::string& token, const std::string& room, const std::string& nickname, bool isAdmin = false);
     Packet makeConnectReject(ErrorCode code, const std::string& reason);
     Packet makeReconnectRequest(const std::string& token);
     Packet makeChatBroadcast(const std::string& sender, const std::string& room, const std::string& message);

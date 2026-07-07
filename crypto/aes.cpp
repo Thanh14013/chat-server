@@ -72,7 +72,7 @@ namespace vcs::crypto
                     throw std::runtime_error("EVP_EncryptUpdate (AAD) failed");
             }
 
-            std::vector<uint8_t> ciphertext(plaintext.size());
+            std::vector<uint8_t> ciphertext(plaintext.size() + 16);
             int out_len = 0;
             if (!plaintext.empty())
             {
@@ -129,7 +129,7 @@ namespace vcs::crypto
         if (!ctx)
             throw std::runtime_error("AES256GCM::decrypt: EVP_CIPHER_CTX_new failed");
 
-        std::vector<uint8_t> plaintext(enc_len);
+        std::vector<uint8_t> plaintext(enc_len + 16);
 
         try
         {

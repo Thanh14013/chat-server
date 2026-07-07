@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <ctime>
 #include <nlohmann/json.hpp>
+#include "WinConsole.h"
 #ifdef _WIN32
 #include <conio.h>
 #else
@@ -13,6 +14,23 @@
 #include <unistd.h>
 #endif
 using json = nlohmann::json;
+
+static std::string getUniqueFilename(const std::string& baseName) {
+    if (!std::filesystem::exists(baseName)) {
+        return baseName;
+    }
+    std::filesystem::path p(baseName);
+    std::string stem = p.stem().string();
+    std::string ext = p.extension().string();
+    int counter = 1;
+    while (true) {
+        std::string newName = stem + " (" + std::to_string(counter) + ")" + ext;
+        if (!std::filesystem::exists(newName)) {
+            return newName;
+        }
+        counter++;
+    }
+}
 
 ConnectionManager::ConnectionManager(TcpClient *client)
     : m_client(client), m_cmdHandler(client), m_running(false)
@@ -169,46 +187,59 @@ void ConnectionManager::run()
     std::string input;
     while (m_running)
     {
-        if (std::getline(std::cin, input))
+#ifdef _WIN32
+        if (!nonblocking_getline(input)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            continue;
+        }
+#else
+        if (!std::getline(std::cin, input)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            continue;
+        }
+        std::cout << "\033[A\33[2K\r";
+#endif
+        if (!input.empty() && input.back() == '\r') input.pop_back();
+        if (input.empty())
+            continue;
+
+        if (m_cmdParser.isCommand(input))
         {
-            if (input.empty())
+            Command cmd = m_cmdParser.parse(input);
+            CommandValidationResult res = m_cmdParser.validate(cmd);
+
+            if (res == CommandValidationResult::INVALID)
+            {
+                std::cout << "[SYSTEM] Unknown command. Type /help for a list of commands." << std::endl;
                 continue;
-
-            if (m_cmdParser.isCommand(input))
-            {
-                Command cmd = m_cmdParser.parse(input);
-                CommandValidationResult res = m_cmdParser.validate(cmd);
-
-                if (res == CommandValidationResult::INVALID)
-                {
-                    std::cout << "[SYSTEM] Unknown command. Type /help for a list of commands." << std::endl;
-                    continue;
-                }
-
-                if (cmd.type == CommandType::CMD_SEND && cmd.args.size() >= 2)
-                {
-                    std::string filepath = cmd.args[1];
-                    std::string filename = std::filesystem::path(filepath).filename().string();
-                    registerUpload(filename, filepath);
-                }
-
-                m_cmdHandler.handleCommand(cmd);
-                if (cmd.type == CommandType::CMD_QUIT)
-                {
-                    stop();
-                    break;
-                }
             }
-            else
+
+            if (cmd.type == CommandType::CMD_SEND && cmd.args.size() >= 2)
             {
-                json j;
-                j["message"] = input;
-                std::string s = j.dump();
-                std::vector<uint8_t> payload(s.begin(), s.end());
-                // Removed escape sequence to prevent Windows terminal issues
-                m_client->sendPacket(Packet(MessageType::MSG_CHAT_SEND, payload));
+                std::string filepath = cmd.args[1];
+                std::string filename = std::filesystem::path(filepath).filename().string();
+                registerUpload(filename, filepath);
+            }
+
+            m_cmdHandler.handleCommand(cmd);
+            if (cmd.type == CommandType::CMD_QUIT)
+            {
+                stop();
+                break;
             }
         }
+        else
+        {
+            json j;
+            j["message"] = input;
+            std::string s = j.dump();
+            std::vector<uint8_t> payload(s.begin(), s.end());
+            // Removed escape sequence to prevent Windows terminal issues
+            m_client->sendPacket(Packet(MessageType::MSG_CHAT_SEND, payload));
+        }
+#ifdef _WIN32
+        input.clear();
+#endif
     }
 }
 
@@ -268,8 +299,11 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
                         std::string r = item.value("room", "");
                         if (!r.empty() && r[0] == '#') r = r.substr(1);
                         
-                        std::cout << "[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
-                                  << r << "] ";
+                        if (ts > 0) {
+                            std::time_t ts_local = ts + 7 * 3600;
+                            std::cout << "[" << std::put_time(std::gmtime(&ts_local), "%H:%M:%S") << "] ["
+                                          << r << "] ";
+                        }
                         if (sender == m_nickname) {
                             std::cout << item.value("message", "") << std::endl;
                         } else {
@@ -282,8 +316,13 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
                     std::string r = j.value("room", "");
                     if (!r.empty() && r[0] == '#') r = r.substr(1);
 
-                    std::cout << "[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
-                              << r << "] ";
+                    if (ts > 0) {
+                        std::time_t ts_local = ts + 7 * 3600;
+                        std::cout << "[" << std::put_time(std::gmtime(&ts_local), "%H:%M:%S") << "] ["
+                                  << r << "] ";
+                    } else {
+                        std::cout << "[" << r << "] ";
+                    }
                     if (sender == m_nickname) {
                         std::cout << j.value("message", "") << std::endl;
                     } else {
@@ -310,8 +349,13 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[PRIVATE] " << j.value("from", "") << ": "
-                      << j.value("message", "") << std::endl;
+            if (j.value("from", "") == m_nickname) {
+                std::cout << "[PRIVATE] You -> " << j.value("to", "") << ": "
+                          << j.value("message", "") << std::endl;
+            } else {
+                std::cout << "[PRIVATE] " << j.value("from", "") << ": "
+                          << j.value("message", "") << std::endl;
+            }
         }
         break;
     }
@@ -320,7 +364,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[ERROR] " << j.value("reason", "") << std::endl;
+            std::cout << "[ERROR] " << j.value("detail", j.value("reason", "")) << std::endl;
         }
         break;
     }
@@ -386,7 +430,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[SYSTEM] Transfer " << j.value("transfer_id", "") << " was rejected." << std::endl;
+            std::cout << "[SYSTEM] Transfer was rejected." << std::endl;
         }
         break;
     }
@@ -408,7 +452,7 @@ void ConnectionManager::handleFileRequest(const nlohmann::json &j)
     std::cout << "[FILE] User " << j.value("from", "")
               << " wants to send file: " << j.value("filename", "")
               << " (" << j.value("size", 0) << " bytes). "
-              << "Type /accept " << j.value("transfer_id", "") << " or /reject " << j.value("transfer_id", "") << std::endl;
+              << "Type /accept or /reject" << std::endl;
 
     std::lock_guard<std::mutex> lock(m_fileMutex);
     DownloadState state;
@@ -417,6 +461,7 @@ void ConnectionManager::handleFileRequest(const nlohmann::json &j)
     state.receivedSize = 0;
     state.expectedHash = j.value("sha256", "");
     m_activeDownloads[j.value("transfer_id", "")] = state;
+    m_lastIncomingTransferId = j.value("transfer_id", "");
 }
 
 void ConnectionManager::handleFileAccept(const nlohmann::json &j)
@@ -437,11 +482,11 @@ void ConnectionManager::handleFileAccept(const nlohmann::json &j)
 
     if (filepath.empty())
     {
-        std::cout << "[SYSTEM] Accepted transfer " << tid << " but cannot find local file mapping." << std::endl;
+        std::cout << "[SYSTEM] Accepted transfer for file " << filename << " but cannot find local file mapping." << std::endl;
         return;
     }
 
-    std::cout << "[SYSTEM] Transfer " << tid << " accepted. Starting upload..." << std::endl;
+    std::cout << "[SYSTEM] Transfer for file " << filename << " accepted. Starting upload..." << std::endl;
     std::thread(&ConnectionManager::uploadWorker, this, tid, filepath).detach();
 }
 
@@ -476,7 +521,7 @@ void ConnectionManager::uploadWorker(std::string transferId, std::string filepat
     endj["transfer_id"] = transferId;
     std::string s = endj.dump();
     m_client->sendPacket(Packet(MessageType::MSG_FILE_COMPLETE, std::vector<uint8_t>(s.begin(), s.end())));
-    std::cout << "[SYSTEM] Finished sending file " << filepath << " (tid: " << transferId << ")" << std::endl;
+    std::cout << "[SYSTEM] Finished sending file " << filepath << std::endl;
 }
 
 void ConnectionManager::handleFileData(const nlohmann::json &j)
@@ -491,12 +536,22 @@ void ConnectionManager::handleFileData(const nlohmann::json &j)
     if (it == m_activeDownloads.end())
         return;
 
-    std::string outPath = "Downloads_" + it->second.filename;
-    std::ofstream ofs(outPath, std::ios::binary | std::ios::app);
-    if (ofs.is_open() && !chunk.empty())
-    {
-        ofs.write(reinterpret_cast<const char *>(chunk.data()), chunk.size());
-        it->second.receivedSize += chunk.size();
+    if (it->second.isFirstChunk) {
+        it->second.localFilepath = getUniqueFilename(it->second.filename);
+        it->second.isFirstChunk = false;
+        // Truncate the file upon first chunk to ensure clean state
+        std::ofstream ofs(it->second.localFilepath, std::ios::binary | std::ios::trunc);
+        if (ofs.is_open() && !chunk.empty()) {
+            ofs.write(reinterpret_cast<const char *>(chunk.data()), chunk.size());
+            it->second.receivedSize += chunk.size();
+        }
+    } else {
+        std::ofstream ofs(it->second.localFilepath, std::ios::binary | std::ios::app);
+        if (ofs.is_open() && !chunk.empty())
+        {
+            ofs.write(reinterpret_cast<const char *>(chunk.data()), chunk.size());
+            it->second.receivedSize += chunk.size();
+        }
     }
 }
 

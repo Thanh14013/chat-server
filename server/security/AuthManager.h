@@ -44,6 +44,9 @@ namespace vcs::security
         void updateLastRoom(const std::string& nickname, const std::string& room);
         std::string getLastRoom(const std::string& nickname) const;
 
+        void updateMuteStateDb(const std::string& nickname, bool isMuted, time_t muteUntil);
+        bool getMuteStateDb(const std::string& nickname, time_t& muteUntilOut) const;
+
         struct RoomData {
             std::string name;
             std::string creator;

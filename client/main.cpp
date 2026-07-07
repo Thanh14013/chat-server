@@ -44,10 +44,7 @@ int main(int argc, char* argv[]){
         }
     }
 #endif
-
-    std::cin.tie(nullptr);
-    std::ios::sync_with_stdio(false);
-
+    
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--host" && i + 1 < argc) host = argv[++i];

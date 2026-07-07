@@ -1,5 +1,6 @@
 #include "CommandHandler.h"
 #include "../core/TcpClient.h"
+#include "../core/ConnectionManager.h"
 #include "../security/ClientCrypto.h"
 #include "../../common/MessageTypes.h"
 #include "../../crypto/sha256.h"
@@ -9,6 +10,8 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+
+extern ConnectionManager* g_mgr;
 
 CommandHandler::CommandHandler(TcpClient *client) : m_client(client) {};
 void CommandHandler::handleCommand(const Command &cmd)
@@ -25,9 +28,6 @@ void CommandHandler::handleCommand(const Command &cmd)
         break;
     case CommandType::CMD_LIST:
         handleList(cmd);
-        break;
-    case CommandType::CMD_LISTALL:
-        handleListAll(cmd);
         break;
     case CommandType::CMD_ROOMS:
         handleRooms(cmd);
@@ -93,10 +93,6 @@ void CommandHandler::handleList(const Command &cmd)
     m_client->sendPacket(Packet(MessageType::MSG_USER_LIST_REQUEST, {}));
 }
 
-void CommandHandler::handleListAll(const Command &cmd)
-{
-    m_client->sendPacket(Packet(MessageType::MSG_ROOM_LIST_REQUEST, {}));
-}
 
 void CommandHandler::handleRooms(const Command &cmd)
 {
@@ -173,7 +169,6 @@ void CommandHandler::handleMsg(const Command &cmd)
     std::string s = j.dump();
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_CHAT_PRIVATE, payload));
-    std::cout << "[PRIVATE] You -> " << target << ": " << text << std::endl;
 }
 
 void CommandHandler::handleSend(const Command &cmd)
@@ -208,31 +203,59 @@ void CommandHandler::handleSend(const Command &cmd)
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_FILE_REQUEST, payload));
 
+    if (g_mgr) {
+        g_mgr->registerUpload(filename, filepath);
+    }
+
     std::cout << "[SYSTEM] File transfer request sent to " << target << std::endl;
 }
 
 void CommandHandler::handleAccept(const Command& cmd) {
+    std::string tid;
     if (cmd.args.empty()) {
-        std::cout << "[SYSTEM] Usage: /accept <transfer_id>" << std::endl;
-        return;
+        tid = g_mgr ? g_mgr->getLastIncomingTransferId() : "";
+        if (tid.empty()) {
+            std::cout << "[SYSTEM] No pending transfer to accept." << std::endl;
+            return;
+        }
+    } else {
+        tid = cmd.args[0];
     }
     json j;
-    j["transfer_id"] = cmd.args[0];
+    j["transfer_id"] = tid;
     std::string s = j.dump();
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_FILE_ACCEPT, payload));
+    std::string fname = g_mgr ? g_mgr->getIncomingFileName(tid) : "";
+    if (!fname.empty()) {
+        std::cout << "[SYSTEM] Accepted transfer for file " << fname << ". Waiting for file..." << std::endl;
+    } else {
+        std::cout << "[SYSTEM] Accepted transfer. Waiting for file..." << std::endl;
+    }
 }
 
 void CommandHandler::handleReject(const Command& cmd) {
+    std::string tid;
     if (cmd.args.empty()) {
-        std::cout << "[SYSTEM] Usage: /reject <transfer_id>" << std::endl;
-        return;
+        tid = g_mgr ? g_mgr->getLastIncomingTransferId() : "";
+        if (tid.empty()) {
+            std::cout << "[SYSTEM] No pending transfer to reject." << std::endl;
+            return;
+        }
+    } else {
+        tid = cmd.args[0];
     }
     json j;
-    j["transfer_id"] = cmd.args[0];
+    j["transfer_id"] = tid;
     std::string s = j.dump();
     std::vector<uint8_t> payload(s.begin(), s.end());
     m_client->sendPacket(Packet(MessageType::MSG_FILE_REJECT, payload));
+    std::string fname = g_mgr ? g_mgr->getIncomingFileName(tid) : "";
+    if (!fname.empty()) {
+        std::cout << "[SYSTEM] Rejected transfer for file " << fname << "." << std::endl;
+    } else {
+        std::cout << "[SYSTEM] Rejected transfer." << std::endl;
+    }
 }
 
 void CommandHandler::handleWhois(const Command &cmd)
@@ -257,26 +280,28 @@ void CommandHandler::handleHelp(const Command &cmd)
               << " /create <room_name> [pass]    : Create a new chat room\n"
               << " /delete <room_name>           : Delete a room (Creator/Admin/Owner)\n"
               << " /list                         : List all users in the current room\n"
-              << " /rooms (or /listall)          : List all active public rooms\n"
+              << " /rooms                        : List all active public rooms\n"
               << " /msg <username> <message>     : Send a private message\n"
               << " /send <username> <filepath>   : Send a file securely\n"
-              << " /accept <transfer_id>         : Accept an incoming file transfer\n"
-              << " /reject <transfer_id>         : Reject an incoming file transfer\n"
+              << " /accept <filename>            : Accept an incoming file transfer\n"
+              << " /reject <filename>            : Reject an incoming file transfer\n"
               << " /whois <username>             : Request public profile info\n"
               << " /help                         : Display this help menu\n"
-              << " /quit                         : Disconnect and exit\n"
-              << "\n[Admin/Owner Commands]\n"
-              << " /kick <username> [reason]     : Kick a user from current room\n"
-              << " /unkick <username> <room>     : Remove user from room's kick list\n"
-              << " /mute <username> [seconds]    : Prevent a user from sending messages\n"
-              << " /unmute <username>            : Remove a mute restriction\n"
-              << " /ban <username> [reason]      : Permanently ban a user\n"
-              << " /unban <username>             : Remove a ban from a user\n"
-              << " /broadcast <message>          : Send a global system message\n"
-              << " /rooms_admin                  : View detailed info of all rooms\n"
-              << " /promote <username>           : Promote a user to ADMIN (Owner only)\n"
-              << " /demote <username>            : Demote an ADMIN to USER (Owner only)\n"
-              << "-------------------------------\n";
+              << " /quit                         : Disconnect and exit\n";
+
+    if (m_client->isAdmin()) {
+        std::cout << "\n[Admin Commands]\n"
+                  << " /kick <username> [reason]     : Kick a user from current room\n"
+                  << " /unkick <username> <room>     : Remove user from room's kick list\n"
+                  << " /mute <username> [seconds]    : Prevent a user from sending messages\n"
+                  << " /unmute <username>            : Remove a mute restriction\n"
+                  << " /ban <username> [reason]      : Permanently ban a user\n"
+                  << " /unban <username>             : Remove a ban from a user\n"
+                  << " /broadcast <message>          : Send a global system message\n"
+                  << " /rooms_admin                  : View detailed info of all rooms\n";
+    }
+    
+    std::cout << "-------------------------------\n" << std::endl;
 }
 
 void CommandHandler::handleAdminCommand(const Command &cmd)
@@ -294,6 +319,8 @@ void CommandHandler::handleAdminCommand(const Command &cmd)
         j["target"] = cmd.args[0];
         if (cmd.args.size() > 1)
             j["reason"] = cmd.args[1];
+        else
+            j["reason"] = "";
     }
     else if (cmd.type == CommandType::CMD_UNKICK)
     {
@@ -315,6 +342,8 @@ void CommandHandler::handleAdminCommand(const Command &cmd)
         j["target"] = cmd.args[0];
         if (cmd.args.size() > 1)
             j["duration"] = std::stoi(cmd.args[1]);
+        else
+            j["duration"] = -1;
     }
     else if (cmd.type == CommandType::CMD_UNMUTE)
     {

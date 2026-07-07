@@ -18,7 +18,7 @@ private:
 
     void handleQuit(const Command &cmd);
     void handleList(const Command &cmd);
-    void handleListAll(const Command &cmd);
+
     void handleRooms(const Command &cmd);
     void handleJoin(const Command &cmd);
     void handleLeave(const Command &cmd);

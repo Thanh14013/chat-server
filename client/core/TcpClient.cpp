@@ -80,6 +80,7 @@ bool TcpClient::connectToServer(const std::string &host, uint16_t port)
             std::cout << "Retrying in " << delays[attempt] << "s...\n";
             std::this_thread::sleep_for(std::chrono::seconds(delays[attempt]));
         }
+        std::cout << "Connecting to " << host << ":" << port << " (Attempt " << (attempt + 1) << "/4)..." << std::endl;
         if (tryConnect(host, port))
         {
             m_connected = true;

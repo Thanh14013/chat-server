@@ -19,12 +19,13 @@ namespace Builder
         return makePacket(MessageType::MSG_SYSTEM_NOTIFY, j.dump());
     }
 
-    Packet makeConnectAccept(const std::string &token, const std::string &room, const std::string &nickname)
+    Packet makeConnectAccept(const std::string &token, const std::string &room, const std::string &nickname, bool isAdmin)
     {
         json j;
         j["token"] = token;
         j["room"] = room;
         j["nickname"] = nickname;
+        j["is_admin"] = isAdmin;
         return makePacket(MessageType::MSG_CONNECT_ACCEPT, j.dump());
     }
 
