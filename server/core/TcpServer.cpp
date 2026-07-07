@@ -384,6 +384,7 @@ void TcpServer::handlePacket(int fd, const Packet& raw_pkt){
         case MessageType::MSG_FILE_REJECT:   FileTransfer::instance().handleReject  (fd, payload); break;
         case MessageType::MSG_FILE_DATA:     FileTransfer::instance().handleData    (fd, payload); break;
         case MessageType::MSG_FILE_COMPLETE: FileTransfer::instance().handleComplete(fd, payload); break;
+        case MessageType::MSG_FILE_ACK:      FileTransfer::instance().handleAck     (fd, payload); break;
 
         default:
             LOG_WARN("Unknown packet type: " + std::to_string(pkt.header.msg_type));

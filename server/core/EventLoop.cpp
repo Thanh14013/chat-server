@@ -53,6 +53,8 @@ void EventLoop::loop(){
             }
         }
 
+        FileTransfer::instance().cleanupExpired();
+
         if (ticker % 60 == 0){
             std::vector<int> timedOut;
             for (auto& room : m_server->getRoomList()){
@@ -64,7 +66,6 @@ void EventLoop::loop(){
                 LOG_INFO("Session timed out, disconnecting fd=" + std::to_string(fd));
                 m_server->onClientDisconnected(fd);
             }
-            FileTransfer::instance().cleanupExpired();
         }
 
         if (ticker % 600 == 0) {

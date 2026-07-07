@@ -39,6 +39,7 @@ enum class MessageType : uint8_t {
     MSG_FILE_REJECT          = 0x52,
     MSG_FILE_DATA            = 0x53,
     MSG_FILE_COMPLETE        = 0x54,
+    MSG_FILE_ACK             = 0x55,
 
     MSG_ADMIN_KICK           = 0x60,
     MSG_ADMIN_MUTE           = 0x61,

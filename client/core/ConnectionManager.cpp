@@ -470,6 +470,9 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
     case MessageType::MSG_FILE_COMPLETE:
         handleFileComplete(json::parse(payload, nullptr, false));
         break;
+    case MessageType::MSG_FILE_ACK:
+        std::cout << "[SYSTEM] File transfer completed successfully." << std::endl;
+        break;
     default:
         break;
     }
@@ -530,6 +533,7 @@ void ConnectionManager::uploadWorker(std::string transferId, std::string filepat
     }
 
     std::vector<uint8_t> buffer(4096);
+    bool firstChunk = true;
     while (ifs)
     {
         ifs.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
@@ -540,6 +544,10 @@ void ConnectionManager::uploadWorker(std::string transferId, std::string filepat
             json j;
             j["transfer_id"] = transferId;
             j["data"] = chunk;
+            if (firstChunk) {
+                j["is_start"] = true;
+                firstChunk = false;
+            }
             std::string s = j.dump();
             m_client->sendPacket(Packet(MessageType::MSG_FILE_DATA, std::vector<uint8_t>(s.begin(), s.end())));
             std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Prevent flooding
@@ -549,9 +557,10 @@ void ConnectionManager::uploadWorker(std::string transferId, std::string filepat
 
     json endj;
     endj["transfer_id"] = transferId;
+    endj["is_end"] = true;
     std::string s = endj.dump();
     m_client->sendPacket(Packet(MessageType::MSG_FILE_COMPLETE, std::vector<uint8_t>(s.begin(), s.end())));
-    std::cout << "[SYSTEM] Finished sending file " << filepath << std::endl;
+    // Client will wait for MSG_FILE_ACK to print success message
 }
 
 void ConnectionManager::handleFileData(const nlohmann::json &j)
@@ -565,6 +574,10 @@ void ConnectionManager::handleFileData(const nlohmann::json &j)
     auto it = m_activeDownloads.find(tid);
     if (it == m_activeDownloads.end())
         return;
+
+    if (j.value("is_start", false)) {
+        it->second.isFirstChunk = true;
+    }
 
     if (it->second.isFirstChunk) {
         it->second.localFilepath = getUniqueFilename(it->second.filename);
@@ -597,6 +610,12 @@ void ConnectionManager::handleFileComplete(const nlohmann::json &j)
     {
         std::cout << "[SYSTEM] File download complete: " << it->second.filename
                   << " (" << it->second.receivedSize << " bytes)." << std::endl;
+        
+        json ackj;
+        ackj["transfer_id"] = tid;
+        std::string s = ackj.dump();
+        m_client->sendPacket(Packet(MessageType::MSG_FILE_ACK, std::vector<uint8_t>(s.begin(), s.end())));
+
         m_activeDownloads.erase(it);
     }
 }

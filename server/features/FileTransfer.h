@@ -24,6 +24,8 @@ struct FileTransferSession
     std::string sha256_hash;
     std::string temp_path;
     time_t start_time;
+    time_t last_activity_time;
+    bool is_completed_by_sender;
     TransferStatus status;
 };
 
@@ -40,6 +42,7 @@ public:
     void handleReject(int receiverFd, const std::string &payloadJson);
     void handleData(int senderFd, const std::string &payloadJson);
     void handleComplete(int senderFd, const std::string &payloadJson);
+    void handleAck(int senderFd, const std::string &payloadJson);
 
     void cleanupExpired();
 private:
