@@ -124,9 +124,19 @@ bool Database::createTables()
             UNIQUE(room_name, nickname)
         );
 
+        CREATE TABLE IF NOT EXISTS GlobalBans (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip_address    TEXT    NOT NULL,
+            nickname      TEXT    NOT NULL,
+            reason        TEXT,
+            banned_at     INTEGER NOT NULL
+        );
+
         CREATE INDEX IF NOT EXISTS idx_chat_room_ts ON ChatHistory(room, timestamp);
         CREATE INDEX IF NOT EXISTS idx_audit_ts     ON AuditLog(timestamp);
         CREATE INDEX IF NOT EXISTS idx_roombans     ON RoomBans(room_name);
+        CREATE INDEX IF NOT EXISTS idx_globalbans_ip ON GlobalBans(ip_address);
+        CREATE INDEX IF NOT EXISTS idx_globalbans_nick ON GlobalBans(nickname);
     )";
 
     char *errMsg = nullptr;

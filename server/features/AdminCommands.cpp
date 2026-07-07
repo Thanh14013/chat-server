@@ -187,27 +187,39 @@ void AdminCommands::ban(int adminFd, const std::string &targetNick, const std::s
     }
 
     std::string anik = adminNick(adminFd);
+    std::string actualReason = reason.empty() ? "No reason provided" : reason;
+    
     int targetFd = m_server->getFdByNickname(targetNick);
     auto target = m_server->getSession(targetFd);
-    if (!target)
+    
+    if (!target) {
+        if (m_server->getAuthManager()->isNicknameTaken(targetNick)) {
+            IntrusionDetector::instance().permBanUser("", targetNick, actualReason);
+            AUDIT_D(AuditEventType::ADMIN, anik, targetNick, "BAN", AuditResult::SUCCESS, "", actualReason);
+            LOG_INFO("BAN: admin=" + anik + " target=" + targetNick + " (offline) reason=" + actualReason);
+            auto admin = m_server->getSession(adminFd);
+            if (admin) admin->sendPacket(Builder::makeSystemNotify("Banned offline user: " + targetNick));
+        } else {
+            auto admin = m_server->getSession(adminFd);
+            if (admin) admin->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "User not found"));
+        }
         return;
+    }
 
     std::string ip = target->ip();
-    IntrusionDetector::instance().permBan(ip, reason);
-    IntrusionDetector::instance().permBanNick(targetNick, reason);
-    AUDIT_D(AuditEventType::ADMIN, anik, targetNick, "BAN", AuditResult::SUCCESS, ip, reason);
+    IntrusionDetector::instance().permBanUser(ip, targetNick, actualReason);
+    AUDIT_D(AuditEventType::ADMIN, anik, targetNick, "BAN", AuditResult::SUCCESS, ip, actualReason);
     m_server->broadcastToRoom(target->currentRoom(), Builder::makeSystemNotify(targetNick + " has been banned by " + anik));
 
-    target->disconnect("You have been banned: " + reason);
-    LOG_INFO("BAN: admin=" + anik + " target=" + targetNick + " ip=" + ip);
+    target->disconnect("Your IP has been banned: " + actualReason);
+    LOG_INFO("BAN: admin=" + anik + " target=" + targetNick + " ip=" + ip + " reason=" + actualReason);
 }
 
 void AdminCommands::unban(int adminFd, const std::string &ipOrNick)
 {
     if (!hasAdminRight(adminFd))
         return;
-    IntrusionDetector::instance().unban(ipOrNick);
-    IntrusionDetector::instance().unbanNick(ipOrNick);
+    IntrusionDetector::instance().unbanUser(ipOrNick);
     AUDIT(AuditEventType::ADMIN, adminNick(adminFd), ipOrNick,
           "UNBAN", AuditResult::SUCCESS);
     LOG_INFO("UNBAN: " + ipOrNick);

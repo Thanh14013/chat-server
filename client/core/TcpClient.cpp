@@ -1,5 +1,4 @@
 #include "TcpClient.h"
-#include "../security/CertVerifier.h"
 #include "../../common/MessageTypes.h"
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -189,6 +188,8 @@ void TcpClient::receiveThread()
                     if (m_onDisconnect) m_onDisconnect();
                     break;
                 }
+            } else if (pkt.header.msg_type == static_cast<uint8_t>(MessageType::MSG_CONNECT_REJECT)) {
+                // Allow MSG_CONNECT_REJECT even if unencrypted (e.g. from IP bans before handshake)
             } else {
                 std::cerr << "[!] Unencrypted packet received before handshake.\n";
                 disconnect();
@@ -207,22 +208,7 @@ void TcpClient::handleHandshakePacket(const Packet &pkt) {
         if (pkt.payload.size() >= 4) {
             uint32_t pem_len = (pkt.payload[0] << 24) | (pkt.payload[1] << 16) | (pkt.payload[2] << 8) | pkt.payload[3];
             if (pkt.payload.size() >= 4 + pem_len) {
-                std::string pem(pkt.payload.begin() + 4, pkt.payload.begin() + 4 + pem_len);
-                auto status = vcs::client::CertVerifier::getInstance().verifyServerKey(m_host, m_port, pem);
-                if (status == vcs::client::CertVerifier::TrustStatus::CHANGED) {
-                    std::string old_fp = vcs::client::CertVerifier::getInstance().getFingerprint(m_host, m_port);
-                    std::string new_fp = vcs::client::CertVerifier::fingerprintOf(pem);
-                    bool trust = vcs::client::CertVerifier::promptUserOnChange(m_host, m_port, old_fp, new_fp);
-                    if (!trust) {
-                        disconnect();
-                        if (m_onHandshakeDone) m_onHandshakeDone(false);
-                        return;
-                    } else {
-                        vcs::client::CertVerifier::getInstance().saveServerKey(m_host, m_port, pem);
-                    }
-                } else if (status == vcs::client::CertVerifier::TrustStatus::NEW) {
-                    vcs::client::CertVerifier::getInstance().saveServerKey(m_host, m_port, pem);
-                }
+                // Fingerprint check removed
             }
         }
 

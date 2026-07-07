@@ -1,6 +1,7 @@
 #include "IntrusionDetector.h"
 #include "AuditLogger.h"
 #include "../utils/Logger.h"
+#include "../utils/Database.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <sstream>
@@ -169,8 +170,70 @@ void IntrusionDetector::unban(const std::string& ip) {
 void IntrusionDetector::unbanNick(const std::string& nick) {
     std::lock_guard<std::mutex> lk(m_mutex);
     m_bannedNicks.erase(nick);
-    LOG_INFO("IDS unban Nickname: " + nick);
-    exportBanList();
+    LOG_INFO("IDS unban Nick: " + nick);
+}
+
+void IntrusionDetector::permBanUser(const std::string& ip, const std::string& nick, const std::string& reason) {
+    {
+        std::lock_guard<std::mutex> lk(m_mutex);
+        m_permBans.insert(ip);
+        m_bannedNicks.insert(nick);
+    }
+    LOG_WARN("Manual perm ban for User: IP=" + ip + ", Nick=" + nick + ", reason=" + reason);
+    
+    // Save to Database
+    std::string sql = "INSERT INTO GlobalBans (ip_address, nickname, reason, banned_at) VALUES ('" + 
+                      ip + "', '" + nick + "', '" + reason + "', " + std::to_string(std::time(nullptr)) + ");";
+    Database::instance().execute(sql);
+}
+
+void IntrusionDetector::unbanUser(const std::string& ipOrNick) {
+    if (ipOrNick.empty()) return;
+    // Directly remove from memory to clear older bans (e.g. from ban_list.json)
+    unban(ipOrNick);
+    unbanNick(ipOrNick);
+
+    // Search in Database
+    std::string sql = "SELECT ip_address, nickname FROM GlobalBans WHERE ip_address='" + ipOrNick + "' OR nickname='" + ipOrNick + "';";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(Database::instance().handle(), sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            std::string ip = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            std::string nick = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            unban(ip);
+            unbanNick(nick);
+        }
+        sqlite3_finalize(stmt);
+    }
+    
+    // Delete from Database
+    sql = "DELETE FROM GlobalBans WHERE ip_address='" + ipOrNick + "' OR nickname='" + ipOrNick + "';";
+    Database::instance().execute(sql);
+}
+
+void IntrusionDetector::loadBansFromDB() {
+    std::string sql = "SELECT ip_address, nickname FROM GlobalBans;";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(Database::instance().handle(), sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        std::lock_guard<std::mutex> lk(m_mutex);
+        int ipCount = 0, nickCount = 0;
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            std::string ip = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            std::string nick = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            if (!ip.empty()) {
+                m_permBans.insert(ip);
+                ipCount++;
+            }
+            if (!nick.empty()) {
+                m_bannedNicks.insert(nick);
+                nickCount++;
+            }
+        }
+        sqlite3_finalize(stmt);
+        LOG_INFO("Loaded " + std::to_string(ipCount) + " IP bans and " + std::to_string(nickCount) + " Nick bans from Database.");
+    } else {
+        LOG_WARN("Failed to load bans from Database.");
+    }
 }
 
 bool IntrusionDetector::isBannedNick(const std::string& nick) {

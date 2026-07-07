@@ -100,6 +100,9 @@ bool TcpServer::start(uint16_t port, int maxClients, int threadPoolSize)
     }
     
     m_running = true;
+    
+    IntrusionDetector::instance().loadBansFromDB();
+    
     const auto &cfg = Config::instance().get();
     auto rooms_db = m_authManager->loadAllRoomsFromDb();
     for (const auto& r : rooms_db) {
@@ -177,6 +180,9 @@ void TcpServer::epollLoop() {
 
             IPStatus ipStatus = IntrusionDetector::instance().checkIP(ip);
             if (ipStatus == IPStatus::BLOCKED) {
+                Packet rej = Builder::makeConnectReject(ErrorCode::ERR_PERMISSION_DENIED, "Your IP has been banned.");
+                auto bytes = packetToBytes(rej);
+                ::send(clientFd, bytes.data(), bytes.size(), MSG_NOSIGNAL);
                 ::close(clientFd);
                 continue;
             }
@@ -316,18 +322,29 @@ void TcpServer::handlePacket(int fd, const Packet& raw_pkt){
             std::string target = j.value("target", "");
             json resp;
             int tFd = getFdByNickname(target);
-            if (tFd == -1) {
-                resp["error"] = "User not found";
-            } else {
+            if (tFd != -1) {
+                // User is online
                 auto tSess = getSession(tFd);
                 if (tSess && tSess->isAuthenticated()) {
                     resp["nickname"] = tSess->nickname();
                     resp["ip"]       = tSess->ip();
                     resp["room"]     = tSess->currentRoom();
                     resp["is_muted"] = tSess->isMuted();
-                } else {
-                    resp["error"] = "User not found";
+                    resp["is_banned"] = IntrusionDetector::instance().isBannedNick(tSess->nickname());
+                    resp["status"]   = "online";
                 }
+            } else if (m_authManager->isNicknameTaken(target)) {
+                // User is offline
+                time_t muteUntil = 0;
+                bool isMuted = m_authManager->getMuteStateDb(target, muteUntil);
+                resp["nickname"] = target;
+                resp["ip"]       = "offline";
+                resp["room"]     = "offline";
+                resp["is_muted"] = isMuted;
+                resp["is_banned"] = IntrusionDetector::instance().isBannedNick(target);
+                resp["status"]   = "offline";
+            } else {
+                resp["error"] = "User not found";
             }
             std::string str = resp.dump();
             if (auto sess = getSession(fd)) {
@@ -440,7 +457,7 @@ void TcpServer::handleConnectRequest(int fd, const Packet& pkt){
     }
 
     if (IntrusionDetector::instance().isBannedNick(parsed.nickname)) {
-        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_PERMISSION_DENIED, "Your nickname is permanently banned."));
+        sess->sendPacket(Builder::makeConnectReject(ErrorCode::ERR_PERMISSION_DENIED, "Your nickname has been banned."));
         return;
     }
 

@@ -306,6 +306,9 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
             if (reason.find("token") == std::string::npos) {
                 std::cout << "[-] Connection rejected: " << reason << "\n";
             }
+            if (reason.find("banned") != std::string::npos) {
+                std::exit(0);
+            }
         }
         if (std::filesystem::exists("token.txt")) {
             std::filesystem::remove("token.txt"); // Remove invalid token

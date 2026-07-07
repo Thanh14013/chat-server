@@ -49,14 +49,17 @@ public:
     void tempBan(const std::string& ip, int durationSec, const std::string& reason);
     void permBan(const std::string& ip, const std::string& reason = "Manual ban");
     void permBanNick(const std::string& nick, const std::string& reason = "Manual ban");
+    void permBanUser(const std::string& ip, const std::string& nick, const std::string& reason = "Manual ban");
     void unban(const std::string& ip);
     void unbanNick(const std::string& nick);
+    void unbanUser(const std::string& ipOrNick);
     bool isBannedNick(const std::string& nick);
 
     void addWhitelist(const std::string& ip);
     void decayScores();
     void exportBanList(const std::string& path = "ban_list.json");
     void loadBanList(const std::string& path = "ban_list.json");
+    void loadBansFromDB();
 
     std::string exportCEF(const std::string& ip, ViolationType type, int severity);
 
