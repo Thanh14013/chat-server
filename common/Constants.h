@@ -21,5 +21,5 @@ namespace Constants{
     constexpr int      NONCE_SIZE            = 16;
     constexpr int      HEADER_SIZE           = 17;
     constexpr int      PING_INTERVAL_SEC     = 30;
-    constexpr int      PONG_TIMEOUT_SEC      = 60;
+    constexpr int      PING_TIMEOUT_SEC      = 40;
 }

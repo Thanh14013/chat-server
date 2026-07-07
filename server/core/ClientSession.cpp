@@ -24,6 +24,7 @@ ClientSession::ClientSession(int fd, const std::string& ip, TcpServer* server)
 {
     m_connectTime = std::time(nullptr);
     m_lastActive  = m_connectTime;
+    m_lastPingTime = m_connectTime;
 }
 
 ClientSession::~ClientSession() {

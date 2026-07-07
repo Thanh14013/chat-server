@@ -52,7 +52,6 @@ class TcpServer {
         void handleChatPrivate(int fd, const Packet& pkt);
         void handleDisconnect(int fd, const Packet& pkt);
         void handlePing(int fd);
-        void handlePong(int fd);
         void handleUserListRequest(int fd);
         void handleRoomListRequest(int fd);
         void handleRoomJoin(int fd, const Packet& pkt);

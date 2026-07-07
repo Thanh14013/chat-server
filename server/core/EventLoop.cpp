@@ -34,18 +34,16 @@ void EventLoop::loop(){
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ticker++;
 
-        if (ticker % Constants::PING_INTERVAL_SEC == 0){
+        if (ticker % 5 == 0){
             std::vector<int> deadFds;
+            time_t now = std::time(nullptr);
 
             for (auto& room : m_server->getRoomList()){
                 for (auto sess : m_server->getSessionsInRoom(room)){
                     if (!sess->isAuthenticated()) continue;
-                    if (!sess->m_pongReceived) {
-                        LOG_WARN("Client timeout (no pong): " + sess->nickname());
+                    if (now - sess->lastPingTime() > 40) {
+                        LOG_WARN("Client timeout (no ping): " + sess->nickname());
                         deadFds.push_back(sess->fd());
-                    } else {
-                        sess->m_pongReceived = false;
-                        sess->sendPacket(Builder::makePing());
                     }
                 }
             }

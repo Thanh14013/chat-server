@@ -51,9 +51,9 @@ public:
     void setRole(UserRole r)                { m_role = r; }
     void setMuted(bool v, time_t until = 0) { m_muted = v; m_muteUntil = until; }
     void setLastActive(time_t t)            { m_lastActive = t; }
-    void incrementMsgCount()               { m_msgCount++; }
-
-    bool m_pongReceived { true };
+    void incrementMsgCount()                { m_msgCount++; }
+    void setLastPingTime(time_t t) { m_lastPingTime = t; }
+    time_t lastPingTime() const { return m_lastPingTime; }
 
 private:
     std::vector<uint8_t> m_readBuffer;    
@@ -69,6 +69,7 @@ private:
     time_t m_connectTime;
     time_t m_lastActive;
     uint32_t m_msgCount;
+    time_t m_lastPingTime;
     std::atomic<bool> m_running;
 
     std::mutex m_sendMutex;

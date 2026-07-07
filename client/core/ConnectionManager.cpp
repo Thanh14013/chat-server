@@ -184,6 +184,19 @@ void ConnectionManager::run()
 
     std::cout << "Type /help for a list of commands." << std::endl;
 
+    std::thread pingThread([this]() {
+        int ticks = 0;
+        while (m_running) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            ticks++;
+            if (ticks >= 30) {
+                ticks = 0;
+                m_client->sendPacket(Packet(MessageType::MSG_PING, {}));
+            }
+        }
+    });
+    pingThread.detach();
+
     std::string input;
     while (m_running)
     {
@@ -234,8 +247,24 @@ void ConnectionManager::run()
             j["message"] = input;
             std::string s = j.dump();
             std::vector<uint8_t> payload(s.begin(), s.end());
-            // Removed escape sequence to prevent Windows terminal issues
-            m_client->sendPacket(Packet(MessageType::MSG_CHAT_SEND, payload));
+            
+            auto pkt = Packet(MessageType::MSG_CHAT_SEND, payload);
+            if (!m_client->sendPacket(pkt)) {
+                std::thread([this, pkt]() {
+                    int delays[] = {2, 4, 8};
+                    bool success = false;
+                    for (int i = 0; i < 3; ++i) {
+                        std::this_thread::sleep_for(std::chrono::seconds(delays[i]));
+                        if (this->m_client->sendPacket(pkt)) {
+                            success = true;
+                            break;
+                        }
+                    }
+                    if (!success) {
+                        std::cout << "\n[SYSTEM] Đã xảy ra lỗi, vui lòng kiểm tra lại đường truyền.\n";
+                    }
+                }).detach();
+            }
         }
 #ifdef _WIN32
         input.clear();
@@ -369,8 +398,9 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         break;
     }
     case MessageType::MSG_PING:
+    case MessageType::MSG_PONG:
     {
-        m_client->sendPacket(Packet(MessageType::MSG_PONG, std::vector<uint8_t>()));
+        // Handled or ignored
         break;
     }
     case MessageType::MSG_USER_LIST_RESPONSE:

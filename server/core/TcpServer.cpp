@@ -304,7 +304,6 @@ void TcpServer::handlePacket(int fd, const Packet& raw_pkt){
         case MessageType::MSG_CHAT_PRIVATE:      handleChatPrivate(fd, pkt);    break;
         case MessageType::MSG_DISCONNECT:        handleDisconnect(fd, pkt);     break;
         case MessageType::MSG_PING:              handlePing(fd);                break;
-        case MessageType::MSG_PONG:              handlePong(fd);                break;
         case MessageType::MSG_USER_LIST_REQUEST: handleUserListRequest(fd);     break;
         case MessageType::MSG_ROOM_LIST_REQUEST: handleRoomListRequest(fd);     break;
         case MessageType::MSG_ROOM_JOIN:         handleRoomJoin(fd, pkt);       break;
@@ -654,12 +653,10 @@ void TcpServer::handleDisconnect(int fd, const Packet&) {
 
 void TcpServer::handlePing(int fd) {
     auto sess = getSession(fd);
-    if (sess) sess->sendPacket(Builder::makePong());
-}
-
-void TcpServer::handlePong(int fd) {
-    auto sess = getSession(fd);
-    if (sess) sess->m_pongReceived = true;
+    if (sess) {
+        sess->setLastPingTime(std::time(nullptr));
+        sess->sendPacket(Builder::makePong());
+    }
 }
 
 void TcpServer::handleUserListRequest(int fd) {
