@@ -32,6 +32,15 @@ public:
         }
         return "";
     }
+    std::string getTransferIdBySender(const std::string& sender) const {
+        std::lock_guard<std::mutex> lock(m_fileMutex);
+        for (const auto& pair : m_activeDownloads) {
+            if (pair.second.sender == sender) {
+                return pair.first; // return TID
+            }
+        }
+        return "";
+    }
 
 private:
     void onPacketReceived(const Packet &pkt);
@@ -68,6 +77,7 @@ private:
     struct DownloadState
     {
         std::string filename;
+        std::string sender;
         uint64_t expectedSize = 0;
         uint64_t receivedSize = 0;
         std::string expectedHash;

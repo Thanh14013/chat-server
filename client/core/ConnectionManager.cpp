@@ -490,6 +490,7 @@ void ConnectionManager::handleFileRequest(const nlohmann::json &j)
     std::lock_guard<std::mutex> lock(m_fileMutex);
     DownloadState state;
     state.filename = j.value("filename", "");
+    state.sender = j.value("from", "");
     state.expectedSize = j.value("size", 0);
     state.receivedSize = 0;
     state.expectedHash = j.value("sha256", "");

@@ -219,7 +219,12 @@ void CommandHandler::handleAccept(const Command& cmd) {
             return;
         }
     } else {
-        tid = cmd.args[0];
+        std::string sender = cmd.args[0];
+        tid = g_mgr ? g_mgr->getTransferIdBySender(sender) : "";
+        if (tid.empty()) {
+            std::cout << "[SYSTEM] No pending transfer from user: " << sender << std::endl;
+            return;
+        }
     }
     json j;
     j["transfer_id"] = tid;
@@ -243,7 +248,12 @@ void CommandHandler::handleReject(const Command& cmd) {
             return;
         }
     } else {
-        tid = cmd.args[0];
+        std::string sender = cmd.args[0];
+        tid = g_mgr ? g_mgr->getTransferIdBySender(sender) : "";
+        if (tid.empty()) {
+            std::cout << "[SYSTEM] No pending transfer from user: " << sender << std::endl;
+            return;
+        }
     }
     json j;
     j["transfer_id"] = tid;
