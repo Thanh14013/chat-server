@@ -29,7 +29,6 @@ CommandType CommandParser::stringToCommandType(const std::string& cmdStr) const 
     if (cmdStr == "/promote") return CommandType::CMD_PROMOTE;
     if (cmdStr == "/demote") return CommandType::CMD_DEMOTE;
     if (cmdStr == "/broadcast") return CommandType::CMD_BROADCAST;
-    if (cmdStr == "/shutdown") return CommandType::CMD_SHUTDOWN;
     if (cmdStr == "/delete") return CommandType::CMD_DELETE_ROOM;
     if (cmdStr == "/rooms_admin") return CommandType::CMD_ROOMS_ADMIN;
     
@@ -80,31 +79,8 @@ CommandValidationResult CommandParser::validate(const Command& cmd) const {
         cmd.type == CommandType::CMD_PROMOTE ||
         cmd.type == CommandType::CMD_DEMOTE ||
         cmd.type == CommandType::CMD_BROADCAST ||
-        cmd.type == CommandType::CMD_SHUTDOWN ||
-        cmd.type == CommandType::CMD_DELETE_ROOM ||
         cmd.type == CommandType::CMD_ROOMS_ADMIN) {
         return CommandValidationResult::REQUIRES_ADMIN;
     }
-    // Check required arguments
-    switch (cmd.type) {
-        case CommandType::CMD_UNKICK:
-            if (cmd.args.size() < 2) return CommandValidationResult::INVALID;
-            break;
-        case CommandType::CMD_JOIN:
-        case CommandType::CMD_CREATE:
-        case CommandType::CMD_WHOIS:
-        case CommandType::CMD_ACCEPT:
-        case CommandType::CMD_REJECT:
-        case CommandType::CMD_DELETE_ROOM:
-            if (cmd.args.size() < 1) return CommandValidationResult::INVALID;
-            break;
-        case CommandType::CMD_MSG:
-        case CommandType::CMD_SEND:
-            if (cmd.args.size() < 2) return CommandValidationResult::INVALID;
-            break;
-        default:
-            break;
-    }
-
     return CommandValidationResult::VALID;
 }

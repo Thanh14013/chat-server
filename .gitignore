@@ -2,5 +2,8 @@
 windows_deps
 *.sh
 *baocao
-*logs
-*tests
+logs
+tests
+scripts
+baocao
+docs

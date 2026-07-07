@@ -181,7 +181,7 @@ void ConnectionManager::run()
 
                 if (res == CommandValidationResult::INVALID)
                 {
-                    std::cout << "[SYSTEM] Invalid command syntax." << std::endl;
+                    std::cout << "[SYSTEM] Unknown command. Type /help for a list of commands." << std::endl;
                     continue;
                 }
 
@@ -205,7 +205,7 @@ void ConnectionManager::run()
                 j["message"] = input;
                 std::string s = j.dump();
                 std::vector<uint8_t> payload(s.begin(), s.end());
-                std::cout << "\x1b[1A\x1b[2K\r" << std::flush; // Erase the line the user just typed to avoid double printing
+                // Removed escape sequence to prevent Windows terminal issues
                 m_client->sendPacket(Packet(MessageType::MSG_CHAT_SEND, payload));
             }
         }
@@ -268,7 +268,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
                         std::string r = item.value("room", "");
                         if (!r.empty() && r[0] == '#') r = r.substr(1);
                         
-                        std::cout << "\r[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
+                        std::cout << "[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
                                   << r << "] ";
                         if (sender == m_nickname) {
                             std::cout << item.value("message", "") << std::endl;
@@ -282,7 +282,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
                     std::string r = j.value("room", "");
                     if (!r.empty() && r[0] == '#') r = r.substr(1);
 
-                    std::cout << "\r[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
+                    std::cout << "[" << std::put_time(std::localtime(&ts), "%H:%M:%S") << "] ["
                               << r << "] ";
                     if (sender == m_nickname) {
                         std::cout << j.value("message", "") << std::endl;
@@ -310,8 +310,7 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[PRIVATE] " << j.value("from", "") << " -> "
-                      << j.value("to", "") << ": "
+            std::cout << "[PRIVATE] " << j.value("from", "") << ": "
                       << j.value("message", "") << std::endl;
         }
         break;
@@ -338,7 +337,20 @@ void ConnectionManager::onPacketReceived(const Packet &pkt)
         auto j = json::parse(payload, nullptr, false);
         if (!j.is_discarded())
         {
-            std::cout << "[INFO] " << j.dump(2) << std::endl;
+            if (j.is_array()) {
+                std::string list_str;
+                for (size_t i = 0; i < j.size(); ++i) {
+                    if (j[i].is_string()) {
+                        list_str += j[i].get<std::string>();
+                    } else {
+                        list_str += j[i].dump();
+                    }
+                    if (i < j.size() - 1) list_str += ", ";
+                }
+                std::cout << "[INFO] " << list_str << std::endl;
+            } else {
+                std::cout << "[INFO] " << j.dump(2) << std::endl;
+            }
         }
         break;
     }

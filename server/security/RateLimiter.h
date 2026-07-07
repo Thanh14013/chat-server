@@ -21,8 +21,8 @@ struct TokenBucket {
     int      violations;
     std::mutex mtx;
 
-    TokenBucket(double max, double rate)
-        : tokens(max), max_tokens(max), refill_rate(rate),
+    TokenBucket(double _max, double _rate)
+        : tokens(std::max(1.0, _max)), max_tokens(std::max(1.0, _max)), refill_rate(_rate),
           last_refill(std::chrono::steady_clock::now()), violations(0) {}
 
     bool consume(double cost = 1.0);

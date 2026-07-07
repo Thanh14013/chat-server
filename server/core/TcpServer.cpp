@@ -615,7 +615,6 @@ void TcpServer::handleChatPrivate(int fd, const Packet& pkt){
             std::vector<uint8_t> payload(s.begin(), s.end());
             Packet p(MessageType::MSG_CHAT_PRIVATE, payload);
             it->second->sendPacket(p);
-            sender->sendPacket(p);
             return;
         }
     }
@@ -822,6 +821,7 @@ void TcpServer::kickFromRoom(int targetFd, const std::string& adminNick, const s
 }
 
 void TcpServer::unkickFromRoom(const std::string& targetNick, const std::string& adminNick, const std::string& room) {
+    (void)adminNick;
     std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
     if (m_rooms.count(room)) {
         if (m_rooms[room].banned_nicks.erase(targetNick) > 0) {

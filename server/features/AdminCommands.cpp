@@ -133,10 +133,14 @@ void AdminCommands::unmute(int adminFd, const std::string &targetNick)
 
     int targetFd = m_server->getFdByNickname(targetNick);
     auto s = m_server->getSession(targetFd);
+    if (!s)
+        return;
+    
     s->setMuted(false, 0);
     s->sendPacket(Builder::makeSystemNotify("You have been unmuted."));
     AUDIT(AuditEventType::ADMIN, adminNick(adminFd), targetNick,
           "UNMUTE", AuditResult::SUCCESS);
+    LOG_INFO("UNMUTE: admin=" + adminNick(adminFd) + " target=" + targetNick);
     return;
 }
 

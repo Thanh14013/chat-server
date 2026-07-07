@@ -4,7 +4,7 @@ project(VCSSecureChat VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2")
-if(WIN32 OR CMAKE_CROSSCOMPILING)
+if((WIN32 OR CMAKE_CROSSCOMPILING) AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
 endif()
 
@@ -63,7 +63,7 @@ target_link_libraries(vcs_client
     Threads::Threads
 )
 if(WIN32 OR CMAKE_CROSSCOMPILING)
-    target_link_libraries(vcs_client wsock32 ws2_32 crypt32)
+    target_link_libraries(vcs_client wsock32 ws2_32 crypt32 bcrypt advapi32 user32)
 endif()
 
 enable_testing()

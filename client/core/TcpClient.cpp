@@ -2,6 +2,9 @@
 #include "../security/CertVerifier.h"
 #include "../../common/MessageTypes.h"
 #ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0600
 #endif
