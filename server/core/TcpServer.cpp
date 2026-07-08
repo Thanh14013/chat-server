@@ -690,16 +690,10 @@ void TcpServer::handleRoomListRequest(int fd) {
     auto sess = getSession(fd);
     if (!sess || !sess->isAuthenticated()) return;
 
-    auto allRooms = m_authManager->loadAllRoomsFromDb();
-    std::set<std::string> publicRooms;
-    for (const auto& r : allRooms) {
-        if (!r.has_password) publicRooms.insert(r.name);
-    }
-
     json j = json::array();
     std::shared_lock<std::shared_mutex> lock(m_roomsMutex);
     for (const auto& [name, roomData] : m_rooms) {
-        if (publicRooms.find(name) != publicRooms.end()) {
+        if (!roomData.has_password) {
             json item;
             item["room"] = name;
             item["users"] = roomData.members.size();
@@ -828,6 +822,7 @@ void TcpServer::handleAdminRoomInfo(int fd) {
             item["room"] = rname;
             item["creator"] = rinfo.creator_nick;
             item["count"] = rinfo.members.size();
+            item["has_password"] = rinfo.has_password;
             j.push_back(item);
         }
     }
@@ -915,9 +910,13 @@ void TcpServer::handleRoomLeave(int fd){
     }
 
     sess->setRoom(defRoom);
+    if (m_authManager) {
+        m_authManager->updateLastRoom(sess->nickname(), defRoom);
+    }
     broadcastToRoom(oldRoom, Builder::makeSystemNotify(sess->nickname() + " left #" + oldRoom), fd);
     broadcastToRoom(defRoom, Builder::makeSystemNotify(sess->nickname() + " joined #" + defRoom), fd);
     sess->sendPacket(Builder::makeSystemNotify("You are now in #" + defRoom));
+    RoomManager::instance().sendHistoryToClient(fd, defRoom, 50);
 }
 
 void TcpServer::onClientDisconnected(int fd) {

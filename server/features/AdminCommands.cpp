@@ -223,6 +223,11 @@ void AdminCommands::unban(int adminFd, const std::string &ipOrNick)
     AUDIT(AuditEventType::ADMIN, adminNick(adminFd), ipOrNick,
           "UNBAN", AuditResult::SUCCESS);
     LOG_INFO("UNBAN: " + ipOrNick);
+
+    auto admin = m_server->getSession(adminFd);
+    if (admin) {
+        admin->sendPacket(Builder::makeSystemNotify("Successfully unbanned user/IP: " + ipOrNick));
+    }
 }
 
 void AdminCommands::promote(int adminFd, const std::string &targetNick)
