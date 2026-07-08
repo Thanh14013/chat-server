@@ -293,8 +293,8 @@ void CommandHandler::handleHelp(const Command &cmd)
               << " /rooms                        : List all active public rooms\n"
               << " /msg <username> <message>     : Send a private message\n"
               << " /send <username> <filepath>   : Send a file securely\n"
-              << " /accept <filename>            : Accept an incoming file transfer\n"
-              << " /reject <filename>            : Reject an incoming file transfer\n"
+              << " /accept [username]            : Accept an incoming file transfer\n"
+              << " /reject [username]            : Reject an incoming file transfer\n"
               << " /whois <username>             : Request public profile info\n"
               << " /help                         : Display this help menu\n"
               << " /quit                         : Disconnect and exit\n";
