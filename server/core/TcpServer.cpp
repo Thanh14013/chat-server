@@ -769,19 +769,19 @@ void TcpServer::handleRoomDelete(int fd, const Packet& pkt) {
     const auto& cfg = Config::instance().get();
 
     if (roomName == cfg.default_room) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Cannot delete the default room (general)"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Lỗi: Không thể xóa phòng mặc định của hệ thống."));
         return;
     }
 
     std::string creator = m_authManager->getRoomCreatorDb(roomName);
     if (creator.empty()) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Room does not exist"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_ROOM_NOT_FOUND, "Lỗi: Phòng #" + roomName + " không tồn tại."));
         return;
     }
 
     bool isAdmin = (sess->role() == UserRole::ADMIN || sess->role() == UserRole::OWNER);
     if (creator != sess->nickname() && !isAdmin) {
-        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Only the room creator or an ADMIN can delete this room"));
+        sess->sendPacket(Builder::makeError(ErrorCode::ERR_PERMISSION_DENIED, "Lỗi: Bạn không có quyền xóa phòng này. Chỉ người tạo phòng (" + creator + ") hoặc Admin mới được phép xóa."));
         return;
     }
 
@@ -845,17 +845,17 @@ void TcpServer::handleRoomCreate(int fd, const Packet& pkt){
     {
         std::unique_lock<std::shared_mutex> lock(m_roomsMutex);
         if (m_rooms.count(roomName)) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Room name already exists"));
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Lỗi: Tên phòng #" + roomName + " đã tồn tại, vui lòng chọn tên khác."));
             return;
         }
         if ((int)m_rooms.size() >= Constants::MAX_ROOMS) {
-            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "System has reached maximum number of rooms"));
+            sess->sendPacket(Builder::makeError(ErrorCode::ERR_INTERNAL, "Lỗi: Hệ thống đã đạt giới hạn số lượng phòng tối đa."));
             return;
         }
         
         ErrorCode err = m_authManager->createRoomDb(roomName, parsed.password, sess->nickname());
         if (err != ErrorCode::ERR_OK) {
-            sess->sendPacket(Builder::makeError(err, "Cannot create room right now, please try again later"));
+            sess->sendPacket(Builder::makeError(err, "Lỗi: Không thể tạo phòng lúc này do lỗi hệ thống, vui lòng thử lại sau."));
             return;
         }
         

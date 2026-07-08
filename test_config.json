@@ -1,1 +1,0 @@
-{"server": {"port": 9500, "max_clients": 100, "session_timeout_seconds": 3600}, "security": {"enable_encryption": false}, "rooms": {"default_room": "general"}, "db_path": "vcs_chat.db"}
